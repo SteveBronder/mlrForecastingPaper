@@ -1,0 +1,68 @@
+\begin{thebibliography}{7}
+\newcommand{\enquote}[1]{``#1''}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Bischl \emph{et~al.}(2015)Bischl, Lang, Richter, Bossek, Judt, Kuehn,
+  Studerus, and Kotthoff}]{mlr}
+Bischl B, Lang M, Richter J, Bossek J, Judt L, Kuehn T, Studerus E, Kotthoff L
+  (2015).
+\newblock \emph{mlr: Machine Learning in R}.
+\newblock R package version 2.7,
+  \urlprefix\url{https://CRAN.R-project.org/package=mlr}.
+
+\bibitem[{from Jed~Wing \emph{et~al.}(2015)from Jed~Wing, Weston, Williams,
+  Keefer, Engelhardt, Cooper, Mayer, Kenkel, the R~Core~Team, Benesty,
+  Lescarbeau, Ziem, Scrucca, Tang, and Candan.}]{caret}
+from Jed~Wing MKC, Weston S, Williams A, Keefer C, Engelhardt A, Cooper T,
+  Mayer Z, Kenkel B, the R~Core~Team, Benesty M, Lescarbeau R, Ziem A, Scrucca
+  L, Tang Y, Candan C (2015).
+\newblock \emph{caret: Classification and Regression Training}.
+\newblock R package version 6.0-62,
+  \urlprefix\url{https://CRAN.R-project.org/package=caret}.
+
+\bibitem[{Ghalanos(2015)}]{rugarch}
+Ghalanos A (2015).
+\newblock \emph{rugarch: Univariate GARCH models.}
+\newblock R package version 1.3-6.
+
+\bibitem[{Gooijer and Hyndman(2006)}]{Hyndman25}
+Gooijer JGD, Hyndman RJ (2006).
+\newblock \enquote{25 years of time series forecasting.}
+\newblock \emph{International Journal of Forecasting}, \textbf{22}(3), 443 --
+  473.
+\newblock ISSN 0169-2070.
+\newblock \doi{http://dx.doi.org/10.1016/j.ijforecast.2006.01.001}.
+\newblock Twenty five years of forecasting,
+  \urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0169207006000021}.
+
+\bibitem[{Hyndman and Khandakar(2008)}]{HyndForecast}
+Hyndman RJ, Khandakar Y (2008).
+\newblock \enquote{Automatic time series forecasting: the forecast package for
+  {R}.}
+\newblock \emph{Journal of Statistical Software}, \textbf{26}(3), 1--22.
+\newblock \urlprefix\url{http://www.jstatsoft.org/article/view/v027i03}.
+
+\bibitem[{Makridakis and Hibon(2000)}]{Makridakis2000451}
+Makridakis S, Hibon M (2000).
+\newblock \enquote{The M3-Competition: results, conclusions and implications.}
+\newblock \emph{International Journal of Forecasting}, \textbf{16}(4), 451 --
+  476.
+\newblock ISSN 0169-2070.
+\newblock \doi{http://dx.doi.org/10.1016/S0169-2070(00)00057-1}.
+\newblock The M3- Competition,
+  \urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0169207000000571}.
+
+\bibitem[{{R Core Team}(2015)}]{Rbase}
+{R Core Team} (2015).
+\newblock \emph{R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria.
+\newblock \urlprefix\url{https://www.R-project.org/}.
+
+\end{thebibliography}

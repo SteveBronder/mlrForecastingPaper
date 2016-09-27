@@ -1,0 +1,160 @@
+\documentclass[article]{jss}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% almost as usual
+\author{Steve Bronder\\ Columbia University}
+\title{Time Series Methods in the R package \pkg{MLR}}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Steve Bronder} %% comma-separated
+\Plaintitle{Time Series Methods in the R package \pkg{mlr}} %% without formatting
+\Shorttitle{\pkg{mlr}: Time Series Methods} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{
+  The MLR package is a unified interface for machine learning tasks such as classification, regression, cluster analysis, and survival analysis. \pkg{mlr} handles the data pipeline of pre-processing, resampling, model selection, model tuning, and prediction. This paper details new methods for developing time series  models in the \pkg{mlr}.  Standard and novel tools such as auto-regressive and LambertW transform data generating processes, fixed and growing window cross validation, and forecasting models in the context of univariate and multivariate time series. Examples from forecasting competitions will be given in order to demonstrate the benefits of a unified framework for machine learning and time series.
+}
+\Keywords{time series, model building, tuning parameters, \proglang{R}}
+\Plainkeywords{time series, model building, tuning parameters, R} %% without formatting
+%% at least one keyword must be supplied
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{50}
+%% \Issue{}
+%% \Month{June}
+%% \Year{2016}
+%% \Submitdate{2012-06-04}
+%% \Acceptdate{2012-06-04}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+  Steve Bronder\\
+  Quantitative Methods in the Social Sciences\\
+  Columbia University in the City of New York\\
+International Affairs Building, MC3355\\
+420 W 118th St, Suite 807 \\
+New York, NY 10027\\
+  E-mail: \email{sab2287@columbia.edu}\\
+  URL: \url{insert.url}
+}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/512/507-7103
+%% Fax: +43/512/507-2851
+
+%% for those who use Sweave please include the following line (with % symbols):
+%\usepackage{Sweave}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+%% include your article here, just as usual
+%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+
+\section{Introduction}
+
+There has been a rapid developement in time series methods over the last 25 years ~\cite{Hyndman25}. Time series models have not only become more common, but more complex. The \proglang{R} language ~\cite{Rbase} has a large task view with many packages available for forecasting and time series methods. However, without a standard framework, many packages have their own sub-culture of style, syntax, and output. The \pkg{mlr} ~\cite{mlr} package, short for Machine Learning in R, works to give a strong syntatic framework for the modeling pipeline. By automating many of the standard tools in machine learning such as preprocessing and cross validation, \pkg{mlr} reduces error in the modeling process that is derived from the user. 
+
+While there are some time series methods available in the \pkg{caret} ~\cite{caret}, development of full on forecasting models in \pkg{caret} is difficult due to computational constraints and design choices. The highly modular structure of \pkg{mlr} makes it the best choice for implementing time series methods and models. This paper will show how using \pkg{mlr}'s strong syntatic structure allows for time series packages such as \pkg{forecast} ~\cite{HyndForecast} and \pkg{rugarch} ~\cite{rugarch} to use machine learning methedologies such as automated parameter tuning, data preprocessing, model blending, cross validation, performance evaluation, and parallel processing techniques for decreasing model build time.
+
+\section{Forecasting Example with the M4 Competition}
+
+The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency and areas such as finance, macroeconomics, microeconomics, and industry. For our purposes we will look at two particular daily financial series, one with 9136 observations and another with 6742 observations.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(M4comp)}
+\hlkwd{library}\hlstd{(xts)}
+\hlkwd{library}\hlstd{(lubridate)}
+\hlstd{m4Fin1} \hlkwb{<-} \hlstd{M4[[}\hlnum{28}\hlstd{]]}
+\hlstd{m4Train1} \hlkwb{<-} \hlkwd{xts}\hlstd{(m4Fin1}\hlopt{$}\hlstd{past,} \hlkwd{as.POSIXct}\hlstd{(}\hlstr{"1971-04-10"}\hlstd{)} \hlopt{+} \hlkwd{days}\hlstd{(}\hlnum{0}\hlopt{:}\hlkwd{I}\hlstd{(}\hlkwd{length}\hlstd{(m4Fin1}\hlopt{$}\hlstd{past)}\hlopt{-}\hlnum{1}\hlstd{)))}
+\hlstd{m4Test1} \hlkwb{<-} \hlkwd{xts}\hlstd{(m4Fin1}\hlopt{$}\hlstd{future,} \hlkwd{as.POSIXct}\hlstd{(}\hlstr{"1996-01-15"}\hlstd{)} \hlopt{+} \hlkwd{days}\hlstd{(}\hlnum{0}\hlopt{:}\hlkwd{I}\hlstd{(}\hlkwd{length}\hlstd{(m4Fin1}\hlopt{$}\hlstd{future)}\hlopt{-}\hlnum{1}\hlstd{)))}
+
+\hlstd{m4Fin2} \hlkwb{<-} \hlstd{M4[[}\hlnum{29}\hlstd{]]}
+\hlstd{m4Train2} \hlkwb{<-} \hlkwd{xts}\hlstd{(m4Fin2}\hlopt{$}\hlstd{past,} \hlkwd{as.POSIXct}\hlstd{(}\hlstr{"1981-01-07"}\hlstd{)} \hlopt{+} \hlkwd{days}\hlstd{(}\hlnum{0}\hlopt{:}\hlkwd{I}\hlstd{(}\hlkwd{length}\hlstd{(m4Fin2}\hlopt{$}\hlstd{past)}\hlopt{-}\hlnum{1}\hlstd{)))}
+\hlstd{m4Test2} \hlkwb{<-} \hlkwd{xts}\hlstd{(m4Fin2}\hlopt{$}\hlstd{future,} \hlkwd{as.POSIXct}\hlstd{(}\hlstr{"1999-06-23"}\hlstd{)} \hlopt{+} \hlkwd{days}\hlstd{(}\hlnum{0}\hlopt{:}\hlkwd{I}\hlstd{(}\hlkwd{length}\hlstd{(m4Fin2}\hlopt{$}\hlstd{future)}\hlopt{-}\hlnum{1}\hlstd{)))}
+\hlkwd{plot}\hlstd{(m4Train1,} \hlkwc{main} \hlstd{=} \hlstr{"Daily Financial Data One"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+
+{\centering \includegraphics[width=\maxwidth]{figure/get_dat-1} 
+
+}
+
+
+\begin{kframe}\begin{alltt}
+\hlkwd{plot}\hlstd{(m4Train2,} \hlkwc{main} \hlstd{=} \hlstr{"Daily Financial Data Two"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+
+{\centering \includegraphics[width=\maxwidth]{figure/get_dat-2} 
+
+}
+
+
+
+\end{knitrout}
+
+%% Note: If there is markup in \(sub)section, then it has to be escape as above.
+\clearpage
+\bibliographystyle{plainnat}
+\bibliography{thesisbib}
+
+\end{document}
