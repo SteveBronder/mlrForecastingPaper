@@ -1,4 +1,4 @@
-\begin{thebibliography}{7}
+\begin{thebibliography}{8}
 \newcommand{\enquote}[1]{``#1''}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
@@ -8,6 +8,12 @@
   \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
   \urlstyle{rm}\Url}\fi
 \providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{BenTaieb(2016)}]{m4comp}
+BenTaieb S (2016).
+\newblock \emph{M4comp: Data from the M4 Time Series Forecasting Competition}.
+\newblock R package version 0.0.1,
+  \urlprefix\url{https://CRAN.R-project.org/package=M4comp}.
 
 \bibitem[{Bischl \emph{et~al.}(2015)Bischl, Lang, Richter, Bossek, Judt, Kuehn,
   Studerus, and Kotthoff}]{mlr}
