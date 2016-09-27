@@ -1,4 +1,4 @@
-\begin{thebibliography}{8}
+\begin{thebibliography}{14}
 \newcommand{\enquote}[1]{``#1''}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
@@ -8,6 +8,14 @@
   \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
   \urlstyle{rm}\Url}\fi
 \providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Allan H.~Murphy(1984)}]{MurphymeteoForecast}
+Allan H~Murphy RLW (1984).
+\newblock \enquote{Probability Forecasting in Meterology.}
+\newblock \emph{Journal of the American Statistical Association},
+  \textbf{79}(387), 489--500.
+\newblock ISSN 01621459.
+\newblock \urlprefix\url{http://www.jstor.org/stable/2288395}.
 
 \bibitem[{BenTaieb(2016)}]{m4comp}
 BenTaieb S (2016).
@@ -22,6 +30,14 @@ Bischl B, Lang M, Richter J, Bossek J, Judt L, Kuehn T, Studerus E, Kotthoff L
 \newblock \emph{mlr: Machine Learning in R}.
 \newblock R package version 2.7,
   \urlprefix\url{https://CRAN.R-project.org/package=mlr}.
+
+\bibitem[{Chadefaux(2014)}]{Chadefaux01012014}
+Chadefaux T (2014).
+\newblock \enquote{Early warning signals for war in the news.}
+\newblock \emph{Journal of Peace Research}, \textbf{51}(1), 5--18.
+\newblock \doi{10.1177/0022343313507302}.
+\newblock \eprint{http://jpr.sagepub.com/content/51/1/5.full.pdf+html},
+  \urlprefix\url{http://jpr.sagepub.com/content/51/1/5.abstract}.
 
 \bibitem[{from Jed~Wing \emph{et~al.}(2015)from Jed~Wing, Weston, Williams,
   Keefer, Engelhardt, Cooper, Mayer, Kenkel, the R~Core~Team, Benesty,
@@ -48,6 +64,22 @@ Gooijer JGD, Hyndman RJ (2006).
 \newblock Twenty five years of forecasting,
   \urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0169207006000021}.
 
+\bibitem[{Granger(1992)}]{GRANGER19923}
+Granger CW (1992).
+\newblock \enquote{Forecasting stock market prices: Lessons for forecasters.}
+\newblock \emph{International Journal of Forecasting}, \textbf{8}(1), 3 -- 13.
+\newblock ISSN 0169-2070.
+\newblock \doi{http://dx.doi.org/10.1016/0169-2070(92)90003-R}.
+\newblock
+  \urlprefix\url{http://www.sciencedirect.com/science/article/pii/016920709290003R}.
+
+\bibitem[{Hyndman and Athanasopoulos(2014)}]{hyndman2014forecasting}
+Hyndman R, Athanasopoulos G (2014).
+\newblock \emph{Forecasting: principles and practice:}.
+\newblock OTexts.
+\newblock ISBN 9780987507105.
+\newblock \urlprefix\url{https://books.google.com/books?id=gDuRBAAAQBAJ}.
+
 \bibitem[{Hyndman and Khandakar(2008)}]{HyndForecast}
 Hyndman RJ, Khandakar Y (2008).
 \newblock \enquote{Automatic time series forecasting: the forecast package for
@@ -70,5 +102,18 @@ Makridakis S, Hibon M (2000).
 \newblock \emph{R: A Language and Environment for Statistical Computing}.
 \newblock R Foundation for Statistical Computing, Vienna, Austria.
 \newblock \urlprefix\url{https://www.R-project.org/}.
+
+\bibitem[{Ryan and Ulrich(2016)}]{xts}
+Ryan JA, Ulrich JM (2016).
+\newblock \emph{xts: eXtensible Time Series}.
+\newblock R package version 0.10-0,
+  \urlprefix\url{https://github.com/joshuaulrich/xts}.
+
+\bibitem[{Yegulalp(1974)}]{earthquakeYegu}
+Yegulalp TM (1974).
+\newblock \enquote{Forecasting for Largest Earthquakes.}
+\newblock \emph{Management Science}, \textbf{21}(4), 418--421.
+\newblock ISSN 00251909, 15265501.
+\newblock \urlprefix\url{http://www.jstor.org/stable/2629612}.
 
 \end{thebibliography}

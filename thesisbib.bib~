@@ -225,3 +225,102 @@ keywords = "M-Competition",
 keywords = "Forecasting methods, Forecasting accuracy "
 }
 
+@Manual{m4comp,
+    title = {M4comp: Data from the M4 Time Series Forecasting Competition},
+    author = {Souhaib BenTaieb},
+    year = {2016},
+    note = {R package version 0.0.1},
+    url = {https://CRAN.R-project.org/package=M4comp},
+}
+
+@article{MurphymeteoForecast,
+ ISSN = {01621459},
+ URL = {http://www.jstor.org/stable/2288395},
+ author = {Allan H. Murphy, Robert L. Winkler},
+ journal = {Journal of the American Statistical Association},
+ number = {387},
+ pages = {489-500},
+ publisher = {[American Statistical Association, Taylor & Francis, Ltd.]},
+ title = {Probability Forecasting in Meterology},
+ volume = {79},
+ year = {1984}
+}
+
+@article{Chadefaux01012014,
+author = {Chadefaux, Thomas}, 
+title = {Early warning signals for war in the news},
+volume = {51}, 
+number = {1}, 
+pages = {5-18}, 
+year = {2014}, 
+doi = {10.1177/0022343313507302}, 
+URL = {http://jpr.sagepub.com/content/51/1/5.abstract}, 
+eprint = {http://jpr.sagepub.com/content/51/1/5.full.pdf+html}, 
+journal = {Journal of Peace Research} 
+}
+
+@article{earthquakeYegu,
+ ISSN = {00251909, 15265501},
+ URL = {http://www.jstor.org/stable/2629612},
+ abstract = {The primary concern of this paper is the establishment of a forecasting procedure for largest earthquake magnitudes of the next n years. It is shown that the use of the third-type asymptotic distribution of the largest values as an approximation to the exact distribution provides for an expression for the expected value and the mode of the largest earthquake magnitude in the next n years. An example of the application of this procedure is given and the results are compared with actual observations.},
+ author = {Tuncel M. Yegulalp},
+ journal = {Management Science},
+ number = {4},
+ pages = {418-421},
+ publisher = {INFORMS},
+ title = {Forecasting for Largest Earthquakes},
+ volume = {21},
+ year = {1974}
+}
+
+
+@book{TrippiNueralForecast,
+ editor = {Trippi, Robert R. and Turban, Efraim},
+ title = {Neural Networks in Finance and Investing: Using Artificial Intelligence to Improve Real World Performance},
+ year = {1992},
+ isbn = {1557384525},
+ publisher = {McGraw-Hill, Inc.},
+ address = {New York, NY, USA},
+} 
+
+@Article{Cao2001,
+author="Cao, Lijuan
+and Tay, E.H Francis",
+title="Financial Forecasting Using Support Vector Machines",
+journal="Neural Computing {\&} Applications",
+year="2001",
+volume="10",
+number="2",
+pages="184--192",
+issn="1433-3058",
+doi="10.1007/s005210170010",
+url="http://dx.doi.org/10.1007/s005210170010"
+}
+
+@article{GRANGER19923,
+title = "Forecasting stock market prices: Lessons for forecasters",
+journal = "International Journal of Forecasting",
+volume = "8",
+number = "1",
+pages = "3 - 13",
+year = "1992",
+note = "",
+issn = "0169-2070",
+doi = "http://dx.doi.org/10.1016/0169-2070(92)90003-R",
+url = "http://www.sciencedirect.com/science/article/pii/016920709290003R",
+author = "Clive W.J. Granger",
+keywords = "Forecastability",
+keywords = "Stock returns",
+keywords = "Non-linear models",
+keywords = "Efficient markets"
+}
+
+
+@book{hyndman2014forecasting,
+  title={Forecasting: principles and practice: },
+  author={Hyndman, R.J. and Athanasopoulos, G.},
+  isbn={9780987507105},
+  url={https://books.google.com/books?id=gDuRBAAAQBAJ},
+  year={2014},
+  publisher={OTexts}
+}

@@ -66,27 +66,54 @@ While there are some time series methods available in the \pkg{caret} ~\cite{car
 
 \section{Forecasting Example with the M4 Competition}
 
-Professional forecasters attempt to predict the future of a series based on its past values. While forecasting is commonly associated with economics and finance, the ability to predict the future is very important for a number of fields.
+Professional forecasters attempt to predict the future of a series based on its past values. Forecasting can be used in a wide range of fields. Examples include forecasting stock prices, ~\cite{GRANGER19923}, weather patterns ~\cite{MurphymeteoForecast}, international conficts ~\cite{Chadefaux01012014}, and earthquakes ~\cite{earthquakeYegu}. In order to evaluate \pkg{mlr}'s forecasting framework we need a large set of possible time series to make sure our methods generalize well.\footnote{Very goofy sentence need to fix}
 The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency and areas such as finance, macroeconomics, microeconomics, and industry. For our purposes we will look at two particular daily financial series, one with 9136 observations from April 10th, 1971 to April 13th, 1996 and another with 6742 observations from January 7th, 1981 to June 23rd, 1999. Each series has a forecasting of 328 and 242 periods into the future, respectively.
 
-<<get_dat, cache = TRUE, fig.height= 4, fig.width=4, fig.align='center'>>=
+<<get_dat, cache = TRUE, fig.height= 4, fig.width=4, fig.align='center', echo = FALSE>>=
 library(M4comp)
 library(xts)
 library(lubridate)
 m4Fin1 <- M4[[28]]
 m4Train1 <- xts(m4Fin1$past, as.POSIXct("1971-04-10") + days(0:I(length(m4Fin1$past)-1)))
 m4Test1 <- xts(m4Fin1$future, as.POSIXct("1996-01-15") + days(0:I(length(m4Fin1$future)-1)))
+colnames(m4Train1) <- "target_var"
+colnames(m4Test1) <- "target_var"
 
 m4Fin2 <- M4[[29]]
 m4Train2 <- xts(m4Fin2$past, as.POSIXct("1981-01-07") + days(0:I(length(m4Fin2$past)-1)))
 m4Test2 <- xts(m4Fin2$future, as.POSIXct("1999-06-23") + days(0:I(length(m4Fin2$future)-1)))
+colnames(m4Train2) <- "target_var"
+colnames(m4Test2) <- "target_var"
 plot(m4Train1, main = "Daily Financial Data One")
 plot(m4Train2, main = "Daily Financial Data Two")
 @
 
-These two series were chosen for their large time features and stark contrast. Our data set should be large enough that the tuning method can take multiple windows of the data. Some series in M4 only contain 12 observations, which is not enough data to accurately train a model. These two time series were chosen as they are the two largest ones in the M4 competitions data set. We can see figure one is what most people imagine when they think of a time series. Figure two shows a series which appears to have a sort of step feature. The stark difference between the time process of the two series will allow us to investigate whether the methods in \pkg{mlr}'s forecasting framework can find the appropriate model. The data can be found in the package \pkg{M4comp} ~\cite{m4comp} under sets twenty eight and twenty nine. 
+These two series were chosen for their large time features and stark contrast. Our data set should be large enough that the tuning method can take multiple windows of the data. Some series in M4 only contain 12 observations, which is not enough data to accurately train a model. These two time series were chosen as they are the two largest ones in the M4 competitions data set. We can see figure one is what most people imagine when they think of a time series. Figure two shows a series which appears to have a sort of step feature. The stark difference between the time process of the two series will allow us to investigate whether the methods in \pkg{mlr}'s forecasting framework can find the appropriate model. The data can be found in the package \pkg{M4comp} ~\cite{m4comp} under sets `M4[28]` and `M4[29]. 
 
+\section{Forecasting Tasks}
 
+From a development perspective, it is a good idea to form a rigorous framework to define the data and relevant information about a particular predictive task. For forecasting tasks, this is handled in \pkg{mlr} by the function \code{makeForecastRegrTask()}. The forecasting task inherets from \code{makeRegrTask()}, but has two noticable differences in parameters.
+
+\begin{itemize}
+\item[data:] Instead of a data frame, an xts object from \pkg{xts} ~\cite{xts} containing the time series.
+\item[frequency:] An integer with the number of periods your time series contains. For example, daily data with a weekly periodicity has a frequency of 7 while daily data with a yearly frequency have a frequency of 365.
+\end{itemize}
+
+<<fin_task, eval = FALSE>>=
+Fin.task1 = makeForecastRegrTask(id = "M4 Finance Data One",
+                                 data = m4train1,
+                                 target = "target_var")
+@
+
+\section{Resampling with Time}
+
+Overfitting models is one of the most common problems in prediction. Resampling schemes such as cross-validation, bootstrapping, etc. are common in machine learning. When their is a time component to the data, windowing schemes are necessary so that we correctly resample while still validating the time component of the model\footnote{crap}. Growing and fixed window resampling such as from ~\cite{hyndman2014forecasting} are now available in the \code{resampling()} function of \pkg{mlr}.
+
+\begin{figure}[h]
+\caption{Resampling with a window scheme as exampled by caret}
+  \includegraphics{windowing_pic_caret}
+  \centering
+\end{figure}
 %% Note: If there is markup in \(sub)section, then it has to be escape as above.
 \clearpage
 \bibliographystyle{plainnat}
