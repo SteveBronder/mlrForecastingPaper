@@ -183,12 +183,14 @@ These two series were chosen for their large time features and stark contrast.\f
 The \code{makeLearner()} function provides a structured model building framework to the 7 forecasting models currently implimented in \pkg{mlr}. As an example, we will build a simple AutoRegressive Integrated Moving Average (ARIMA) model. The ARIMA model is of the form
 
 \begin{equation}
-y_t \sim \alpha + \beta_1 y_{t-1} ... \beta_n y_{t-n} + \phi_1 \epsilon_{t-1} + ... + \phi_n \epsilon_{t-n} + \epsilon_t
+y_t \sim \alpha + \beta_1 \Delta_k y_{t-1} ... \beta_n \Delta_k y_{t-n} + \phi_1 \epsilon_{t-1} + ... + \phi_n \epsilon_{t-n} + \epsilon_t
 \end{equation}
 
 \begin{equation}
 y_t \sim \alpha + \sum_{i=1}^n \beta_i y_{t-i} + \sum_{i=1}^n \phi_i \epsilon_{t-i} +\epsilon_t
 \end{equation}
+
+In equation three, $\alpha$ is a constant, $\beta_n$ is the coefficient associated with the lagged observations of $y$ with $\Delta_k$ being the $k$th difference operator. The coefficient for the one step forecast error $\epsilon_{t-n}$ is $\phi_n$.
 
 
 \section{Resampling with Time}

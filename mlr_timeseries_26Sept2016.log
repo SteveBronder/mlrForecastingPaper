@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2016.2.19)  29 SEP 2016 12:19
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2016.2.19)  29 SEP 2016 13:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -477,22 +477,18 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 LaTeX Font Warning: Font shape `T1/aett/bx/n' undefined
 (Font)              using `T1/aett/m/n' instead on input line 153.
 
-<windowing_pic_caret.png, id=119, 1734.48pt x 963.6pt>
-File: windowing_pic_caret.png Graphic file (type png)
-
-<use windowing_pic_caret.png>
-Package pdftex.def Info: windowing_pic_caret.png used on input line 202.
-(pdftex.def)             Requested size: 354.12434pt x 196.73059pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 \T1/aer/m/n/10.95 4 []
  []
 
-[4]
+[4] <windowing_pic_caret.png, id=133, 1734.48pt x 963.6pt>
+File: windowing_pic_caret.png Graphic file (type png)
+
+<use windowing_pic_caret.png>
+Package pdftex.def Info: windowing_pic_caret.png used on input line 204.
+(pdftex.def)             Requested size: 354.12434pt x 196.73059pt.
+
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/aer/m/n/10.95 5
  []
@@ -506,18 +502,18 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 
 ])
 LaTeX Font Info:    Font shape `T1/pzc/m/n' in size <13> not available
-(Font)              Font shape `T1/pzc/mb/it' tried instead on input line 210.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 210.
+(Font)              Font shape `T1/pzc/mb/it' tried instead on input line 212.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 212.
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/aer/m/n/10.95 7
  []
 
 [7]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 210.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 212.
  (./mlr_timeseries_26Sept2016.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 210.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 210.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 212.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 212.
 Package rerunfilecheck Info: File `mlr_timeseries_26Sept2016.out' has not chang
 ed.
 (rerunfilecheck)             Checksum: FDF98656B5F8E109E80197389066A21B;428.
@@ -525,7 +521,7 @@ ed.
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 210.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 212.
  ) 
 Here is how much of TeX's memory you used:
  6991 strings out of 493304
@@ -554,7 +550,7 @@ s/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1
 /public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
 c/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/zapfcha
 n/uzcmi8a.pfb>
-Output written on mlr_timeseries_26Sept2016.pdf (7 pages, 402295 bytes).
+Output written on mlr_timeseries_26Sept2016.pdf (7 pages, 403411 bytes).
 PDF statistics:
  260 PDF objects out of 1000 (max. 8388607)
  222 compressed objects within 3 object streams
