@@ -1,73 +1,121 @@
-\documentclass[article]{jss}
+\documentclass{article}%[final]
+\setcounter{secnumdepth}{3}
+% if you need to pass options to natbib, use, e.g.:
+% \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading nips_2016
+%
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{nips_2016}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{nips_2016}
 
-%% almost as usual
-\author{Steve Bronder\\ Columbia University}
-\title{Time Series Methods in the R package \pkg{MLR}}
+% to compile a camera-ready version, add the [final] option, e.g.:
+%\usepackage[final]{nips_2016}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{float}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{color,soul}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage[margin=1.5in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{longtable}
 
-%% for pretty printing and a nice hypersummary also set:
-\Plainauthor{Steve Bronder} %% comma-separated
-\Plaintitle{Time Series Methods in the R package \pkg{mlr}} %% without formatting
-\Shorttitle{\pkg{mlr}: Time Series Methods} %% a short title (if necessary)
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
 
-%% an abstract and keywords
-\Abstract{
-  The MLR package is a unified interface for machine learning tasks such as classification, regression, cluster analysis, and survival analysis. \pkg{mlr} handles the data pipeline of pre-processing, resampling, model selection, model tuning, ensembling, and prediction. This paper details new methods for developing time series  models in the \pkg{mlr}. It includes Standard and novel tools such as auto-regressive and LambertW transform data generating processes, fixed and growing window cross validation, and forecasting models in the context of univariate and multivariate time series. Examples from forecasting competitions will be given in order to demonstrate the benefits of a unified framework for machine learning and time series.
+% Code defs from jss
+\newcommand\code{\@codex}
+\def\@codex#1{{\normalfont\ttfamily\hyphenchar\font=-1 #1}}
+%%\let\code=\texttt
+\let\proglang=\textsf
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+
+
+%\theoremstyle{definition}
+%\newtheorem{definition}{Definition}[section]
+
+
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+
+\title{Time Series Methods in the R package \pkg{mlr}}
+
+% The \author macro works with any number of authors. There are two
+% commands used to separate the names and addresses of multiple
+% authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to
+% break the lines. Using \AND forces a line break at that point. So,
+% if LaTeX puts 3 of 4 authors names on the first line, and the last
+% on the second line, try using \AND instead of \And before the third
+% author name.
+
+\author{
+  Steve Bronder \\
+  %Quantitative Methods of the Social Sciences\\
+  %Columbia University\\
+  %New York City, NY 10027 \\
+  \texttt{sab2287@columbia.edu} \\
+  %% examples of more authors test etst
+   %Department of Computer Science \\
+   %Columbia University\\
+   %New York City, NY 10027 \\
+  %% \AND
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
 }
-\Keywords{time series, model building, tuning parameters, \proglang{R}}
-\Plainkeywords{time series, model building, tuning parameters, R} %% without formatting
-%% at least one keyword must be supplied
-
-%% publication information
-%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
-%% \Volume{50}
-%% \Issue{}
-%% \Month{June}
-%% \Year{2016}
-%% \Submitdate{2012-06-04}
-%% \Acceptdate{2012-06-04}
-
-%% The address of (at least) one author should be given
-%% in the following format:
-\Address{
-  Steve Bronder\\
-  Quantitative Methods in the Social Sciences\\
-  Columbia University in the City of New York\\
-International Affairs Building, MC3355\\
-420 W 118th St, Suite 807 \\
-New York, NY 10027\\
-  E-mail: \email{sab2287@columbia.edu}\\
-  URL: \url{insert.url}
-}
-%% It is also possible to add a telephone and fax number
-%% before the e-mail in the following format:
-%% Telephone: +43/512/507-7103
-%% Fax: +43/512/507-2851
-
-%% for those who use Sweave please include the following line (with % symbols):
-%\usepackage{Sweave}
-
-%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 \begin{document}
+% \nipsfinalcopy is no longer used
 
-%% include your article here, just as usual
-%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+\maketitle
+
+\begin{abstract}
+The \pkg{mlr} package is a unified interface for machine learning tasks such as classification, regression, cluster analysis, and survival analysis. \pkg{mlr} handles the data pipeline of pre-processing, resampling, model selection, model tuning, ensembling, and prediction. This paper details new methods for developing time series  models in the \pkg{mlr}. It includes Standard and novel tools such as auto-regressive and LambertW transform data generating processes, fixed and growing window cross validation, and forecasting models in the context of univariate and multivariate time series. Examples from forecasting competitions will be given in order to demonstrate the benefits of a unified framework for machine learning and time series.
+  \end{abstract}
 
 \section{Introduction}
-
 There has been a rapid developement in time series methods over the last 25 years ~\cite{Hyndman25}. Time series models have not only become more common, but more complex. The \proglang{R} language ~\cite{Rbase} has a large task view with many packages available for forecasting and time series methods. However, without a standard framework, many packages have their own sub-culture of style, syntax, and output. The \pkg{mlr} ~\cite{mlr} package, short for Machine Learning in R, works to give a strong syntatic framework for the modeling pipeline. By automating many of the standard tools in machine learning such as preprocessing and cross validation, \pkg{mlr} reduces error in the modeling process that is derived from the user. 
 
 While there are some time series methods available in the \pkg{caret} ~\cite{caret}, development of forecasting models in \pkg{caret} is difficult due to computational constraints and design choices. The highly modular structure of \pkg{mlr} makes it the best choice for implementing time series methods and models. This paper will show how using \pkg{mlr}'s strong syntatic structure allows for time series packages such as \pkg{forecast} ~\cite{HyndForecast} and \pkg{rugarch} ~\cite{rugarch} to use machine learning methedologies such as automated parameter tuning, data preprocessing, model blending, cross validation, performance evaluation, and parallel processing techniques for decreasing model build time.
 
 \section{Forecasting Example with the M4 Competition}
+\label{sec:m4data}
 
 Professional forecasters attempt to predict the future of a series based on its past values. Forecasting can be used in a wide range of tasks including forecasting stock prices, ~\cite{GRANGER19923}, weather patterns ~\cite{MurphymeteoForecast}, international conficts ~\cite{Chadefaux01012014}, and earthquakes ~\cite{earthquakeYegu}. In order to evaluate \pkg{mlr}'s forecasting framework we need a large set of possible time series to make sure our methods generalize well.\footnote{Very goofy sentence need to fix}
+
 The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency and areas such as finance, macroeconomics, microeconomics, and industry. For our purposes we will look at two particular daily financial series, one with 9136 observations from April 10th, 1971 to April 13th, 1996 and another with 6742 observations from January 7th, 1981 to June 23rd, 1999. Each series has a forecasting of 328 and 242 periods into the future, respectively.
+
+
 
 <<get_dat, cache = TRUE, fig.height= 4, fig.width=4, fig.align='center', echo = FALSE>>=
 library(M4comp)
@@ -91,8 +139,9 @@ plot(m4Train2, main = "Daily Financial Data Two")
 These two series were chosen for their large time features and stark contrast.\footnote{I think it would be better to just use one series for examples, and actually train / test over all of M4 later} Our data set should be large enough that the tuning method can take multiple windows of the data. Some series in M4 only contain 12 observations, which is not enough data to accurately train a model. These two time series were chosen as they are the two largest ones in the M4 competitions data set. We can see figure one is what most people imagine when they think of a time series. Figure two shows a series which appears to have a sort of step feature. The stark difference between the time process of the two series will allow us to investigate whether the methods in \pkg{mlr}'s forecasting framework can find the appropriate model. The data can be found in the package \pkg{M4comp} ~\cite{m4comp} under sets `M4[28]` and `M4[29]. 
 
 \section{Forecasting Tasks}
+\label{sec:task}
 
-\pkg{mlr} provides uses the S3 object system to clearly define a predictive modeling task. Tasks contain the data and other relevant information such as the task id and which variable you are targeting for supervised learning problems. Forecasting tasks are handled in \pkg{mlr} by the function \code{makeForecastRegrTask()}. The forecasting task inherets from \code{makeRegrTask()}, but has two noticable differences in parameters.
+\pkg{mlr} provides uses the S3 object system to clearly define a predictive modeling task. Tasks contain the data and other relevant information such as the task id and which variable you are targeting for supervised learning problems. Forecasting tasks are handled in \pkg{mlr} by the function \code{makeForecastRegrTask()}. The forecasting task inherets from \code{makeRegrTask}, but has two noticable differences in parameters.
 
 \begin{itemize}
 \item[data:] Instead of a data frame, an xts object from \pkg{xts} ~\cite{xts} containing the time series.
@@ -103,7 +152,8 @@ These two series were chosen for their large time features and stark contrast.\f
 library(mlr)
 Fin.task1 = makeForecastRegrTask(id = "M4 Finance Data One",
                                  data = m4Train1,
-                                 target = "target_var")
+                                 target = "target_var",
+                                 frequency = 7L)
 Fin.task1
 @
 
@@ -112,30 +162,110 @@ Fin.task1
 The \code{makeLearner()} function provides a structured model building framework to the 7 forecasting models currently implimented in \pkg{mlr}. As an example, we will build a simple AutoRegressive Integrated Moving Average (ARIMA) model. The ARIMA model is of the form
 
 \begin{equation}
-y_t \sim \alpha + \beta_1 \Delta_k y_{t-1} ... \beta_n \Delta_k y_{t-n} + \phi_1 \epsilon_{t-1} + ... + \phi_n \epsilon_{t-n} + \epsilon_t
+y_t \sim \alpha + \beta_1 \Delta_d y_{t-1} ... \beta_p \Delta_d y_{t-p} + \phi_1 \epsilon_{t-1} + ... + \phi_q \epsilon_{t-q} + \epsilon_t
 \end{equation}
 
 \begin{equation}
-y_t \sim \alpha + \sum_{i=1}^n \beta_i y_{t-i} + \sum_{i=1}^n \phi_i \epsilon_{t-i} +\epsilon_t
+y_t \sim \alpha + \sum_{i=1}^p \beta_i \Delta_d y_{t-i} + \sum_{i=1}^q \phi_i \epsilon_{t-i} +\epsilon_t
 \end{equation}
 
-In equation three, $\alpha$ is a constant, $\beta_n$ is the coefficient associated with the lagged observations of $y$ with $\Delta_k$ being the $k$th difference operator. The coefficient for the one step forecast error $\epsilon_{t-n}$ is $\phi_n$.
+In equation three, $\alpha$ is a constant, $\beta_n$ is the coefficient associated with the lagged observations of $y$ with $\Delta_k$ being the $k$th difference operator. The coefficient for the one step forecast error $\epsilon_{t-n}$ is $\phi_n$. ARIMA is one of the most well known forecasting models and is avaible in mlr along with models such as BATS, TBATS, THIEF, ETS, several GARCH variants, and autoregressive neural networks.
 
+To impliment this model we use \code{makeLearner()}, supplying the class of learner, order, the number of steps to forecast, and any additional arguments to be passed to \code{Arima} for \pkg{forecast}. 
+
+<<makeArima>>=
+arm = makeLearner("fcregr.Arima", order = c(2L,0L,1L), h = 328L, include.mean = FALSE)
+arm
+@
+
+To train the model we simply call train, supplying the model and task.
+
+<<makeArimaTrain>>=
+trainArima = train(arm, Fin.task1 )
+trainArima
+@
+
+While ARIMA is one of the most well known time series models, the order selection process can be subjective and difficult to users. One of the first proposals for automatic order selection comes from ~\cite{hannanOrder} where innovations are obtained vai fitting high order autoregressive model to the data and then computing the likelihood of potential models through a series of standard regresssions. Proprietary algorithms from software such as \proglang{Forecast Pro} ~\cite{forecastpro} and \proglang{Autobox} ~\cite{reillyautobox} are well known and have performed to high standards in competitions such as the M3 forecasting competition ~\cite{Makridakis2000451}. One of the most well known R packages for automated forecast is \pkg{forecast} ~\cite{HyndForecast} which contains several methods for automated forecasting including exponential smoothing based methods and step-wise algorithms for forecasting with ARIMA models.
+
+Forecasting in \pkg{mlr} takes a machine learning approach, creating a parameter set for a given model and using an optimization method to search over the parameter space. To do this, we will have use a resampling scheme to train over the possible models.
 
 \section{Resampling with Time}
 
-Overfitting models is one of the most common problems in prediction. Resampling schemes such as cross-validation, bootstrapping, etc. are common in machine learning. When their is a time component to the data, windowing schemes are necessary so that we correctly resample while still validating the time component of the model\footnote{crap}. Growing and fixed window resampling such as from ~\cite{hyndman2014forecasting} are now available in the \code{resampling()} function of \pkg{mlr}.
+Resampling schemes such as cross-validation, bootstrapping, etc. are common in machine learning for dealing with the bias-variance tradeoff ~\cite{Friedman1997} ~\cite{rodriguezkfold}. When their is a time component to the data, windowing schemes are useful in allowing a valid resampling scheme while still maintaining the time properties of the series.\footnote{crap}. Figure one gives an example of what fixed and growing window resamples look like. Given a horizon and initial starting point the window slides forward the one step each time while either shifting in the fixed case or enlarging by one in the growing case. Growing and fixed window resampling such as from ~\cite{hyndman2014forecasting} are now available in the \code{resampling()} function of \pkg{mlr}. 
 
-
-
-\begin{figure}[h]
-\caption{Resampling with a window scheme as exampled by caret}
-  \includegraphics{windowing_pic_caret}
+\begin{figure}[ht]
+\caption{Resampling with a window scheme as exampled by caret ~\cite{windowingcaret} }
+  \includegraphics[scale = .2]{windowing_pic_caret}
   \centering
 \end{figure}
 %% Note: If there is markup in \(sub)section, then it has to be escape as above.
-\clearpage
-\bibliographystyle{plainnat}
-\bibliography{thesisbib}
+\newpage
+
+A windowing resampling process is created in the function \code{makeResampleDesc()} by supplying the resampling type, horizon, initial window, the length of the series, and an optional parameter to skip over some windows for the sake of time.
+
+<<makeResampleDesc, cache = TRUE>>=
+resampDesc = makeResampleDesc("GrowingCV", horizon = 328L,
+                               initialWindow = 6000L,
+                               size = nrow(getTaskData(Fin.task1)), skip = 100L)
+resampDesc
+@
+
+To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{paramhelper}. For this example we tune over the entire grid space. 
+<<makeparSet, cache = TRUE>>=
+parSet = makeParamSet(
+  makeIntegerVectorParam(id = "order",
+                         len = 3,
+                         lower = c(10,0,3),
+                         upper = c(14,3,6),
+                         tunable = TRUE),
+  makeIntegerVectorParam(id = "seasonal",
+                         len = 3,
+                         lower = c(0,0,0),
+                         upper = c(3,3,3),
+                         tunable = TRUE),
+  makeLogicalParam(id = "include.mean",
+                   default = FALSE,
+                   tunable = TRUE),
+  makeLogicalParam(id = "include.drift",
+                   default = FALSE,
+                   tunable = TRUE),
+  makeNumericParam(id = "h",
+                   default = 328,
+                   tunable = FALSE,
+                   lower = 328,
+                   upper = 328)
+)
+
+#Specify tune by grid estimation
+ctrl = makeTuneControlGrid()
+@
+
+Using \code{tuneParams()} the model is tuned for the task using the specified resampling scheme, parameter set, tune control, and measure. For this tuning task we use MASE ~\cite{Hyndman2006} as a measure of performance \footnote{Models with a seasonal difference $> 0$ may be favorably biased as we use the non-seasonal MASE score}.
+
+<<tuneparam, eval = FALSE>>=
+#
+res = tuneParams("fcregr.Arima", task = Fin.task1, resampling = resampDesc, par.set = parSet,
+                 control = ctrl, measures = mase)
+
+res
+@
+
+The best model's parameters are extracted using \code{setHyperPars()} and the best model is passed to \code{train()} to go over the full data set.
+
+<<bestmodtrain, eval = FALSE>>=
+lrn = setHyperPars(makeLearner("fcregr.Arima"), par.vals = res$x)
+m = train(lrn, Timeregr.task)
+@
+
+To make predictions for our test set we simply pass our model, task, and test data to \code{predict()}
+
+<<predbestArima, eval = FALSE>>=
+predict(m, task = Fin.task1, newdata = m4Test1)
+@
+
+\newpage
+%\small
+\bibliography{thesisbib}{}
+\bibliographystyle{plain}
 
 \end{document}

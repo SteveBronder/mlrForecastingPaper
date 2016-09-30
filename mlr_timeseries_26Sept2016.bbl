@@ -1,119 +1,126 @@
-\begin{thebibliography}{14}
-\newcommand{\enquote}[1]{``#1''}
-\providecommand{\natexlab}[1]{#1}
-\providecommand{\url}[1]{\texttt{#1}}
-\providecommand{\urlprefix}{URL }
-\expandafter\ifx\csname urlstyle\endcsname\relax
-  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
-  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
-  \urlstyle{rm}\Url}\fi
-\providecommand{\eprint}[2][]{\url{#2}}
+\begin{thebibliography}{10}
 
-\bibitem[{Allan H.~Murphy(1984)}]{MurphymeteoForecast}
-Allan H~Murphy RLW (1984).
-\newblock \enquote{Probability Forecasting in Meterology.}
-\newblock \emph{Journal of the American Statistical Association},
-  \textbf{79}(387), 489--500.
-\newblock ISSN 01621459.
-\newblock \urlprefix\url{http://www.jstor.org/stable/2288395}.
+\bibitem{MurphymeteoForecast}
+Robert L.~Winkler Allan H.~Murphy.
+\newblock Probability forecasting in meterology.
+\newblock {\em Journal of the American Statistical Association},
+  79(387):489--500, 1984.
 
-\bibitem[{BenTaieb(2016)}]{m4comp}
-BenTaieb S (2016).
-\newblock \emph{M4comp: Data from the M4 Time Series Forecasting Competition}.
-\newblock R package version 0.0.1,
-  \urlprefix\url{https://CRAN.R-project.org/package=M4comp}.
+\bibitem{m4comp}
+Souhaib BenTaieb.
+\newblock {\em M4comp: Data from the M4 Time Series Forecasting Competition},
+  2016.
+\newblock R package version 0.0.1.
 
-\bibitem[{Bischl \emph{et~al.}(2015)Bischl, Lang, Richter, Bossek, Judt, Kuehn,
-  Studerus, and Kotthoff}]{mlr}
-Bischl B, Lang M, Richter J, Bossek J, Judt L, Kuehn T, Studerus E, Kotthoff L
-  (2015).
-\newblock \emph{mlr: Machine Learning in R}.
-\newblock R package version 2.7,
-  \urlprefix\url{https://CRAN.R-project.org/package=mlr}.
+\bibitem{paramhelper}
+Bernd Bischl, Michel Lang, Jakob Bossek, Daniel Horn, Jakob Richter, and Pascal
+  Kerschke.
+\newblock {\em ParamHelpers: Helpers for Parameters in Black-Box Optimization,
+  Tuning and Machine Learning}, 2016.
+\newblock R package version 1.9.
 
-\bibitem[{Chadefaux(2014)}]{Chadefaux01012014}
-Chadefaux T (2014).
-\newblock \enquote{Early warning signals for war in the news.}
-\newblock \emph{Journal of Peace Research}, \textbf{51}(1), 5--18.
-\newblock \doi{10.1177/0022343313507302}.
-\newblock \eprint{http://jpr.sagepub.com/content/51/1/5.full.pdf+html},
-  \urlprefix\url{http://jpr.sagepub.com/content/51/1/5.abstract}.
+\bibitem{mlr}
+Bernd Bischl, Michel Lang, Jakob Richter, Jakob Bossek, Leonard Judt, Tobias
+  Kuehn, Erich Studerus, and Lars Kotthoff.
+\newblock {\em mlr: Machine Learning in R}, 2015.
+\newblock R package version 2.7.
 
-\bibitem[{from Jed~Wing \emph{et~al.}(2015)from Jed~Wing, Weston, Williams,
-  Keefer, Engelhardt, Cooper, Mayer, Kenkel, the R~Core~Team, Benesty,
-  Lescarbeau, Ziem, Scrucca, Tang, and Candan.}]{caret}
-from Jed~Wing MKC, Weston S, Williams A, Keefer C, Engelhardt A, Cooper T,
-  Mayer Z, Kenkel B, the R~Core~Team, Benesty M, Lescarbeau R, Ziem A, Scrucca
-  L, Tang Y, Candan C (2015).
-\newblock \emph{caret: Classification and Regression Training}.
-\newblock R package version 6.0-62,
-  \urlprefix\url{https://CRAN.R-project.org/package=caret}.
+\bibitem{Chadefaux01012014}
+Thomas Chadefaux.
+\newblock Early warning signals for war in the news.
+\newblock {\em Journal of Peace Research}, 51(1):5--18, 2014.
 
-\bibitem[{Ghalanos(2015)}]{rugarch}
-Ghalanos A (2015).
-\newblock \emph{rugarch: Univariate GARCH models.}
+\bibitem{hannanOrder}
+J.~Rissanen E.~J.~Hannan.
+\newblock Recursive estimation of mixed autoregressive-moving average order.
+\newblock {\em Biometrika}, 69(1):81--94, 1982.
+
+\bibitem{Friedman1997}
+Jerome~H. Friedman.
+\newblock On bias, variance, 0/1---loss, and the curse-of-dimensionality.
+\newblock {\em Data Mining and Knowledge Discovery}, 1(1):55--77, 1997.
+
+\bibitem{caret}
+Max Kuhn.~Contributions from Jed~Wing, Steve Weston, Andre Williams, Chris
+  Keefer, Allan Engelhardt, Tony Cooper, Zachary Mayer, Brenton Kenkel, the
+  R~Core~Team, Michael Benesty, Reynald Lescarbeau, Andrew Ziem, Luca Scrucca,
+  Yuan Tang, and Can Candan.
+\newblock {\em caret: Classification and Regression Training}, 2015.
+\newblock R package version 6.0-62.
+
+\bibitem{rugarch}
+Alexios Ghalanos.
+\newblock {\em rugarch: Univariate GARCH models.}, 2015.
 \newblock R package version 1.3-6.
 
-\bibitem[{Gooijer and Hyndman(2006)}]{Hyndman25}
-Gooijer JGD, Hyndman RJ (2006).
-\newblock \enquote{25 years of time series forecasting.}
-\newblock \emph{International Journal of Forecasting}, \textbf{22}(3), 443 --
-  473.
-\newblock ISSN 0169-2070.
-\newblock \doi{http://dx.doi.org/10.1016/j.ijforecast.2006.01.001}.
-\newblock Twenty five years of forecasting,
-  \urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0169207006000021}.
+\bibitem{Hyndman25}
+Jan G.~De Gooijer and Rob~J. Hyndman.
+\newblock 25 years of time series forecasting.
+\newblock {\em International Journal of Forecasting}, 22(3):443 -- 473, 2006.
+\newblock Twenty five years of forecasting.
 
-\bibitem[{Granger(1992)}]{GRANGER19923}
-Granger CW (1992).
-\newblock \enquote{Forecasting stock market prices: Lessons for forecasters.}
-\newblock \emph{International Journal of Forecasting}, \textbf{8}(1), 3 -- 13.
-\newblock ISSN 0169-2070.
-\newblock \doi{http://dx.doi.org/10.1016/0169-2070(92)90003-R}.
-\newblock
-  \urlprefix\url{http://www.sciencedirect.com/science/article/pii/016920709290003R}.
+\bibitem{GRANGER19923}
+Clive~W.J. Granger.
+\newblock Forecasting stock market prices: Lessons for forecasters.
+\newblock {\em International Journal of Forecasting}, 8(1):3 -- 13, 1992.
 
-\bibitem[{Hyndman and Athanasopoulos(2014)}]{hyndman2014forecasting}
-Hyndman R, Athanasopoulos G (2014).
-\newblock \emph{Forecasting: principles and practice:}.
-\newblock OTexts.
-\newblock ISBN 9780987507105.
-\newblock \urlprefix\url{https://books.google.com/books?id=gDuRBAAAQBAJ}.
+\bibitem{hyndman2014forecasting}
+R.J. Hyndman and G.~Athanasopoulos.
+\newblock {\em Forecasting: principles and practice:}.
+\newblock OTexts, 2014.
 
-\bibitem[{Hyndman and Khandakar(2008)}]{HyndForecast}
-Hyndman RJ, Khandakar Y (2008).
-\newblock \enquote{Automatic time series forecasting: the forecast package for
-  {R}.}
-\newblock \emph{Journal of Statistical Software}, \textbf{26}(3), 1--22.
-\newblock \urlprefix\url{http://www.jstatsoft.org/article/view/v027i03}.
+\bibitem{HyndForecast}
+Rob~J Hyndman and Yeasmin Khandakar.
+\newblock Automatic time series forecasting: the forecast package for {R}.
+\newblock {\em Journal of Statistical Software}, 26(3):1--22, 2008.
 
-\bibitem[{Makridakis and Hibon(2000)}]{Makridakis2000451}
-Makridakis S, Hibon M (2000).
-\newblock \enquote{The M3-Competition: results, conclusions and implications.}
-\newblock \emph{International Journal of Forecasting}, \textbf{16}(4), 451 --
-  476.
-\newblock ISSN 0169-2070.
-\newblock \doi{http://dx.doi.org/10.1016/S0169-2070(00)00057-1}.
-\newblock The M3- Competition,
-  \urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0169207000000571}.
+\bibitem{Hyndman2006}
+Rob~J. Hyndman and Anne~B. Koehler.
+\newblock {Another Look at Measures of Forecast Accuracy}.
+\newblock Monash Econometrics and Business Statistics Working Papers 13/05,
+  Monash University, Department of Econometrics and Business Statistics, May
+  2005.
 
-\bibitem[{{R Core Team}(2015)}]{Rbase}
-{R Core Team} (2015).
-\newblock \emph{R: A Language and Environment for Statistical Computing}.
-\newblock R Foundation for Statistical Computing, Vienna, Austria.
-\newblock \urlprefix\url{https://www.R-project.org/}.
+\bibitem{windowingcaret}
+Max Kuhn.
+\newblock {caret} data splitting methods, 1999.
 
-\bibitem[{Ryan and Ulrich(2016)}]{xts}
-Ryan JA, Ulrich JM (2016).
-\newblock \emph{xts: eXtensible Time Series}.
-\newblock R package version 0.10-0,
-  \urlprefix\url{https://github.com/joshuaulrich/xts}.
+\bibitem{Makridakis2000451}
+Spyros Makridakis and Michèle Hibon.
+\newblock The m3-competition: results, conclusions and implications.
+\newblock {\em International Journal of Forecasting}, 16(4):451 -- 476, 2000.
+\newblock The M3- Competition.
 
-\bibitem[{Yegulalp(1974)}]{earthquakeYegu}
-Yegulalp TM (1974).
-\newblock \enquote{Forecasting for Largest Earthquakes.}
-\newblock \emph{Management Science}, \textbf{21}(4), 418--421.
-\newblock ISSN 00251909, 15265501.
-\newblock \urlprefix\url{http://www.jstor.org/stable/2629612}.
+\bibitem{Rbase}
+{R Core Team}.
+\newblock {\em R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria, 2015.
+
+\bibitem{reillyautobox}
+David Reilly.
+\newblock The autobox system.
+\newblock {\em International Journal of Forecasting}, 16(4):531--533, 2000.
+
+\bibitem{forecastpro}
+Goodrich RL.
+\newblock The forecast pro methodology.
+\newblock {\em International Journal of Forecasting}, 16(4):533--535, 2000.
+
+\bibitem{rodriguezkfold}
+J.~D. Rodriguez, A.~Perez, and J.~A. Lozano.
+\newblock Sensitivity analysis of k-fold cross validation in prediction error
+  estimation.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  32(3):569--575, March 2010.
+
+\bibitem{xts}
+Jeffrey~A. Ryan and Joshua~M. Ulrich.
+\newblock {\em xts: eXtensible Time Series}, 2016.
+\newblock R package version 0.10-0.
+
+\bibitem{earthquakeYegu}
+Tuncel~M. Yegulalp.
+\newblock Forecasting for largest earthquakes.
+\newblock {\em Management Science}, 21(4):418--421, 1974.
 
 \end{thebibliography}
