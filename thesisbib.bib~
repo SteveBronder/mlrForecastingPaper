@@ -404,14 +404,14 @@ ISSN={0162-8828},
 month={March}
 }
 
- @Manual{paramhelper,
+@Manual{paramhelper,
     title = {ParamHelpers: Helpers for Parameters in Black-Box Optimization, Tuning and
 Machine Learning},
     author = {Bernd Bischl and Michel Lang and Jakob Bossek and Daniel Horn and Jakob Richter and Pascal Kerschke},
     year = {2016},
     note = {R package version 1.9},
     url = {https://CRAN.R-project.org/package=ParamHelpers},
-  }
+}
 
 
 

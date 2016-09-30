@@ -69,6 +69,11 @@ R.J. Hyndman and G.~Athanasopoulos.
 \newblock {\em Forecasting: principles and practice:}.
 \newblock OTexts, 2014.
 
+\bibitem{thief}
+Rob Hyndman and Nikolaos Kourentzes.
+\newblock {\em thief: Temporal Hierarchical Forecasting}, 2016.
+\newblock R package version 0.2.
+
 \bibitem{HyndForecast}
 Rob~J Hyndman and Yeasmin Khandakar.
 \newblock Automatic time series forecasting: the forecast package for {R}.
