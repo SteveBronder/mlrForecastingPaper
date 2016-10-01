@@ -113,7 +113,10 @@ While there are some time series methods available in \pkg{caret} ~\cite{caret},
 
 Professional forecasters attempt to predict the future of a series based on its past values. Forecasting can be used in a wide range of tasks including forecasting stock prices, ~\cite{GRANGER19923}, weather patterns ~\cite{MurphymeteoForecast}, international conficts ~\cite{Chadefaux01012014}, and earthquakes ~\cite{earthquakeYegu}. In order to evaluate \pkg{mlr}'s forecasting framework we need a large set of possible time series to make sure our methods generalize well.\footnote{Very goofy sentence need to fix}
 
-The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency in areas such as finance, macroeconomics, microeconomics, and industry. For our purposes we will look at two particular daily financial series, one with 9136 observations from April 10th, 1971 to April 13th, 1996 and another with 6742 observations from January 7th, 1981 to June 23rd, 1999. Each series must be forecast 328 and 242 periods into the future, respectively.
+The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency in areas such as finance, macroeconomics, climate, microeconomics, and industry. To show examples of how \pkg{mlr}'s forecasting features work we will look at a particular climate series. The data is daily with the training subset starting on September 6th, 2007 and ending on September 5th, 2009 while the testing subset is from September 6th, 2009 to October 10th, 2009 for a total of 640 training periods and 35 test periods to forecast.
+
+
+%For our purposes we will look at two particular daily financial series, one with 9136 observations from April 10th, 1971 to April 13th, 1996 and another with 6742 observations from January 7th, 1981 to June 23rd, 1999. Each series must be forecast 328 and 242 periods into the future, respectively.
 
 
 
@@ -121,22 +124,22 @@ The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges
 library(M4comp)
 library(xts)
 library(lubridate)
-m4Fin1 <- M4[[28]]
-m4Train1 <- xts(m4Fin1$past, as.POSIXct("1971-04-10") + days(0:I(length(m4Fin1$past)-1)))
-m4Test1 <- xts(m4Fin1$future, as.POSIXct("1996-01-15") + days(0:I(length(m4Fin1$future)-1)))
+m4Fin1 <- M4[[8836]]
+m4Train1 <- xts(m4Fin1$past, as.POSIXct("2007-12-05") + days(0:I(length(m4Fin1$past)-1)))
+m4Test1 <- xts(m4Fin1$future, as.POSIXct("2009-09-06") + days(0:I(length(m4Fin1$future)-1)))
 colnames(m4Train1) <- "target_var"
 colnames(m4Test1) <- "target_var"
 
-m4Fin2 <- M4[[29]]
-m4Train2 <- xts(m4Fin2$past, as.POSIXct("1981-01-07") + days(0:I(length(m4Fin2$past)-1)))
-m4Test2 <- xts(m4Fin2$future, as.POSIXct("1999-06-23") + days(0:I(length(m4Fin2$future)-1)))
-colnames(m4Train2) <- "target_var"
-colnames(m4Test2) <- "target_var"
+#m4Fin2 <- M4[[29]]
+#m4Train2 <- xts(m4Fin2$past, as.POSIXct("1981-01-07") + days(0:I(length(m4Fin2$past)-1)))
+#m4Test2 <- xts(m4Fin2$future, as.POSIXct("1999-06-23") + days(0:I(length(m4Fin2$future)-1)))
+#colnames(m4Train2) <- "target_var"
+#colnames(m4Test2) <- "target_var"
 plot(m4Train1, main = "Daily Financial Data One")
-plot(m4Train2, main = "Daily Financial Data Two")
+#plot(m4Train2, main = "Daily Financial Data Two")
 @
 
-These two series were chosen for their large time features and stark contrast.\footnote{I think it would be better to just use one series for examples, and actually train / test over all of M4 later} Our data set should be large enough that the tuning method can take multiple windows of the data. Some series in M4 only contain 12 observations, which is not enough data to accurately train a model. These two time series were chosen as they are the two largest ones in the M4 competitions data set. We can see figure one is what most people imagine when they think of a time series. Figure two shows a series which appears to have a sort of step feature. The stark difference between the time process of the two series will allow us to investigate whether the methods in \pkg{mlr}'s forecasting framework can find the appropriate model. The data can be found in the package \pkg{M4comp} ~\cite{m4comp} under sets `M4[28]` and `M4[29]. 
+%These two series were chosen for their large time features and stark contrast.\footnote{I think it would be better to just use one series for examples, and actually train / test over all of M4 later} Our data set should be large enough that the tuning method can take multiple windows of the data. Some series in M4 only contain 12 observations, which is not enough data to accurately train a model. These two time series were chosen as they are the two largest ones in the M4 competitions data set. We can see figure one is what most people imagine when they think of a time series. Figure two shows a series which appears to have a sort of step feature. The stark difference between the time process of the two series will allow us to investigate whether the methods in \pkg{mlr}'s forecasting framework can find the appropriate model. The data can be found in the package \pkg{M4comp} ~\cite{m4comp} under sets `M4[28]` and `M4[29]. 
 
 \section{Forecasting Tasks}
 \label{sec:task}
@@ -153,7 +156,7 @@ library(mlr)
 Fin.task1 = makeForecastRegrTask(id = "M4 Finance Data One",
                                  data = m4Train1,
                                  target = "target_var",
-                                 frequency = 7L)
+                                 frequency = 365L)
 Fin.task1
 @
 
@@ -174,7 +177,7 @@ In equation three, $\alpha$ is a constant, $\beta_p$ is the coefficient associat
 To impliment this model we use \code{makeLearner()}, supplying the class of learner, order, the number of steps to forecast, and any additional arguments to be passed to \code{Arima} for \pkg{forecast}. 
 
 <<makeArima>>=
-arm = makeLearner("fcregr.Arima", order = c(2L,0L,1L), h = 328L, include.mean = FALSE)
+arm = makeLearner("fcregr.Arima", order = c(2L,1L,1L), h = 35L, include.mean = FALSE)
 arm
 @
 
@@ -204,9 +207,9 @@ Resampling schemes such as cross-validation, bootstrapping, etc. are common in m
 A windowing resampling process is created in the function \code{makeResampleDesc()} by supplying the resampling type, horizon, initial window, the length of the series, and an optional parameter to skip over some windows for the sake of time.
 
 <<makeResampleDesc, cache = TRUE>>=
-resampDesc = makeResampleDesc("GrowingCV", horizon = 328L,
-                               initialWindow = 6000L,
-                               size = nrow(getTaskData(Fin.task1)), skip = 100L)
+resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
+                               initialWindow = 300L,
+                               size = nrow(getTaskData(Fin.task1)), skip = 2L)
 resampDesc
 @
 
@@ -214,14 +217,14 @@ To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{pa
 <<makeparSet, cache = TRUE>>=
 parSet = makeParamSet(
   makeIntegerVectorParam(id = "order",
-                         len = 3,
-                         lower = c(10,0,3),
-                         upper = c(14,3,6),
+                         len = 3L,
+                         lower = c(1L,1L,1L),
+                         upper = c(8,5,8),
                          tunable = TRUE),
   makeIntegerVectorParam(id = "seasonal",
                          len = 3,
                          lower = c(0,0,0),
-                         upper = c(3,3,3),
+                         upper = c(2,2,2),
                          tunable = TRUE),
   makeLogicalParam(id = "include.mean",
                    default = FALSE,
@@ -230,10 +233,10 @@ parSet = makeParamSet(
                    default = FALSE,
                    tunable = TRUE),
   makeNumericParam(id = "h",
-                   default = 328,
+                   default = 35,
                    tunable = FALSE,
-                   lower = 328,
-                   upper = 328)
+                   lower = 35,
+                   upper = 35)
 )
 
 #Specify tune by grid estimation
