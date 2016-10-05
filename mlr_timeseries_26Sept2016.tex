@@ -163,7 +163,10 @@ While there are some time series methods available in \pkg{caret} ~\cite{caret},
 
 Professional forecasters attempt to predict the future of a series based on its past values. Forecasting can be used in a wide range of tasks including forecasting stock prices, ~\cite{GRANGER19923}, weather patterns ~\cite{MurphymeteoForecast}, international conficts ~\cite{Chadefaux01012014}, and earthquakes ~\cite{earthquakeYegu}. In order to evaluate \pkg{mlr}'s forecasting framework we need a large set of possible time series to make sure our methods generalize well.\footnote{Very goofy sentence need to fix}
 
-The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency in areas such as finance, macroeconomics, microeconomics, and industry. For our purposes we will look at two particular daily financial series, one with 9136 observations from April 10th, 1971 to April 13th, 1996 and another with 6742 observations from January 7th, 1981 to June 23rd, 1999. Each series must be forecast 328 and 242 periods into the future, respectively.
+The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency in areas such as finance, macroeconomics, climate, microeconomics, and industry. To show examples of how \pkg{mlr}'s forecasting features work we will look at a particular climate series. The data is daily with the training subset starting on September 6th, 2007 and ending on September 5th, 2009 while the testing subset is from September 6th, 2009 to October 10th, 2009 for a total of 640 training periods and 35 test periods to forecast.
+
+
+%For our purposes we will look at two particular daily financial series, one with 9136 observations from April 10th, 1971 to April 13th, 1996 and another with 6742 observations from January 7th, 1981 to June 23rd, 1999. Each series must be forecast 328 and 242 periods into the future, respectively.
 
 
 
@@ -176,16 +179,9 @@ The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges
 
 
 
-
-{\centering \includegraphics[width=\maxwidth]{figure/get_dat-2} 
-
-}
-
-
-
 \end{knitrout}
 
-These two series were chosen for their large time features and stark contrast.\footnote{I think it would be better to just use one series for examples, and actually train / test over all of M4 later} Our data set should be large enough that the tuning method can take multiple windows of the data. Some series in M4 only contain 12 observations, which is not enough data to accurately train a model. These two time series were chosen as they are the two largest ones in the M4 competitions data set. We can see figure one is what most people imagine when they think of a time series. Figure two shows a series which appears to have a sort of step feature. The stark difference between the time process of the two series will allow us to investigate whether the methods in \pkg{mlr}'s forecasting framework can find the appropriate model. The data can be found in the package \pkg{M4comp} ~\cite{m4comp} under sets `M4[28]` and `M4[29]. 
+%These two series were chosen for their large time features and stark contrast.\footnote{I think it would be better to just use one series for examples, and actually train / test over all of M4 later} Our data set should be large enough that the tuning method can take multiple windows of the data. Some series in M4 only contain 12 observations, which is not enough data to accurately train a model. These two time series were chosen as they are the two largest ones in the M4 competitions data set. We can see figure one is what most people imagine when they think of a time series. Figure two shows a series which appears to have a sort of step feature. The stark difference between the time process of the two series will allow us to investigate whether the methods in \pkg{mlr}'s forecasting framework can find the appropriate model. The data can be found in the package \pkg{M4comp} ~\cite{m4comp} under sets `M4[28]` and `M4[29]. 
 
 \section{Forecasting Tasks}
 \label{sec:task}
@@ -201,24 +197,20 @@ These two series were chosen for their large time features and stark contrast.\f
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlkwd{library}\hlstd{(mlr)}
-\end{alltt}
-
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: ParamHelpers}}\begin{alltt}
 \hlstd{Fin.task1} \hlkwb{=} \hlkwd{makeForecastRegrTask}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"M4 Finance Data One"}\hlstd{,}
                                  \hlkwc{data} \hlstd{= m4Train1,}
                                  \hlkwc{target} \hlstd{=} \hlstr{"target_var"}\hlstd{,}
-                                 \hlkwc{frequency} \hlstd{=} \hlnum{7L}\hlstd{)}
+                                 \hlkwc{frequency} \hlstd{=} \hlnum{52L}\hlstd{)}
 \hlstd{Fin.task1}
 \end{alltt}
 \begin{verbatim}
 ## Task: M4 Finance Data One
 ## Type: regr
-## Observations: 9136
+## Observations: 640
 ## Dates:
-##  Start: 1971-04-10 
-##  End: 1996-04-13
-## Frequency: 7
+##  Start: 2007-12-05 
+##  End: 2009-09-04
+## Frequency: 52
 ## Features:
 ## numerics  factors  ordered 
 ##        1        0        0 
@@ -248,7 +240,7 @@ To impliment this model we use \code{makeLearner()}, supplying the class of lear
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{arm} \hlkwb{=} \hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.Arima"}\hlstd{,} \hlkwc{order} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{2L}\hlstd{,}\hlnum{0L}\hlstd{,}\hlnum{1L}\hlstd{),} \hlkwc{h} \hlstd{=} \hlnum{328L}\hlstd{,} \hlkwc{include.mean} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+\hlstd{arm} \hlkwb{=} \hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.Arima"}\hlstd{,} \hlkwc{order} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{2L}\hlstd{,}\hlnum{1L}\hlstd{,}\hlnum{1L}\hlstd{),} \hlkwc{h} \hlstd{=} \hlnum{35L}\hlstd{,} \hlkwc{include.mean} \hlstd{=} \hlnum{FALSE}\hlstd{)}
 \hlstd{arm}
 \end{alltt}
 \begin{verbatim}
@@ -258,7 +250,7 @@ To impliment this model we use \code{makeLearner()}, supplying the class of lear
 ## Class: fcregr.Arima
 ## Properties: numerics,ts
 ## Predict-Type: response
-## Hyperparameters: order=2,0,1,h=328,include.mean=FALSE
+## Hyperparameters: order=2,1,1,h=35,include.mean=FALSE
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -273,8 +265,8 @@ To train the model we simply call train, supplying the model and task.
 \end{alltt}
 \begin{verbatim}
 ## Model for learner.id=fcregr.Arima; learner.class=fcregr.Arima
-## Trained on: task.id = M4 Finance Data One; obs = 9136; features = 1
-## Hyperparameters: order=2,0,1,h=328,include.mean=FALSE
+## Trained on: task.id = M4 Finance Data One; obs = 640; features = 1
+## Hyperparameters: order=2,1,1,h=35,include.mean=FALSE
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -300,15 +292,15 @@ A windowing resampling process is created in the function \code{makeResampleDesc
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{resampDesc} \hlkwb{=} \hlkwd{makeResampleDesc}\hlstd{(}\hlstr{"GrowingCV"}\hlstd{,} \hlkwc{horizon} \hlstd{=} \hlnum{328L}\hlstd{,}
-                               \hlkwc{initialWindow} \hlstd{=} \hlnum{6000L}\hlstd{,}
-                               \hlkwc{size} \hlstd{=} \hlkwd{nrow}\hlstd{(}\hlkwd{getTaskData}\hlstd{(Fin.task1)),} \hlkwc{skip} \hlstd{=} \hlnum{100L}\hlstd{)}
+\hlstd{resampDesc} \hlkwb{=} \hlkwd{makeResampleDesc}\hlstd{(}\hlstr{"GrowingCV"}\hlstd{,} \hlkwc{horizon} \hlstd{=} \hlnum{35L}\hlstd{,}
+                               \hlkwc{initialWindow} \hlstd{=} \hlnum{400L}\hlstd{,}
+                               \hlkwc{size} \hlstd{=} \hlkwd{nrow}\hlstd{(}\hlkwd{getTaskData}\hlstd{(Fin.task1)),} \hlkwc{skip} \hlstd{=} \hlnum{2L}\hlstd{)}
 \hlstd{resampDesc}
 \end{alltt}
 \begin{verbatim}
 ## Window description:
-##  growing with 28 iterations:
-##  6000 observations in initial window and 328 horizon.
+##  growing with 69 iterations:
+##  400 observations in initial window and 35 horizon.
 ## Predict: test
 ## Stratification: FALSE
 \end{verbatim}
@@ -321,14 +313,14 @@ To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{pa
 \begin{alltt}
 \hlstd{parSet} \hlkwb{=} \hlkwd{makeParamSet}\hlstd{(}
   \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"order"}\hlstd{,}
-                         \hlkwc{len} \hlstd{=} \hlnum{3}\hlstd{,}
-                         \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{10}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{3}\hlstd{),}
-                         \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{14}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{6}\hlstd{),}
+                         \hlkwc{len} \hlstd{=} \hlnum{3L}\hlstd{,}
+                         \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1L}\hlstd{,}\hlnum{0L}\hlstd{,}\hlnum{1L}\hlstd{),}
+                         \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{8}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{8}\hlstd{),}
                          \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
   \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"seasonal"}\hlstd{,}
                          \hlkwc{len} \hlstd{=} \hlnum{3}\hlstd{,}
                          \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{0}\hlstd{),}
-                         \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{3}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{3}\hlstd{),}
+                         \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{),}
                          \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
   \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"include.mean"}\hlstd{,}
                    \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
@@ -337,14 +329,14 @@ To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{pa
                    \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
                    \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
   \hlkwd{makeNumericParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"h"}\hlstd{,}
-                   \hlkwc{default} \hlstd{=} \hlnum{328}\hlstd{,}
+                   \hlkwc{default} \hlstd{=} \hlnum{35}\hlstd{,}
                    \hlkwc{tunable} \hlstd{=} \hlnum{FALSE}\hlstd{,}
-                   \hlkwc{lower} \hlstd{=} \hlnum{328}\hlstd{,}
-                   \hlkwc{upper} \hlstd{=} \hlnum{328}\hlstd{)}
+                   \hlkwc{lower} \hlstd{=} \hlnum{35}\hlstd{,}
+                   \hlkwc{upper} \hlstd{=} \hlnum{35}\hlstd{)}
 \hlstd{)}
 
 \hlcom{#Specify tune by grid estimation}
-\hlstd{ctrl} \hlkwb{=} \hlkwd{makeTuneControlGrid}\hlstd{()}
+\hlstd{ctrl} \hlkwb{=} \hlkwd{makeTuneControlRandom}\hlstd{()}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -355,8 +347,13 @@ Using \code{tuneParams()} the model is tuned for the task using the specified re
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlcom{#}
+\hlkwd{library}\hlstd{(}\hlstr{"parallelMap"}\hlstd{)}
+\hlkwd{parallelStartSocket}\hlstd{(}\hlnum{6}\hlstd{)}
+\hlkwd{configureMlr}\hlstd{(}\hlkwc{on.learner.error} \hlstd{=} \hlstr{"warn"}\hlstd{)}
+\hlkwd{set.seed}\hlstd{(}\hlnum{1234}\hlstd{)}
 \hlstd{res} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(}\hlstr{"fcregr.Arima"}\hlstd{,} \hlkwc{task} \hlstd{= Fin.task1,} \hlkwc{resampling} \hlstd{= resampDesc,}
                  \hlkwc{par.set} \hlstd{= parSet,} \hlkwc{control} \hlstd{= ctrl,} \hlkwc{measures} \hlstd{= mase)}
+\hlkwd{parallelStop}\hlstd{()}
 
 \hlstd{res}
 \end{alltt}

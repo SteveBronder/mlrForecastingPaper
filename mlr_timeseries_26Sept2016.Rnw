@@ -156,7 +156,7 @@ library(mlr)
 Fin.task1 = makeForecastRegrTask(id = "M4 Finance Data One",
                                  data = m4Train1,
                                  target = "target_var",
-                                 frequency = 365L)
+                                 frequency = 52L)
 Fin.task1
 @
 
@@ -208,7 +208,7 @@ A windowing resampling process is created in the function \code{makeResampleDesc
 
 <<makeResampleDesc, cache = TRUE>>=
 resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
-                               initialWindow = 300L,
+                               initialWindow = 400L,
                                size = nrow(getTaskData(Fin.task1)), skip = 2L)
 resampDesc
 @
@@ -224,7 +224,7 @@ parSet = makeParamSet(
   makeIntegerVectorParam(id = "seasonal",
                          len = 3,
                          lower = c(0,0,0),
-                         upper = c(2,1,2),
+                         upper = c(1,1,1),
                          tunable = TRUE),
   makeLogicalParam(id = "include.mean",
                    default = FALSE,
@@ -240,15 +240,20 @@ parSet = makeParamSet(
 )
 
 #Specify tune by grid estimation
-ctrl = makeTuneControlGrid()
+ctrl = makeTuneControlRandom()
 @
 
 Using \code{tuneParams()} the model is tuned for the task using the specified resampling scheme, parameter set, tune control, and measure. For this tuning task we use MASE ~\cite{Hyndman2006} as a measure of performance \footnote{Models with a seasonal difference $> 0$ may be favorably biased as we use the non-seasonal MASE score}.
 
 <<tuneparam, eval = FALSE>>=
 #
+library("parallelMap")
+parallelStartSocket(6)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
 res = tuneParams("fcregr.Arima", task = Fin.task1, resampling = resampDesc,
                  par.set = parSet, control = ctrl, measures = mase)
+parallelStop()
 
 res
 @
