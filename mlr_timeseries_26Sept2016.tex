@@ -197,14 +197,18 @@ The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlkwd{library}\hlstd{(mlr)}
-\hlstd{Fin.task1} \hlkwb{=} \hlkwd{makeForecastRegrTask}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"M4 Finance Data One"}\hlstd{,}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: ParamHelpers}}\begin{alltt}
+\hlstd{Fin.task1} \hlkwb{=} \hlkwd{makeForecastRegrTask}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"M4 Climate Data"}\hlstd{,}
                                  \hlkwc{data} \hlstd{= m4Train1,}
                                  \hlkwc{target} \hlstd{=} \hlstr{"target_var"}\hlstd{,}
                                  \hlkwc{frequency} \hlstd{=} \hlnum{52L}\hlstd{)}
 \hlstd{Fin.task1}
 \end{alltt}
 \begin{verbatim}
-## Task: M4 Finance Data One
+## Task: M4 Climate Data
 ## Type: regr
 ## Observations: 640
 ## Dates:
@@ -265,7 +269,7 @@ To train the model we simply call train, supplying the model and task.
 \end{alltt}
 \begin{verbatim}
 ## Model for learner.id=fcregr.Arima; learner.class=fcregr.Arima
-## Trained on: task.id = M4 Finance Data One; obs = 640; features = 1
+## Trained on: task.id = M4 Climate Data; obs = 640; features = 1
 ## Hyperparameters: order=2,1,1,h=35,include.mean=FALSE
 \end{verbatim}
 \end{kframe}
@@ -307,7 +311,7 @@ A windowing resampling process is created in the function \code{makeResampleDesc
 \end{kframe}
 \end{knitrout}
 
-To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{paramhelper}. For this example we tune over the entire grid space by setting our tune control to a grid search. 
+To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{paramhelper}. For this example we use the random search procedure from ~\cite{Bergstra} to search our parameter space for the most optimal model.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}

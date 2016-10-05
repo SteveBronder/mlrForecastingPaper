@@ -135,7 +135,7 @@ colnames(m4Test1) <- "target_var"
 #m4Test2 <- xts(m4Fin2$future, as.POSIXct("1999-06-23") + days(0:I(length(m4Fin2$future)-1)))
 #colnames(m4Train2) <- "target_var"
 #colnames(m4Test2) <- "target_var"
-plot(m4Train1, main = "Daily Financial Data One")
+plot(m4Train1, main = "Weekly Climate Data")
 #plot(m4Train2, main = "Daily Financial Data Two")
 @
 
@@ -153,7 +153,7 @@ plot(m4Train1, main = "Daily Financial Data One")
 
 <<fin_task, eval = TRUE>>=
 library(mlr)
-Fin.task1 = makeForecastRegrTask(id = "M4 Finance Data One",
+Fin.task1 = makeForecastRegrTask(id = "M4 Climate Data",
                                  data = m4Train1,
                                  target = "target_var",
                                  frequency = 52L)
@@ -213,7 +213,7 @@ resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
 resampDesc
 @
 
-To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{paramhelper}. For this example we tune over the entire grid space by setting our tune control to a grid search. 
+To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{paramhelper}. For this example we use the random search procedure from ~\cite{Bergstra} to search our parameter space for the most optimal model.
 <<makeparSet, cache = TRUE>>=
 parSet = makeParamSet(
   makeIntegerVectorParam(id = "order",

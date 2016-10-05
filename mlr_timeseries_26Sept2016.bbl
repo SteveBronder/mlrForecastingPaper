@@ -6,6 +6,11 @@ Robert L.~Winkler Allan H.~Murphy.
 \newblock {\em Journal of the American Statistical Association},
   79(387):489--500, 1984.
 
+\bibitem{Bergstra}
+James Bergstra and Yoshua Bengio.
+\newblock Random search for hyper-parameter optimization.
+\newblock {\em J. Mach. Learn. Res.}, 13(1):281--305, February 2012.
+
 \bibitem{paramhelper}
 Bernd Bischl, Michel Lang, Jakob Bossek, Daniel Horn, Jakob Richter, and Pascal
   Kerschke.
