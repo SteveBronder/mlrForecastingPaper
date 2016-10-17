@@ -201,20 +201,20 @@ The Makridakis competitions ~\cite{Makridakis2000451} are forecasting challenges
 
 
 {\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: ParamHelpers}}\begin{alltt}
-\hlstd{Fin.task1} \hlkwb{=} \hlkwd{makeForecastRegrTask}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"M4 Climate Data"}\hlstd{,}
+\hlstd{climate.task} \hlkwb{=} \hlkwd{makeForecastRegrTask}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"M4 Climate Data"}\hlstd{,}
                                  \hlkwc{data} \hlstd{= m4Train1,}
                                  \hlkwc{target} \hlstd{=} \hlstr{"target_var"}\hlstd{,}
-                                 \hlkwc{frequency} \hlstd{=} \hlnum{52L}\hlstd{)}
-\hlstd{Fin.task1}
+                                 \hlkwc{frequency} \hlstd{=} \hlnum{365L}\hlstd{)}
+\hlstd{climate.task}
 \end{alltt}
 \begin{verbatim}
 ## Task: M4 Climate Data
-## Type: regr
+## Type: fcregr
 ## Observations: 640
 ## Dates:
 ##  Start: 2007-12-05 
 ##  End: 2009-09-04
-## Frequency: 52
+## Frequency: 365
 ## Features:
 ## numerics  factors  ordered 
 ##        1        0        0 
@@ -244,18 +244,12 @@ To impliment this model we use \code{makeLearner()}, supplying the class of lear
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{arm} \hlkwb{=} \hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.Arima"}\hlstd{,} \hlkwc{order} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{2L}\hlstd{,}\hlnum{1L}\hlstd{,}\hlnum{1L}\hlstd{),} \hlkwc{h} \hlstd{=} \hlnum{35L}\hlstd{,} \hlkwc{include.mean} \hlstd{=} \hlnum{FALSE}\hlstd{)}
-\hlstd{arm}
+\hlstd{tbatsMod} \hlkwb{=}\hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.tbats"}\hlstd{,} \hlkwc{use.box.cox} \hlstd{=} \hlnum{FALSE}\hlstd{,}
+                      \hlkwc{use.trend} \hlstd{=} \hlnum{TRUE}\hlstd{,}
+                      \hlkwc{seasonal.periods} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{max.p} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{max.q} \hlstd{=} \hlnum{2}\hlstd{,}
+                      \hlkwc{stationary} \hlstd{=} \hlnum{FALSE}\hlstd{,} \hlkwc{use.arma.errors} \hlstd{=} \hlnum{TRUE}\hlstd{,}
+                      \hlkwc{h} \hlstd{=} \hlnum{35}\hlstd{)}
 \end{alltt}
-\begin{verbatim}
-## Learner fcregr.Arima from package forecast
-## Type: regr
-## Name: AutoRegressive Integrated Moving Average; Short name: Arima
-## Class: fcregr.Arima
-## Properties: numerics,ts
-## Predict-Type: response
-## Hyperparameters: order=2,1,1,h=35,include.mean=FALSE
-\end{verbatim}
 \end{kframe}
 \end{knitrout}
 
@@ -264,15 +258,28 @@ To train the model we simply call train, supplying the model and task.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{trainArima} \hlkwb{=} \hlkwd{train}\hlstd{(arm, Fin.task1 )}
-\hlstd{trainArima}
+\hlstd{trainTbats}\hlkwb{=} \hlkwd{train}\hlstd{(tbatsMod, climate.task )}
+\hlstd{trainTbats}
 \end{alltt}
 \begin{verbatim}
-## Model for learner.id=fcregr.Arima; learner.class=fcregr.Arima
+## Model for learner.id=fcregr.tbats; learner.class=fcregr.tbats
 ## Trained on: task.id = M4 Climate Data; obs = 640; features = 1
-## Hyperparameters: order=2,1,1,h=35,include.mean=FALSE
+## Hyperparameters: use.box.cox=FALSE,use.trend=TRUE,seasonal.periods=TRUE,max.p=3,max.q=2,stationary=FALSE,use.arma.errors=TRUE,h=35
 \end{verbatim}
+\begin{alltt}
+\hlstd{testp} \hlkwb{=} \hlkwd{predict}\hlstd{(trainTbats,} \hlkwc{newdata} \hlstd{= m4Test1)}
+\hlkwd{performance}\hlstd{(testp, mase,} \hlkwc{task} \hlstd{= climate.task)}
+\end{alltt}
+\begin{verbatim}
+##      mase 
+## 0.0676601
+\end{verbatim}
+\begin{alltt}
+\hlkwd{matplot}\hlstd{(testp}\hlopt{$}\hlstd{data,} \hlkwc{type} \hlstd{=} \hlstr{"l"}\hlstd{)}
+\end{alltt}
 \end{kframe}
+\includegraphics[width=\maxwidth]{figure/makeArimaTrain-1} 
+
 \end{knitrout}
 
 While ARIMA is one of the most well known time series models, the order selection process can be subjective and difficult for users. One of the first proposals for automatic order selection comes from ~\cite{hannanOrder} where innovations are obtained by fitting high order autoregressive model to the data and then computing the likelihood of potential models through a series of standard regresssions. Proprietary algorithms from software such as \proglang{Forecast Pro} ~\cite{forecastpro} and \proglang{Autobox} ~\cite{reillyautobox} are well known and have performed to high standards in competitions such as the M3 forecasting competition ~\cite{Makridakis2000451}. One of the most well known R packages for automated forecast is \pkg{forecast} ~\cite{HyndForecast} which contains several methods for automated forecasting including exponential smoothing based methods and step-wise algorithms for forecasting with ARIMA models.
@@ -297,13 +304,13 @@ A windowing resampling process is created in the function \code{makeResampleDesc
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlstd{resampDesc} \hlkwb{=} \hlkwd{makeResampleDesc}\hlstd{(}\hlstr{"GrowingCV"}\hlstd{,} \hlkwc{horizon} \hlstd{=} \hlnum{35L}\hlstd{,}
-                               \hlkwc{initialWindow} \hlstd{=} \hlnum{400L}\hlstd{,}
-                               \hlkwc{size} \hlstd{=} \hlkwd{nrow}\hlstd{(}\hlkwd{getTaskData}\hlstd{(Fin.task1)),} \hlkwc{skip} \hlstd{=} \hlnum{2L}\hlstd{)}
+                               \hlkwc{initial.window} \hlstd{=} \hlnum{400L}\hlstd{,}
+                               \hlkwc{size} \hlstd{=} \hlkwd{nrow}\hlstd{(}\hlkwd{getTaskData}\hlstd{(climate.task)),} \hlkwc{skip} \hlstd{=} \hlnum{6L}\hlstd{)}
 \hlstd{resampDesc}
 \end{alltt}
 \begin{verbatim}
 ## Window description:
-##  growing with 69 iterations:
+##  growing with 30 iterations:
 ##  400 observations in initial window and 35 horizon.
 ## Predict: test
 ## Stratification: FALSE
@@ -316,31 +323,54 @@ To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{pa
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlstd{parSet} \hlkwb{=} \hlkwd{makeParamSet}\hlstd{(}
-  \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"order"}\hlstd{,}
-                         \hlkwc{len} \hlstd{=} \hlnum{3L}\hlstd{,}
-                         \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1L}\hlstd{,}\hlnum{0L}\hlstd{,}\hlnum{1L}\hlstd{),}
-                         \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{8}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{8}\hlstd{),}
-                         \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"seasonal"}\hlstd{,}
-                         \hlkwc{len} \hlstd{=} \hlnum{3}\hlstd{,}
-                         \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{0}\hlstd{),}
-                         \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{),}
-                         \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"include.mean"}\hlstd{,}
+  \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"use.box.cox"}\hlstd{,}
                    \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
                    \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"include.drift"}\hlstd{,}
+  \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"use.trend"}\hlstd{,}
                    \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
                    \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-  \hlkwd{makeNumericParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"h"}\hlstd{,}
+  \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"use.damped.trend"}\hlstd{,}
+                   \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
+                   \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
+  \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"seasonal.periods"}\hlstd{,}
+                   \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
+                   \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
+  \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"max.p"}\hlstd{,}
+                   \hlkwc{upper} \hlstd{=} \hlnum{20}\hlstd{,}
+                   \hlkwc{lower} \hlstd{=} \hlnum{0}\hlstd{),}
+  \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"start.p"}\hlstd{,}
+                   \hlkwc{upper} \hlstd{=} \hlnum{10}\hlstd{,}
+                   \hlkwc{lower} \hlstd{=} \hlnum{1}\hlstd{,}
+                   \hlkwc{trafo} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) x}\hlopt{*}\hlnum{2}\hlstd{),}
+  \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"max.q"}\hlstd{,}
+                   \hlkwc{upper} \hlstd{=} \hlnum{20}\hlstd{,}
+                   \hlkwc{lower} \hlstd{=} \hlnum{0}\hlstd{),}
+  \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"start.q"}\hlstd{,}
+                   \hlkwc{upper} \hlstd{=} \hlnum{10}\hlstd{,}
+                   \hlkwc{lower} \hlstd{=} \hlnum{1}\hlstd{,}
+                   \hlkwc{trafo} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) x}\hlopt{*}\hlnum{2}\hlstd{),}
+  \hlkwd{makeIntegerParam}\hlstd{(}\hlstr{"max.P"}\hlstd{,}
+                   \hlkwc{lower} \hlstd{=} \hlnum{0}\hlstd{,}
+                   \hlkwc{upper} \hlstd{=} \hlnum{5}\hlstd{),}
+  \hlkwd{makeIntegerParam}\hlstd{(}\hlstr{"max.Q"}\hlstd{,}
+                   \hlkwc{lower} \hlstd{=} \hlnum{0}\hlstd{,}
+                   \hlkwc{upper} \hlstd{=} \hlnum{5}\hlstd{),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"ic"}\hlstd{,}
+                    \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"aicc"}\hlstd{,}\hlstr{"aic"}\hlstd{,}\hlstr{"bic"}\hlstd{)),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"test"}\hlstd{,}
+                    \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"kpss"}\hlstd{,}\hlstr{"adf"}\hlstd{,}\hlstr{"pp"}\hlstd{)),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"seasonal.test"}\hlstd{,}
+                    \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"ocsb"}\hlstd{,} \hlstr{"ch"}\hlstd{)),}
+  \hlkwd{makeLogicalParam}\hlstd{(}\hlstr{"biasadj"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{),}
+  \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"h"}\hlstd{,}
                    \hlkwc{default} \hlstd{=} \hlnum{35}\hlstd{,}
                    \hlkwc{tunable} \hlstd{=} \hlnum{FALSE}\hlstd{,}
                    \hlkwc{lower} \hlstd{=} \hlnum{35}\hlstd{,}
-                   \hlkwc{upper} \hlstd{=} \hlnum{35}\hlstd{)}
+                   \hlkwc{upper} \hlstd{=} \hlnum{36}\hlstd{)}
 \hlstd{)}
 
 \hlcom{#Specify tune by grid estimation}
-\hlstd{ctrl} \hlkwb{=} \hlkwd{makeTuneControlRandom}\hlstd{()}
+\hlstd{ctrl} \hlkwb{=} \hlkwd{makeTuneControlIrace}\hlstd{(}\hlkwc{maxExperiments} \hlstd{=} \hlnum{500L}\hlstd{)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -355,22 +385,32 @@ Using \code{tuneParams()} the model is tuned for the task using the specified re
 \hlkwd{parallelStartSocket}\hlstd{(}\hlnum{6}\hlstd{)}
 \hlkwd{configureMlr}\hlstd{(}\hlkwc{on.learner.error} \hlstd{=} \hlstr{"warn"}\hlstd{)}
 \hlkwd{set.seed}\hlstd{(}\hlnum{1234}\hlstd{)}
-\hlstd{res} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(}\hlstr{"fcregr.Arima"}\hlstd{,} \hlkwc{task} \hlstd{= Fin.task1,} \hlkwc{resampling} \hlstd{= resampDesc,}
+\hlstd{tbatsTune} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(}\hlstr{"fcregr.tbats"}\hlstd{,} \hlkwc{task} \hlstd{= climate.task,} \hlkwc{resampling} \hlstd{= resampDesc,}
                  \hlkwc{par.set} \hlstd{= parSet,} \hlkwc{control} \hlstd{= ctrl,} \hlkwc{measures} \hlstd{= mase)}
 \hlkwd{parallelStop}\hlstd{()}
-
-\hlstd{res}
+\hlstd{tbatsTune}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## Tune result:
+## Op. pars: use.box.cox=TRUE; use.trend=TRUE; use.damped.trend=TRUE; seasonal.periods=FALSE; max.p=7; start.p=8; max.q=2; start.q=8; max.P=2; max.Q=1; ic=aicc; test=kpss; seasonal.test=ocsb; biasadj=FALSE; h=35
+## mase.test.mean=0.0688
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
 
 The best model's parameters are extracted using \code{setHyperPars()} and the best model is passed to \code{train()} to go over the full data set.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{lrn} \hlkwb{=} \hlkwd{setHyperPars}\hlstd{(}\hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.Arima"}\hlstd{),} \hlkwc{par.vals} \hlstd{= res}\hlopt{$}\hlstd{x)}
-\hlstd{m} \hlkwb{=} \hlkwd{train}\hlstd{(lrn, Timeregr.task)}
+\hlstd{lrn} \hlkwb{=} \hlkwd{setHyperPars}\hlstd{(}\hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.tbats"}\hlstd{),} \hlkwc{par.vals} \hlstd{= tbatsTune}\hlopt{$}\hlstd{x)}
+\hlstd{m} \hlkwb{=} \hlkwd{train}\hlstd{(lrn, climate.task)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -380,11 +420,76 @@ To make predictions for our test set we simply pass our model, task, and test da
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{predict}\hlstd{(m,} \hlkwc{task} \hlstd{= Fin.task1,} \hlkwc{newdata} \hlstd{= m4Test1)}
+\hlstd{climate.pred} \hlkwb{=} \hlkwd{predict}\hlstd{(m,} \hlkwc{newdata} \hlstd{= m4Test1)}
+\hlkwd{performance}\hlstd{(climate.pred,} \hlkwc{measures} \hlstd{= mase,} \hlkwc{task} \hlstd{= climate.task)}
+\end{alltt}
+\begin{verbatim}
+##       mase 
+## 0.06145902
+\end{verbatim}
+\begin{alltt}
+\hlkwd{matplot}\hlstd{(climate.pred}\hlopt{$}\hlstd{data,} \hlkwc{type} \hlstd{=} \hlstr{"l"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/predbestArima-1} 
+
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{par_set} \hlkwb{=} \hlkwd{makeParamSet}\hlstd{(}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"model"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"sGARCH"}\hlstd{,} \hlstr{"csGARCH"}\hlstd{)),}
+  \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"garchOrder"}\hlstd{,} \hlkwc{len} \hlstd{=} \hlnum{2L}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{4}\hlstd{,}\hlnum{4}\hlstd{)),}
+  \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"armaOrder"}\hlstd{,} \hlkwc{len} \hlstd{=} \hlnum{2L}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{5}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{8}\hlstd{,}\hlnum{3}\hlstd{)),}
+  \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"include.mean"}\hlstd{),}
+  \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"archm"}\hlstd{),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"distribution.model"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"norm"}\hlstd{,}\hlstr{"std"}\hlstd{,}\hlstr{"jsu"}\hlstd{)),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"stationarity"}\hlstd{,} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{)),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"fixed.se"}\hlstd{,} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{)),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"solver"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlstr{"nloptr"}\hlstd{),}
+  \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"n.ahead"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{35L}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{35L}\hlstd{,}
+                   \hlkwc{upper} \hlstd{=} \hlnum{36L}\hlstd{,} \hlkwc{tunable} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+\hlstd{)}
+
+\hlcom{#Specify tune by grid estimation}
+\hlstd{ctrl} \hlkwb{=} \hlkwd{makeTuneControlIrace}\hlstd{(}\hlkwc{maxExperiments} \hlstd{=} \hlnum{400L}\hlstd{)}
+
+\hlkwd{parallelStartSocket}\hlstd{(}\hlnum{6}\hlstd{)}
+\hlkwd{configureMlr}\hlstd{(}\hlkwc{on.learner.error} \hlstd{=} \hlstr{"warn"}\hlstd{)}
+\hlkwd{set.seed}\hlstd{(}\hlnum{1234}\hlstd{)}
+\hlstd{garchTune} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(}\hlstr{"fcregr.garch"}\hlstd{,} \hlkwc{task} \hlstd{= climate.task,} \hlkwc{resampling} \hlstd{= resampDesc,}
+                 \hlkwc{par.set} \hlstd{= par_set,} \hlkwc{control} \hlstd{= ctrl,} \hlkwc{measures} \hlstd{= mase)}
+\hlkwd{parallelStop}\hlstd{()}
+\hlstd{garchTune}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## Tune result:
+## Op. pars: model=sGARCH; garchOrder=4,1; armaOrder=7,2; include.mean=TRUE; archm=FALSE; distribution.model=norm; stationarity=1; fixed.se=0; solver=nloptr; n.ahead=36
+## mase.test.mean=0.0789
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+##       mase 
+## 0.05589035
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/garchPlot-1} 
+
+\end{knitrout}
 \newpage
 %\small
 \bibliography{thesisbib}{}

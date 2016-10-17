@@ -135,7 +135,7 @@ colnames(m4Test1) <- "target_var"
 #m4Test2 <- xts(m4Fin2$future, as.POSIXct("1999-06-23") + days(0:I(length(m4Fin2$future)-1)))
 #colnames(m4Train2) <- "target_var"
 #colnames(m4Test2) <- "target_var"
-plot(m4Train1, main = "Weekly Climate Data")
+plot(m4Train1, main = "Daily Climate Data")
 #plot(m4Train2, main = "Daily Financial Data Two")
 @
 
@@ -153,11 +153,11 @@ plot(m4Train1, main = "Weekly Climate Data")
 
 <<fin_task, eval = TRUE>>=
 library(mlr)
-Fin.task1 = makeForecastRegrTask(id = "M4 Climate Data",
+climate.task = makeForecastRegrTask(id = "M4 Climate Data",
                                  data = m4Train1,
                                  target = "target_var",
-                                 frequency = 52L)
-Fin.task1
+                                 frequency = 365L)
+climate.task
 @
 
 \section{Building a forecast learner}
@@ -176,16 +176,22 @@ In equation three, $\alpha$ is a constant, $\beta_p$ is the coefficient associat
 
 To impliment this model we use \code{makeLearner()}, supplying the class of learner, order, the number of steps to forecast, and any additional arguments to be passed to \code{Arima} for \pkg{forecast}. 
 
-<<makeArima>>=
-arm = makeLearner("fcregr.Arima", order = c(2L,1L,1L), h = 35L, include.mean = FALSE)
-arm
+<<makeArima, cache = TRUE>>=
+tbatsMod =makeLearner("fcregr.tbats", use.box.cox = FALSE,
+                      use.trend = TRUE,
+                      seasonal.periods = TRUE, max.p = 3, max.q = 2,
+                      stationary = FALSE, use.arma.errors = TRUE,
+                      h = 35)
 @
 
 To train the model we simply call train, supplying the model and task.
 
-<<makeArimaTrain>>=
-trainArima = train(arm, Fin.task1 )
-trainArima
+<<makeArimaTrain, cache = TRUE>>=
+trainTbats= train(tbatsMod, climate.task )
+trainTbats
+testp = predict(trainTbats, newdata = m4Test1)
+performance(testp, mase, task = climate.task)
+matplot(testp$data, type = "l")
 @
 
 While ARIMA is one of the most well known time series models, the order selection process can be subjective and difficult for users. One of the first proposals for automatic order selection comes from ~\cite{hannanOrder} where innovations are obtained by fitting high order autoregressive model to the data and then computing the likelihood of potential models through a series of standard regresssions. Proprietary algorithms from software such as \proglang{Forecast Pro} ~\cite{forecastpro} and \proglang{Autobox} ~\cite{reillyautobox} are well known and have performed to high standards in competitions such as the M3 forecasting competition ~\cite{Makridakis2000451}. One of the most well known R packages for automated forecast is \pkg{forecast} ~\cite{HyndForecast} which contains several methods for automated forecasting including exponential smoothing based methods and step-wise algorithms for forecasting with ARIMA models.
@@ -208,39 +214,62 @@ A windowing resampling process is created in the function \code{makeResampleDesc
 
 <<makeResampleDesc, cache = TRUE>>=
 resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
-                               initialWindow = 400L,
-                               size = nrow(getTaskData(Fin.task1)), skip = 2L)
+                               initial.window = 400L,
+                               size = nrow(getTaskData(climate.task)), skip = 6L)
 resampDesc
 @
 
 To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{paramhelper}. For this example we use the random search procedure from ~\cite{Bergstra} to search our parameter space for the most optimal model.
-<<makeparSet, cache = TRUE>>=
+<<makeparSet, eval = FALSE>>=
 parSet = makeParamSet(
-  makeIntegerVectorParam(id = "order",
-                         len = 3L,
-                         lower = c(1L,0L,1L),
-                         upper = c(8,3,8),
-                         tunable = TRUE),
-  makeIntegerVectorParam(id = "seasonal",
-                         len = 3,
-                         lower = c(0,0,0),
-                         upper = c(1,1,1),
-                         tunable = TRUE),
-  makeLogicalParam(id = "include.mean",
+  makeLogicalParam(id = "use.box.cox",
                    default = FALSE,
                    tunable = TRUE),
-  makeLogicalParam(id = "include.drift",
+  makeLogicalParam(id = "use.trend",
                    default = FALSE,
                    tunable = TRUE),
-  makeNumericParam(id = "h",
+  makeLogicalParam(id = "use.damped.trend",
+                   default = FALSE,
+                   tunable = TRUE),
+  makeLogicalParam(id = "seasonal.periods",
+                   default = FALSE,
+                   tunable = TRUE),
+  makeIntegerParam(id = "max.p",
+                   upper = 20,
+                   lower = 0),
+  makeIntegerParam(id = "start.p",
+                   upper = 10,
+                   lower = 1,
+                   trafo = function(x) x*2),
+  makeIntegerParam(id = "max.q",
+                   upper = 20,
+                   lower = 0),
+  makeIntegerParam(id = "start.q",
+                   upper = 10,
+                   lower = 1,
+                   trafo = function(x) x*2),
+  makeIntegerParam("max.P",
+                   lower = 0,
+                   upper = 5),
+  makeIntegerParam("max.Q",
+                   lower = 0,
+                   upper = 5),
+  makeDiscreteParam("ic",
+                    values = c("aicc","aic","bic")),
+  makeDiscreteParam("test",
+                    values = c("kpss","adf","pp")),
+  makeDiscreteParam("seasonal.test",
+                    values = c("ocsb", "ch")),
+  makeLogicalParam("biasadj", default = FALSE),
+  makeIntegerParam(id = "h",
                    default = 35,
                    tunable = FALSE,
                    lower = 35,
-                   upper = 35)
+                   upper = 36)
 )
 
 #Specify tune by grid estimation
-ctrl = makeTuneControlRandom()
+ctrl = makeTuneControlIrace(maxExperiments = 500L)
 @
 
 Using \code{tuneParams()} the model is tuned for the task using the specified resampling scheme, parameter set, tune control, and measure. For this tuning task we use MASE ~\cite{Hyndman2006} as a measure of performance \footnote{Models with a seasonal difference $> 0$ may be favorably biased as we use the non-seasonal MASE score}.
@@ -251,26 +280,79 @@ library("parallelMap")
 parallelStartSocket(6)
 configureMlr(on.learner.error = "warn")
 set.seed(1234)
-res = tuneParams("fcregr.Arima", task = Fin.task1, resampling = resampDesc,
+tbatsTune = tuneParams("fcregr.tbats", task = climate.task, resampling = resampDesc,
                  par.set = parSet, control = ctrl, measures = mase)
 parallelStop()
-
-res
+tbatsTune
 @
+
+<<loadTuneTbats,echo = FALSE, cache = TRUE>>=
+load("./tbatsTune.RData")
+tbatsTune
+@
+
 
 The best model's parameters are extracted using \code{setHyperPars()} and the best model is passed to \code{train()} to go over the full data set.
 
-<<bestmodtrain, eval = FALSE>>=
-lrn = setHyperPars(makeLearner("fcregr.Arima"), par.vals = res$x)
-m = train(lrn, Timeregr.task)
+<<bestmodtrain, cache = TRUE>>=
+lrn = setHyperPars(makeLearner("fcregr.tbats"), par.vals = tbatsTune$x)
+m = train(lrn, climate.task)
 @
 
 To make predictions for our test set we simply pass our model, task, and test data to \code{predict()}
 
-<<predbestArima, eval = FALSE>>=
-predict(m, task = Fin.task1, newdata = m4Test1)
+<<predbestArima, cache = TRUE>>=
+climate.pred = predict(m, newdata = m4Test1)
+performance(climate.pred, measures = mase, task = climate.task)
+matplot(climate.pred$data, type = "l")
 @
 
+<<tuneGarch, eval = FALSE>>=
+par_set = makeParamSet(
+  makeDiscreteParam(id = "model", values = c("sGARCH", "csGARCH")),
+  makeIntegerVectorParam(id = "garchOrder", len = 2L, lower = c(1,1), upper = c(4,4)),
+  makeIntegerVectorParam(id = "armaOrder", len = 2L, lower = c(5,1), upper = c(8,3)),
+  makeLogicalParam(id = "include.mean"),
+  makeLogicalParam(id = "archm"),
+  makeDiscreteParam(id = "distribution.model", values = c("norm","std","jsu")),
+  makeDiscreteParam(id = "stationarity", c(0,1)),
+  makeDiscreteParam(id = "fixed.se", c(0,1)),
+  makeDiscreteParam(id = "solver", values = "nloptr"),
+  makeIntegerParam(id = "n.ahead", default = 35L, lower = 35L,
+                   upper = 36L, tunable = FALSE)
+)
+
+#Specify tune by grid estimation
+ctrl = makeTuneControlIrace(maxExperiments = 400L)
+
+parallelStartSocket(6)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+garchTune = tuneParams("fcregr.garch", task = climate.task, resampling = resampDesc,
+                 par.set = par_set, control = ctrl, measures = mase)
+parallelStop()
+garchTune
+@
+
+<<loadGarchTune, cache = TRUE, echo = FALSE>>=
+load("./garchTune.RData")
+garchTune
+@
+
+<<trainGarchTuned, cache = TRUE, echo = FALSE>>=
+lrn = setHyperPars(makeLearner("fcregr.garch", predict.type = "quantile"), par.vals = garchTune$x)
+m = train(lrn, climate.task)
+climate.pred = predict(m, newdata = m4Test1)
+performance(climate.pred, measures = mase, task = climate.task)
+@
+
+<<garchPlot, cache = TRUE, echo = FALSE>>=
+nn <- ncol(climate.pred$data)
+par(xpd = TRUE)
+matplot(climate.pred$data,type="l", xlab = "Forecast Horizon", ylab = "Temperature",
+        main = "Forecast of Daily Climate Data\n With Confidence Intervals")
+legend(-.5,-5.2, c("Truth", "Prediction", "Lower ConfInt .05", "Upper ConfInt .95"),col=seq_len(nn),cex=0.8,fill=seq_len(nn), ncol = 4, bty = "n")
+@
 \newpage
 %\small
 \bibliography{thesisbib}{}
