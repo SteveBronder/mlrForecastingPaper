@@ -1,0 +1,250 @@
+Forecasting in the MLR Framework
+========================================================
+author: Steve Bronder
+date: October 11th, 2016
+autosize: true
+
+Goal: Make Forecasting Simple
+========================================================
+
+> "We need to stop teaching abstinence and start teaching safe statistics"
+- Hadley Wickham
+
+Ex: Demeaning the whole data set before CV
+
+- Forecasting is very dangerous
+- Need a framework for 'safe forecasting'
+- Want to use ML in forecasting
+
+The Modeling Process
+========================================================
+
+<img src="modeling_process.jpeg" alt="Drawing" style="width: 1400px; height: 500px"/>
+
+***
+
+<img src="func_process.jpeg" alt="Drawing" style="width: 1400px; height: 500px"/>
+
+Example Data
+======================================================
+```{r quandl, cache = TRUE, fig.align='center',fig.height= 12, fig.width= 15}
+library(Quandl)
+library(xts)
+aapl <- Quandl("YAHOO/AAPL", api_key="UG7wmFCm6zMyq1xhW9Re")
+aaplXts <- xts(aapl$Close, order.by = as.POSIXlt(aapl$Date))
+colnames(aaplXts) <- "Close"
+aaplXtsTrain <- aaplXts[1:9000,]
+aaplXtsTest  <- aaplXts[9001:9035,]
+```
+
+Plot of aapl Stock
+=====================================================
+
+```{r quandlPlot, cache = TRUE, fig.align='center',fig.height= 8, fig.width= 10}
+plot(aaplXtsTrain, main = "Closing Price of Apple by Day")
+
+```
+
+Creating a Forecasting Task
+========================================================
+
+```{r aaplTask, cache = TRUE}
+library(mlr)
+aaplTask <- makeForecastRegrTask(id = "aapl",data = aaplXtsTrain,target  = "Close",frequency = 7L)
+aaplTask
+```
+
+Making a Forecasting Learner
+======================================================
+
+```{r arimaLearner, cache = TRUE}
+arm <- makeLearner("fcregr.Arima", order = c(13L,1L,13L), h = 35L, include.mean = TRUE)
+arm
+```
+
+Train a Forecast Learner
+======================================================
+
+```{r trainArima, cache = TRUE}
+trainArima <- train(arm, aaplTask)
+trainArima
+```
+
+Predict With a Forecast Learner
+======================================================
+```{r predictArima2, cache = TRUE}
+predAapl <- predict(trainArima, newdata = aaplXtsTest)
+performance(predAapl, measures = mase, task = aaplTask)
+```
+
+Prediction Plot
+=====================================================
+
+```{r predplotArima, cache = TRUE, echo = FALSE, fig.align='center',fig.height= 8, fig.width= 10}
+matplot(predAapl$data, type = "l", main = "Prediction Vs. Real Values of Next 35 Days")
+```
+
+Update Model
+=====================================================
+
+```{r updateModelArima, cache = TRUE}
+armUpdate  = updateModel(trainArima, aaplTask, newdata = aaplXtsTest)
+updatePred = predict(armUpdate, newdata = data.frame(None = rep(NA,35), row.names = index(aaplXtsTest)+ days(50) ))
+```
+
+Updated Forecast
+=====================================================
+
+```{r predplotupdateArima, cache = TRUE, echo = FALSE, fig.align='center', fig.height= 8, fig.width= 10}
+updatePredxts = xts(updatePred$data,as.POSIXlt(rownames(updatePred$data)))
+updatePredzoo = as.zoo(updatePredxts)
+plot(updatePredzoo, main = "Forecast of Closing aapl price for next 35 days")
+```
+Tuning a Model
+=====================================================
+
+```{r makeTuneParam, cache = TRUE}
+parSet = makeParamSet(
+  makeIntegerVectorParam(id = "order",
+                         len = 3L,
+                         lower = c(10L,0L,10L),
+                         upper = c(15,1,15),
+                         tunable = TRUE),
+  makeIntegerVectorParam(id = "seasonal",
+                         len = 3,
+                         lower = c(0,0,0),
+                         upper = c(1,1,1),
+                         tunable = TRUE),
+  makeLogicalParam(id = "include.mean",
+                   default = FALSE,
+                   tunable = TRUE),
+  makeLogicalParam(id = "include.drift",
+                   default = FALSE,
+                   tunable = TRUE),
+  makeNumericParam(id = "h",
+                   default = 35,
+                   tunable = FALSE,
+                   lower = 35,
+                   upper = 35)
+)
+
+#Specify tune by grid estimation
+ctrl = makeTuneControlRandom()
+```
+
+Making a Resample Scheme
+========================================
+
+```{r resampleScheme, cache = TRUE}
+resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
+                               initialWindow = 7000L,
+                               size = nrow(getTaskData(aaplTask)), skip = 35L)
+resampDesc
+```
+
+Example of Windowing Resample
+======================================================
+<center>
+<img src="caret_window.png" alt="Drawing" style="width: 1200px; height: 600px"/>
+</center>
+
+Tuning Over Parameter Space
+===========================================
+
+```{r tuneSpace, eval = FALSE}
+library("parallelMap")
+parallelStartSocket(6)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+res = tuneParams("fcregr.Arima", task = Fin.task1, resampling = resampDesc,
+                 par.set = parSet, control = ctrl, measures = mase)
+parallelStop()
+
+```
+
+
+Using an ML Model
+=========================================
+
+```{r mlLagTask, cache = TRUE}
+aaplLagDat = createLagDiffFeatures(aaplXts, lag = 35L:100L, na.pad = FALSE, return.nonlag = TRUE)
+aaplLagTrain = aaplLagDat[1:I(nrow(aaplLagDat) - 35L),]
+aaplLagTest = aaplLagDat[I(nrow(aaplLagDat) - 35L):nrow(aaplLagDat),]
+aaplLagTask = makeForecastRegrTask(id = "gbmAapl", data = aaplLagTrain, target = "Close")
+aaplLagTask$env$data <- aaplLagTask$env$data[,-1]
+regrGbm = makeLearner("regr.gbm", par.vals = list(n.trees = 2000,interaction.depth = 8, distribution = "laplace"))
+gbmMod  = train(regrGbm, aaplLagTask)
+```
+
+Make Resampling Scheme
+===========================================
+
+```{r resampleSchemegbm, cache = TRUE}
+resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
+                               initialWindow = 7000L,
+                               size = nrow(getTaskData(aaplLagTask)), skip = 35L)
+```
+
+Make Tuning Set and Search Scheme
+===========================================
+```{r gbmtuning}
+library(mlr)
+ps = makeParamSet(
+  makeDiscreteParam("distribution", values = c("gaussian","laplace", "tdist")),
+  makeIntegerParam("n.trees", lower = 1, upper = 10, trafo = function(x) x * 1000),
+  makeIntegerParam("interaction.depth", lower = 1, upper = 5, trafo = function(x) x * 5),
+  makeNumericParam("shrinkage", lower = 1E-5, upper = 1E-2)
+)
+ctrl = makeTuneControlIrace(maxExperiments = 200L)
+```
+Tuning GBM Model
+===========================================
+
+```{r tuneSpacegbm, cache = TRUE}
+library("parallelMap")
+parallelStartSocket(3)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+res = tuneParams("regr.gbm", task = aaplLagTask, resampling = resampDesc,
+                 par.set = ps, control = ctrl, measures = mse)
+parallelStop()
+
+```
+
+Predict with ML Model
+======================================================
+```{r mlPred, cache = TRUE}
+testp <- predict(gbmMod, newdata = aaplLagTest)
+performance(testp, mase, aaplLagTask)
+```
+
+Plot Prediction
+===========================================
+```{r mlPredictGraph, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = FALSE}
+testXts <- xts(testp$data, as.POSIXlt(rownames(testp$data)))
+testZoo <- as.zoo(testXts)
+tsRainbow <- rainbow(ncol(testZoo))
+plot(x = testZoo, ylab = "Closing Price", main = "Prediction Vs. Real",
+col = tsRainbow, screens = 1)
+```
+
+
+Make Forecast
+===========================================
+
+```{r mlforecast, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = TRUE}
+library(lubridate)
+aaplLagFore = createLagDiffFeatures(aaplXts, lag = 0L:65L, na.pad = FALSE, return.nonlag = FALSE)
+aaplLagFore = aaplLagFore[I(nrow(aaplLagFore) - 35L):nrow(aaplLagFore),]
+colnames(aaplLagFore)[1:66] = colnames(aaplLagTrain)[2:67]
+forep = predict(gbmMod, newdata = aaplLagFore)
+```
+
+Plot Forecast
+===========================================
+
+```{r mlforecastPlot, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = FALSE}
+testXts = xts(forep$data, as.POSIXlt(rownames(forep$data)) + days(53))
+testZoo = as.zoo(testXts)
+plot(x = testZoo, ylab = "Closing Price", main = "Forecast of aapl Closing Stock Price")
+```
