@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.11.25)  4 DEC 2016 22:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.11.25)  4 DEC 2016 23:34
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1121,27 +1121,27 @@ Overfull \hbox (15.0pt too wide) in paragraph at lines 369--370
 
 [7]
 Package color Info: Redefining color shadecolor on input line 378.
- [8 <./figure/plotbatsTrain-1.pdf>]
-Package color Info: Redefining color shadecolor on input line 405.
 
-Overfull \hbox (61.77785pt too wide) in paragraph at lines 407--407
-[][]\T1/cmtt/m/n/10 bigvar.mod[] []=[] []makeLearner[][]([][]"mfcregr.BigVAR"[]
-[],[][]p[] []=[] []5[][],[] []struct[] []=[] []"SparseLag"[][],[] []gran[] []=[
-] []c[][]([][]50[][],[] []60[][]),[][] 
+Overfull \hbox (305.84325pt too wide) in paragraph at lines 387--387
+[]\T1/cmtt/m/n/10 ## Hyperparameters: use.box.cox=TRUE,use.trend=TRUE,seasonal.
+periods=TRUE,max.p=60,max.q=60,stationary=FALSE,use.arma.errors=TRUE,h=35[] 
  []
 
-Package color Info: Redefining color shadecolor on input line 414.
-Package color Info: Redefining color shadecolor on input line 423.
-Package color Info: Redefining color shadecolor on input line 433.
-Package color Info: Redefining color shadecolor on input line 446.
+[8 <./figure/plotbatsTrain-1.pdf>]
+Package color Info: Redefining color shadecolor on input line 413.
+Package color Info: Redefining color shadecolor on input line 422.
+Package color Info: Redefining color shadecolor on input line 431.
+Package color Info: Redefining color shadecolor on input line 441.
+Package color Info: Redefining color shadecolor on input line 454.
+
 <figure/bigVarplot-1.pdf, id=179, 505.89pt x 505.89pt>
 File: figure/bigVarplot-1.pdf Graphic file (type pdf)
 
 <use figure/bigVarplot-1.pdf>
-Package pdftex.def Info: figure/bigVarplot-1.pdf used on input line 447.
+Package pdftex.def Info: figure/bigVarplot-1.pdf used on input line 455.
 (pdftex.def)             Requested size: 397.485pt x 397.49504pt.
 
-Overfull \hbox (15.0pt too wide) in paragraph at lines 447--448
+Overfull \hbox (15.0pt too wide) in paragraph at lines 455--456
 [][] 
  []
 
@@ -1150,10 +1150,10 @@ Overfull \hbox (15.0pt too wide) in paragraph at lines 447--448
 File: windowing_pic_caret.png Graphic file (type png)
 
 <use windowing_pic_caret.png>
-Package pdftex.def Info: windowing_pic_caret.png used on input line 459.
+Package pdftex.def Info: windowing_pic_caret.png used on input line 467.
 (pdftex.def)             Requested size: 398.92201pt x 221.62334pt.
 
-Overfull \hbox (1.43701pt too wide) in paragraph at lines 459--461
+Overfull \hbox (1.43701pt too wide) in paragraph at lines 467--469
  [][] 
  []
 
@@ -1162,138 +1162,99 @@ Overfull \hbox (1.43701pt too wide) in paragraph at lines 459--461
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.463 \newpage
+l.471 \newpage
                <./windowing_pic_caret.png>]
-Package color Info: Redefining color shadecolor on input line 468.
+Package color Info: Redefining color shadecolor on input line 476.
+Package color Info: Redefining color shadecolor on input line 500.
 
-Overfull \hbox (31.86015pt too wide) in paragraph at lines 472--472
-[]                               []\T1/cmtt/m/n/10 size[] []=[] []nrow[][]([][]
-getTaskData[][](climate.task)),[] []skip[] []=[] [].02[][])[][] 
+Overfull \vbox (0.34715pt too high) detected at line 532
  []
 
-Package color Info: Redefining color shadecolor on input line 491.
-
-Overfull \hbox (14.53938pt too wide) in paragraph at lines 497--497
-[]                     []\T1/cmtt/m/n/10 makeLogicalParam[][]([][]id[] []=[] []
-"use.damped.trend"[][],[] []default[] []=[] []FALSE[][],[][] 
- []
-
-
-Overfull \hbox (14.53938pt too wide) in paragraph at lines 499--499
-[]                     []\T1/cmtt/m/n/10 makeLogicalParam[][]([][]id[] []=[] []
-"seasonal.periods"[][],[] []default[] []=[] []FALSE[][],[][] 
- []
-
-
-Overfull \hbox (4.04195pt too wide) in paragraph at lines 509--509
-[]                     []\T1/cmtt/m/n/10 makeDiscreteParam[][]([][]"ic"[][],[] 
-[]values[] []=[] []c[][]([][]"aicc"[][],[][]"aic"[][],[][]"bic"[][])),[][] 
- []
-
-
-Overfull \hbox (9.29066pt too wide) in paragraph at lines 510--510
-[]                     []\T1/cmtt/m/n/10 makeDiscreteParam[][]([][]"test"[][],[
-] []values[] []=[] []c[][]([][]"kpss"[][],[][]"adf"[][],[][]"pp"[][])),[][] 
- []
-
-
-Overfull \hbox (30.28554pt too wide) in paragraph at lines 511--511
-[]                     []\T1/cmtt/m/n/10 makeDiscreteParam[][]([][]"seasonal.te
-st"[][],[] []values[] []=[] []c[][]([][]"ocsb"[][],[] []"ch"[][])),[][] 
- []
-
-Package color Info: Redefining color shadecolor on input line 524.
 [12]
-Package color Info: Redefining color shadecolor on input line 541.
+Package color Info: Redefining color shadecolor on input line 538.
+Package color Info: Redefining color shadecolor on input line 555.
 
-Overfull \hbox (709.99455pt too wide) in paragraph at lines 546--546
+Overfull \hbox (709.99455pt too wide) in paragraph at lines 560--560
 []\T1/cmtt/m/n/10 ## Op. pars: use.box.cox=TRUE; use.trend=TRUE; use.damped.tre
 nd=TRUE; seasonal.periods=FALSE; max.p=7; start.p=8; max.q=2; start.q=8; max.P=
 2; max.Q=1; ic=aicc; test=kpss; seasonal.test=ocsb; biasadj=FALSE; h=35[] 
  []
 
-Package color Info: Redefining color shadecolor on input line 554.
-
-Overfull \hbox (16.114pt too wide) in paragraph at lines 556--556
-[][]\T1/cmtt/m/n/10 lrn[] []=[] []setHyperPars[][]([][]makeLearner[][]([][]"fcr
-egr.tbats"[][],[] []h[] []=[] []35[][]),[] []par.vals[] []= tbatsTune[][]$[][]x
-)[][] 
- []
-
-Package color Info: Redefining color shadecolor on input line 565.
-Package color Info: Redefining color shadecolor on input line 578.
-<figure/plottbatsTune-1.pdf, id=236, 505.89pt x 505.89pt>
+Package color Info: Redefining color shadecolor on input line 568.
+Package color Info: Redefining color shadecolor on input line 580.
+Package color Info: Redefining color shadecolor on input line 593.
+<figure/plottbatsTune-1.pdf, id=230, 505.89pt x 505.89pt>
 File: figure/plottbatsTune-1.pdf Graphic file (type pdf)
 
 <use figure/plottbatsTune-1.pdf>
-Package pdftex.def Info: figure/plottbatsTune-1.pdf used on input line 579.
+Package pdftex.def Info: figure/plottbatsTune-1.pdf used on input line 594.
 (pdftex.def)             Requested size: 397.485pt x 397.49504pt.
 
-Overfull \hbox (15.0pt too wide) in paragraph at lines 579--580
+Overfull \hbox (15.0pt too wide) in paragraph at lines 594--595
 [][] 
  []
 
-Package color Info: Redefining color shadecolor on input line 585.
+Package color Info: Redefining color shadecolor on input line 600.
 [13]
-Overfull \vbox (1.29947pt too high) detected at line 616
+Overfull \vbox (1.29947pt too high) detected at line 631
  []
 
 [14 <./figure/plottbatsTune-1.pdf>]
-Package color Info: Redefining color shadecolor on input line 620.
+Package color Info: Redefining color shadecolor on input line 635.
 
-Overfull \hbox (484.29967pt too wide) in paragraph at lines 625--625
+Overfull \hbox (484.29967pt too wide) in paragraph at lines 640--640
 []\T1/cmtt/m/n/10 ## Op. pars: model=sGARCH; garchOrder=4,1; armaOrder=7,2; inc
 lude.mean=TRUE; archm=FALSE; distribution.model=norm; stationarity=1; fixed.se=
 0; solver=nloptr; n.ahead=36[] 
  []
 
-Package color Info: Redefining color shadecolor on input line 630.
-Package color Info: Redefining color shadecolor on input line 639.
+Package color Info: Redefining color shadecolor on input line 645.
+Package color Info: Redefining color shadecolor on input line 654.
 <figure/garchPlot-1.pdf, id=252, 505.89pt x 505.89pt>
 File: figure/garchPlot-1.pdf Graphic file (type pdf)
 
 <use figure/garchPlot-1.pdf>
-Package pdftex.def Info: figure/garchPlot-1.pdf used on input line 640.
+Package pdftex.def Info: figure/garchPlot-1.pdf used on input line 655.
 (pdftex.def)             Requested size: 397.485pt x 397.49504pt.
 
-Overfull \hbox (15.0pt too wide) in paragraph at lines 640--641
+Overfull \hbox (15.0pt too wide) in paragraph at lines 655--656
 [][] 
  []
 
 [15]
-Package color Info: Redefining color shadecolor on input line 651.
+Package color Info: Redefining color shadecolor on input line 666.
 
-Overfull \hbox (0.36784pt too wide) in paragraph at lines 658--658
+Overfull \hbox (0.36784pt too wide) in paragraph at lines 673--673
 []                                         []\T1/cmtt/m/n/10 seasonal.lag[] []=
 [] []1L[][]:[][]2L[][],[] []na.pad[][]=[][]FALSE[][])[][] 
  []
 
 [16 <./figure/garchPlot-1.pdf>]
-Package color Info: Redefining color shadecolor on input line 679.
-Package color Info: Redefining color shadecolor on input line 690.
+Package color Info: Redefining color shadecolor on input line 694.
 Package color Info: Redefining color shadecolor on input line 705.
+Package color Info: Redefining color shadecolor on input line 720.
 
 <figure/forecastgbmplot-1.pdf, id=268, 505.89pt x 505.89pt>
 File: figure/forecastgbmplot-1.pdf Graphic file (type pdf)
 
 <use figure/forecastgbmplot-1.pdf>
-Package pdftex.def Info: figure/forecastgbmplot-1.pdf used on input line 706.
+Package pdftex.def Info: figure/forecastgbmplot-1.pdf used on input line 721.
 (pdftex.def)             Requested size: 397.485pt x 397.49504pt.
 
-Overfull \hbox (15.0pt too wide) in paragraph at lines 706--707
+Overfull \hbox (15.0pt too wide) in paragraph at lines 721--722
 [][] 
  []
 
 [17]
-Package color Info: Redefining color shadecolor on input line 715.
+Package color Info: Redefining color shadecolor on input line 730.
  [18 <./figure/forecastgbmplot-1.pdf>]
-Package color Info: Redefining color shadecolor on input line 739.
-Package color Info: Redefining color shadecolor on input line 749.
+Package color Info: Redefining color shadecolor on input line 754.
+Package color Info: Redefining color shadecolor on input line 764.
 
 ! Missing { inserted.
 <to be read again> 
                    \right 
-l.775 Z = U\exp\left(\frac{\delta}{2}(U^2)^\right
+l.790 Z = U\exp\left(\frac{\delta}{2}(U^2)^\right
                                                  ),\; \delta\ge 0
 A left brace was mandatory here, so I've put one in.
 You might want to delete and/or insert some corrections
@@ -1303,7 +1264,7 @@ so that I will find a matching right brace soon.
 ! Missing } inserted.
 <inserted text> 
                 }
-l.775 Z = U\exp\left(\frac{\delta}{2}(U^2)^\right
+l.790 Z = U\exp\left(\frac{\delta}{2}(U^2)^\right
                                                  ),\; \delta\ge 0
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -1312,21 +1273,21 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 [19]
-Package color Info: Redefining color shadecolor on input line 792.
+Package color Info: Redefining color shadecolor on input line 807.
  <figure/lambertWplots-1.pdf, id=296, 505.89pt x 505.89pt>
 File: figure/lambertWplots-1.pdf Graphic file (type pdf)
 
 <use figure/lambertWplots-1.pdf>
-Package pdftex.def Info: figure/lambertWplots-1.pdf used on input line 793.
+Package pdftex.def Info: figure/lambertWplots-1.pdf used on input line 808.
 (pdftex.def)             Requested size: 397.485pt x 397.49504pt.
 
-Overfull \hbox (15.0pt too wide) in paragraph at lines 793--794
+Overfull \hbox (15.0pt too wide) in paragraph at lines 808--809
 [][] 
  []
 
-Package color Info: Redefining color shadecolor on input line 800.
+Package color Info: Redefining color shadecolor on input line 815.
 [20 <./figure/lambertWplots-1.pdf>]
-Package color Info: Redefining color shadecolor on input line 842.
+Package color Info: Redefining color shadecolor on input line 857.
  [21] [22] (./mlr_timeseries_26Sept2016.bbl
 ! Misplaced alignment tab character &.
 l.94 \newblock John Wiley &
@@ -1339,16 +1300,16 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 [23])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 911.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 926.
  [24]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 911.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 926.
  (./mlr_timeseries_26Sept2016.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 911.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 911.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 926.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 926.
 Package rerunfilecheck Info: File `mlr_timeseries_26Sept2016.out' has not chang
 ed.
 (rerunfilecheck)             Checksum: 1779041B7018616E7E89F7AEC9AAA045;844.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 911.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 926.
  ) 
 Here is how much of TeX's memory you used:
  10738 strings out of 493029
@@ -1382,7 +1343,7 @@ ublic/cm-super/sfrm1728.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfss1
 000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti1000.pfb></usr/share/
 texmf/fonts/type1/public/cm-super/sftt1000.pfb></usr/share/texmf/fonts/type1/pu
 blic/cm-super/sftt1200.pfb>
-Output written on mlr_timeseries_26Sept2016.pdf (24 pages, 672425 bytes).
+Output written on mlr_timeseries_26Sept2016.pdf (24 pages, 672550 bytes).
 PDF statistics:
  440 PDF objects out of 1000 (max. 8388607)
  363 compressed objects within 4 object streams

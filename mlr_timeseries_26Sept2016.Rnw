@@ -170,6 +170,7 @@ climate.task = makeForecastRegrTask(id = "M4 Climate Data",
                                  target = "target_var",
                                  frequency = 183L)
 climate.task
+
 @
 
 Like a regression task, this records the type of the learning problem and basic information about the data set such as the start and end dates, frequency, and whether we have missing values. Note that there are zero features in our task because we only have a target variable, which the model itself will use to build features.
@@ -183,7 +184,6 @@ mfcregr.univar.task = makeMultiForecastRegrTask(id = "bigvar",
                                                 target = "FTSE",
                                                 frequency = 365L)
 mfcregr.univar.task
-
 @
 
 Like \code{makeForecastRegrTask()}, \code{mfcregr.univar.task} we get the standard output, but notice now that there are three three features. Alternatively, \code{mfcregr.all.task} contains multiple target values with no features. The difference between each of these multivariate tasks is that \code{mfcregr.univar.task} will act similar to \code{makeForecastRegrTask()}, giving the output, predictions, and even using the measures for univariate forecasting tasks. Both of these tasks will still forecast all of the underlying series, which allows us take exogeneous models and treat them endogeneously for multi-step forecasts.
@@ -194,7 +194,6 @@ mfcregr.all.task = makeMultiForecastRegrTask(id = "bigvar",
                                              target = "all",
                                              frequency = 365L)
 mfcregr.all.task
-
 @
 
 \section{Building and Tuning a forecast learner}
@@ -284,9 +283,10 @@ Need to talk about results
 Because the forecasts are only for the next 35 periods it's useful to be able to update the model continuously without retraining the model each time we want new forecasts. Univariate forecasting models in \pkg{mlr} can be updated using \code{updateModel()}. 
 
 <<tbatsupdate, cache = TRUE>>=
+
 update.tbats = updateModel(train.tbats, climate.task, newdata = m4.test)
 update.tbats
-predict(update.tbats)
+predict(update.tbats, task = climate.task)
 @
 
 \subsection{Multivariate Forecasting}
@@ -294,8 +294,8 @@ predict(update.tbats)
 Need to write things for this
 
 <<bigVarmod, cache=TRUE, message=FALSE, error=FALSE>>=
-bigvar.mod = makeLearner("mfcregr.BigVAR",p = 5, struct = "SparseLag", gran = c(50, 60),
-                         h = 35, n.ahead = 35)
+bigvar.mod = makeLearner("mfcregr.BigVAR",p = 5, struct = "SparseLag",
+                         gran = c(50, 60),h = 35, n.ahead = 35)
 @
 
 <<bigVartrain, cache=TRUE, message=FALSE, error=FALSE, eval=FALSE>>=
@@ -348,7 +348,8 @@ A windowing resampling process is created in the function \code{makeResampleDesc
 <<makeResampleDesc, cache = TRUE>>=
 resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
                                initial.window = .7,
-                               size = nrow(getTaskData(climate.task)), skip = .02)
+                               size = nrow(getTaskData(climate.task)),
+                               skip = .02)
 resampDesc
 @
 
@@ -362,9 +363,11 @@ parSet = makeParamSet(makeLogicalParam(id = "use.box.cox", default = FALSE,
                                      tunable = TRUE),
                      makeLogicalParam(id = "use.trend", default = FALSE,
                                       tunable = TRUE),
-                     makeLogicalParam(id = "use.damped.trend", default = FALSE,
+                     makeLogicalParam(id = "use.damped.trend",
+                                      default = FALSE,
                                       tunable = TRUE),
-                     makeLogicalParam(id = "seasonal.periods", default = FALSE,
+                     makeLogicalParam(id = "seasonal.periods",
+                                      default = FALSE,
                                       tunable = TRUE),
                      makeIntegerParam(id = "max.p", upper = 10, lower = 0),
                      makeIntegerParam(id = "start.p", upper = 10, lower = 1,
@@ -374,9 +377,12 @@ parSet = makeParamSet(makeLogicalParam(id = "use.box.cox", default = FALSE,
                                       trafo = function(x) x*2),
                      makeIntegerParam("max.P", lower = 0, upper = 3),
                      makeIntegerParam("max.Q", lower = 0, upper = 2),
-                     makeDiscreteParam("ic", values = c("aicc","aic","bic")),
-                     makeDiscreteParam("test", values = c("kpss","adf","pp")),
-                     makeDiscreteParam("seasonal.test", values = c("ocsb", "ch")),
+                     makeDiscreteParam("ic",
+                                       values = c("aicc","aic","bic")),
+                     makeDiscreteParam("test",
+                                       values = c("kpss","adf","pp")),
+                     makeDiscreteParam("seasonal.test",
+                                       values = c("ocsb", "ch")),
                      makeLogicalParam("biasadj", default = FALSE)
                      )
 
@@ -408,7 +414,8 @@ tbatsTune
 The best model's parameters are extracted using \code{setHyperPars()} and the best model is passed to \code{train()} to go over the full data set.
 
 <<bestmodtrain, cache = TRUE>>=
-lrn = setHyperPars(makeLearner("fcregr.tbats", h = 35), par.vals = tbatsTune$x)
+lrn = setHyperPars(makeLearner("fcregr.tbats", h = 35),
+                   par.vals = tbatsTune$x)
 m = train(lrn, climate.task)
 @
 

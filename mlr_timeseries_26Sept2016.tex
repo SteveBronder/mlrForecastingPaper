@@ -378,23 +378,31 @@ Because the forecasts are only for the next 35 periods it's useful to be able to
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlstd{update.tbats} \hlkwb{=} \hlkwd{updateModel}\hlstd{(train.tbats, climate.task,} \hlkwc{newdata} \hlstd{= m4.test)}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in `[.data.frame`(.newdata, , target): undefined columns selected}}\begin{verbatim}
-## Timing stopped at: 0 0 0
-\end{verbatim}
-\begin{alltt}
 \hlstd{update.tbats}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'update.tbats' not found}}\begin{alltt}
-\hlkwd{predict}\hlstd{(update.tbats)}
+\begin{verbatim}
+## Model for learner.id=fcregr.tbats; learner.class=fcregr.tbats
+## Trained on: task.id = M4 Climate Data; obs = 35; features = 0
+## Hyperparameters: use.box.cox=TRUE,use.trend=TRUE,seasonal.periods=TRUE,max.p=60,max.q=60,stationary=FALSE,use.arma.errors=TRUE,h=35
+\end{verbatim}
+\begin{alltt}
+\hlkwd{predict}\hlstd{(update.tbats,} \hlkwc{task} \hlstd{= climate.task)}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in predict(update.tbats): object 'update.tbats' not found}}\end{kframe}
+\begin{verbatim}
+## Prediction: 35 observations
+## predict.type: response
+## threshold: 
+## time: 0.00
+##                     response
+## 2009-09-04 23:59:54 6.319959
+## 2009-09-05 23:59:48 7.875401
+## 2009-09-06 23:59:43 8.209328
+## 2009-09-07 23:59:37 8.157638
+## 2009-09-08 23:59:31 8.083591
+## 2009-09-09 23:59:26 8.055280
+## ... (35 rows, 1 cols)
+\end{verbatim}
+\end{kframe}
 \end{knitrout}
 
 \subsection{Multivariate Forecasting}
@@ -404,8 +412,8 @@ Need to write things for this
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{bigvar.mod} \hlkwb{=} \hlkwd{makeLearner}\hlstd{(}\hlstr{"mfcregr.BigVAR"}\hlstd{,}\hlkwc{p} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{struct} \hlstd{=} \hlstr{"SparseLag"}\hlstd{,} \hlkwc{gran} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{50}\hlstd{,} \hlnum{60}\hlstd{),}
-                         \hlkwc{h} \hlstd{=} \hlnum{35}\hlstd{,} \hlkwc{n.ahead} \hlstd{=} \hlnum{35}\hlstd{)}
+\hlstd{bigvar.mod} \hlkwb{=} \hlkwd{makeLearner}\hlstd{(}\hlstr{"mfcregr.BigVAR"}\hlstd{,}\hlkwc{p} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{struct} \hlstd{=} \hlstr{"SparseLag"}\hlstd{,}
+                         \hlkwc{gran} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{50}\hlstd{,} \hlnum{60}\hlstd{),}\hlkwc{h} \hlstd{=} \hlnum{35}\hlstd{,} \hlkwc{n.ahead} \hlstd{=} \hlnum{35}\hlstd{)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -469,7 +477,8 @@ A windowing resampling process is created in the function \code{makeResampleDesc
 \begin{alltt}
 \hlstd{resampDesc} \hlkwb{=} \hlkwd{makeResampleDesc}\hlstd{(}\hlstr{"GrowingCV"}\hlstd{,} \hlkwc{horizon} \hlstd{=} \hlnum{35L}\hlstd{,}
                                \hlkwc{initial.window} \hlstd{=} \hlnum{.7}\hlstd{,}
-                               \hlkwc{size} \hlstd{=} \hlkwd{nrow}\hlstd{(}\hlkwd{getTaskData}\hlstd{(climate.task)),} \hlkwc{skip} \hlstd{=} \hlnum{.02}\hlstd{)}
+                               \hlkwc{size} \hlstd{=} \hlkwd{nrow}\hlstd{(}\hlkwd{getTaskData}\hlstd{(climate.task)),}
+                               \hlkwc{skip} \hlstd{=} \hlnum{.02}\hlstd{)}
 \hlstd{resampDesc}
 \end{alltt}
 \begin{verbatim}
@@ -494,9 +503,11 @@ To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{pa
                                      \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
                      \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"use.trend"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
                                       \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-                     \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"use.damped.trend"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
+                     \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"use.damped.trend"}\hlstd{,}
+                                      \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
                                       \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-                     \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"seasonal.periods"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
+                     \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"seasonal.periods"}\hlstd{,}
+                                      \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
                                       \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
                      \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"max.p"}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{0}\hlstd{),}
                      \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"start.p"}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{10}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{1}\hlstd{,}
@@ -506,9 +517,12 @@ To make a parameter set to tune over \pkg{mlr} uses \pkg{ParamHelpers} ~\cite{pa
                                       \hlkwc{trafo} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) x}\hlopt{*}\hlnum{2}\hlstd{),}
                      \hlkwd{makeIntegerParam}\hlstd{(}\hlstr{"max.P"}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{3}\hlstd{),}
                      \hlkwd{makeIntegerParam}\hlstd{(}\hlstr{"max.Q"}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{2}\hlstd{),}
-                     \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"ic"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"aicc"}\hlstd{,}\hlstr{"aic"}\hlstd{,}\hlstr{"bic"}\hlstd{)),}
-                     \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"test"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"kpss"}\hlstd{,}\hlstr{"adf"}\hlstd{,}\hlstr{"pp"}\hlstd{)),}
-                     \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"seasonal.test"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"ocsb"}\hlstd{,} \hlstr{"ch"}\hlstd{)),}
+                     \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"ic"}\hlstd{,}
+                                       \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"aicc"}\hlstd{,}\hlstr{"aic"}\hlstd{,}\hlstr{"bic"}\hlstd{)),}
+                     \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"test"}\hlstd{,}
+                                       \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"kpss"}\hlstd{,}\hlstr{"adf"}\hlstd{,}\hlstr{"pp"}\hlstd{)),}
+                     \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"seasonal.test"}\hlstd{,}
+                                       \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"ocsb"}\hlstd{,} \hlstr{"ch"}\hlstd{)),}
                      \hlkwd{makeLogicalParam}\hlstd{(}\hlstr{"biasadj"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{)}
                      \hlstd{)}
 
@@ -553,7 +567,8 @@ The best model's parameters are extracted using \code{setHyperPars()} and the be
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{lrn} \hlkwb{=} \hlkwd{setHyperPars}\hlstd{(}\hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.tbats"}\hlstd{,} \hlkwc{h} \hlstd{=} \hlnum{35}\hlstd{),} \hlkwc{par.vals} \hlstd{= tbatsTune}\hlopt{$}\hlstd{x)}
+\hlstd{lrn} \hlkwb{=} \hlkwd{setHyperPars}\hlstd{(}\hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.tbats"}\hlstd{,} \hlkwc{h} \hlstd{=} \hlnum{35}\hlstd{),}
+                   \hlkwc{par.vals} \hlstd{= tbatsTune}\hlopt{$}\hlstd{x)}
 \hlstd{m} \hlkwb{=} \hlkwd{train}\hlstd{(lrn, climate.task)}
 \end{alltt}
 \end{kframe}
