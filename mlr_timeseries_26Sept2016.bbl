@@ -6,6 +6,12 @@ Robert L.~Winkler Allan H.~Murphy.
 \newblock {\em Journal of the American Statistical Association},
   79(387):489--500, 1984.
 
+\bibitem{m4comp}
+Souhaib BenTaieb.
+\newblock {\em M4comp: Data from the M4 Time Series Forecasting Competition},
+  2016.
+\newblock R package version 0.0.1.
+
 \bibitem{Bergstra}
 James Bergstra and Yoshua Bengio.
 \newblock Random search for hyper-parameter optimization.
@@ -34,6 +40,11 @@ J.~Rissanen E.~J.~Hannan.
 \newblock Recursive estimation of mixed autoregressive-moving average order.
 \newblock {\em Biometrika}, 69(1):81--94, 1982.
 
+\bibitem{noteMase}
+Philip~Hans Franses.
+\newblock {A note on the Mean Absolute Scaled Error}.
+\newblock {\em International Journal of Forecasting}, 32(1):20--22, 2016.
+
 \bibitem{Friedman1997}
 Jerome~H. Friedman.
 \newblock On bias, variance, 0/1---loss, and the curse-of-dimensionality.
@@ -52,6 +63,19 @@ Alexios Ghalanos.
 \newblock {\em rugarch: Univariate GARCH models.}, 2015.
 \newblock R package version 1.3-6.
 
+\bibitem{LambertGeneral}
+Georg~M. Goerg.
+\newblock Lambert w random variables - a new family of generalized skewed
+  distributions with applications to risk estimation.
+\newblock {\em Annals of Applied Statistics}, 5(3):2197--2230, 2011.
+
+\bibitem{GaussLam}
+Georg~M. Goerg.
+\newblock The lambert way to gaussianize heavy-tailed data with the inverse of
+  tukey's h transformation as a special case.
+\newblock {\em The Scientific World Journal: Special Issue on Probability and
+  Statistics with Applications in Finance and Economics}, 2015(2015):16, 2015.
+
 \bibitem{Hyndman25}
 Jan G.~De Gooijer and Rob~J. Hyndman.
 \newblock 25 years of time series forecasting.
@@ -63,15 +87,16 @@ Clive~W.J. Granger.
 \newblock Forecasting stock market prices: Lessons for forecasters.
 \newblock {\em International Journal of Forecasting}, 8(1):3 -- 13, 1992.
 
+\bibitem{ghdist}
+David~C. Hoaglin.
+\newblock {\em Summarizing Shape Numerically: The g-and-h Distributions}, pages
+  461--513.
+\newblock John Wiley & Sons, Inc., 2006.
+
 \bibitem{hyndman2014forecasting}
 R.J. Hyndman and G.~Athanasopoulos.
 \newblock {\em Forecasting: principles and practice:}.
 \newblock OTexts, 2014.
-
-\bibitem{thief}
-Rob Hyndman and Nikolaos Kourentzes.
-\newblock {\em thief: Temporal Hierarchical Forecasting}, 2016.
-\newblock R package version 0.2.
 
 \bibitem{HyndForecast}
 Rob~J Hyndman and Yeasmin Khandakar.
@@ -89,16 +114,41 @@ Rob~J. Hyndman and Anne~B. Koehler.
 Max Kuhn.
 \newblock {caret} data splitting methods, 1999.
 
+\bibitem{tbats}
+Alysha M.~De Livera, Rob~J. Hyndman, and Ralph~D. Snyder.
+\newblock Forecasting time series with complex seasonal patterns using
+  exponential smoothing.
+\newblock {\em Journal of the American Statistical Association},
+  106(496):1513--1527, 2011.
+
 \bibitem{Makridakis2000451}
 Spyros Makridakis and Michèle Hibon.
 \newblock The m3-competition: results, conclusions and implications.
 \newblock {\em International Journal of Forecasting}, 16(4):451 -- 476, 2000.
 \newblock The M3- Competition.
 
+\bibitem{hhdist}
+Stephan Morgenthaler and John~W. Tukey.
+\newblock Fitting quantiles: Doubling, hr, hq, and hhh distributions.
+\newblock {\em Journal of Computational and Graphical Statistics},
+  9(1):180--195, 2000.
+
+\bibitem{BigVAR}
+Will Nicholson, David Matteson, and Jacob Bien.
+\newblock {\em BigVAR: Dimension Reduction Methods for Multivariate Time
+  Series}, 2016.
+\newblock R package version 1.0.1.
+
 \bibitem{Rbase}
 {R Core Team}.
 \newblock {\em R: A Language and Environment for Statistical Computing}.
 \newblock R Foundation for Statistical Computing, Vienna, Austria, 2015.
+
+\bibitem{datasets}
+{R Core Team}.
+\newblock {\em R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria, 2016.
+\newblock The data were kindly provided by Erste Bank AG, Vienna, Austria.
 
 \bibitem{reillyautobox}
 David Reilly.
@@ -121,6 +171,11 @@ J.~D. Rodriguez, A.~Perez, and J.~A. Lozano.
 Jeffrey~A. Ryan and Joshua~M. Ulrich.
 \newblock {\em xts: eXtensible Time Series}, 2016.
 \newblock R package version 0.10-0.
+
+\bibitem{fourierTrans}
+Mike West and Jeff Harrison.
+\newblock {\em Bayesian Forecasting and Dynamic Models (2Nd Ed.)}.
+\newblock Springer-Verlag New York, Inc., New York, NY, USA, 1997.
 
 \bibitem{earthquakeYegu}
 Tuncel~M. Yegulalp.

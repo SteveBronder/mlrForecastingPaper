@@ -6,3 +6,8 @@ xts
 lubridate
 ParamHelpers
 mlr
+rpart
+MASS
+ggplot2
+LambertW
+lamW
