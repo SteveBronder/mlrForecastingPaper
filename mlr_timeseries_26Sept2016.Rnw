@@ -31,6 +31,7 @@
 \usepackage[english]{babel}
 \usepackage{graphicx}
 \usepackage{longtable}
+\usepackage{verbatim}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -100,20 +101,20 @@
 \maketitle
 
 \begin{abstract}
-The \pkg{mlr} package is a unified interface for machine learning tasks such as classification, regression, cluster analysis, and survival analysis. \pkg{mlr} handles the data pipeline of pre-processing, resampling, model selection, model tuning, ensembling, and prediction. This paper details new methods for developing time series  models in \pkg{mlr}. It includes standard and novel tools such as auto-regressive and LambertW transform data generating processes, fixed and growing window cross validation, and forecasting models in the context of univariate and multivariate time series. Examples from forecasting competitions will be given in order to demonstrate the benefits of a unified framework for machine learning and time series.
+The \pkg{mlr} package is a unified interface for machine learning tasks such as classification, regression, cluster analysis, and survival analysis. \pkg{mlr} handles the data pipeline of preprocessing, resampling, model selection, model tuning, ensembling, and prediction. This paper details new methods for developing time series  models in \pkg{mlr}. It includes standard and novel tools such as autoregressive and LambertW transform data generating processes, fixed and growing window cross validation, and forecasting models in the context of univariate and multivariate time series. Examples from forecasting competitions will be given in order to demonstrate the benefits of a unified framework for machine learning and time series.
   \end{abstract}
 
 \section{Introduction}
-There has been a rapid developement in time series methods over the last 25 years ~\cite{Hyndman25} whereby time series models have not only become more common, but more complex. The \proglang{R} language ~\cite{Rbase} has a large task view with many packages available for forecasting and time series methods, but the open source nature of R has left users without a standard framework. Many packages have their own sub-culture of style, syntax, and output. The \pkg{mlr} ~\cite{mlr} package, short for Machine Learning in R, works to give a strong syntatic framework for the modeling pipeline. By automating many of the standard tools in machine learning such as preprocessing and cross validation, \pkg{mlr} reduces error from the user during the modeling process. 
+There has been a rapid developement in time series methods over the last 25 years ~\cite{Hyndman25} whereby time series models have not only become more common, but more complex. The \proglang{R} language ~\cite{Rbase} has several task views with compiling the packages available for forecasting, time series methods, and applied finance. However, the open source nature of R has left users without a standard framework. Many packages have their own sub-culture of style, syntax, and output. The \pkg{mlr} ~\cite{mlr} package, short for Machine Learning in R, works to give a strong syntatic framework for the modeling pipeline. By automating many of the standard tools in machine learning such as preprocessing and cross validation, \pkg{mlr} reduces error from the user during the modeling process. 
 
-While there are some time series methods available in \pkg{caret} ~\cite{caret}, development of forecasting models in \pkg{caret} is difficult due to computational constraints and design choices within the package. The highly modular structure of \pkg{mlr} makes it the best choice for implementing time series methods and models. This paper will show how using \pkg{mlr}'s strong syntatic structure allows for time series packages such as \pkg{forecast} ~\cite{HyndForecast}, \pkg{rugarch} ~\cite{rugarch}, and ~\cite{BigVAR} to use machine learning methedologies such as automated parameter tuning, data preprocessing, model blending, cross validation, performance evaluation, and parallel processing techniques for decreasing model build time.
+While there are some time series methods available in \pkg{caret} ~\cite{caret}, development of forecasting models in \pkg{caret} is difficult due to computational constraints and design choices within the package. The highly modular structure of \pkg{mlr} makes it the best choice for implementing time series methods and models. This paper will show how using \pkg{mlr}'s strong syntatic structure allows for time series packages such as \pkg{forecast} ~\cite{HyndForecast}, \pkg{rugarch} ~\cite{rugarch}, and \pkg{BigVAR} ~\cite{BigVAR} to use machine learning methedologies such as automated parameter tuning, data preprocessing, model blending, cross validation, performance evaluation, and parallel processing techniques for decreasing model build time.
 
 \section{Forecasting Example with the M4 Competition}
 \label{sec:m4data}
 
 Professional forecasters attempt to predict the future of a series based on its past values. Forecasting can be used in a wide range of tasks including forecasting stock prices, ~\cite{GRANGER19923}, weather patterns ~\cite{MurphymeteoForecast}, international conficts ~\cite{Chadefaux01012014}, and earthquakes ~\cite{earthquakeYegu}. In order to evaluate \pkg{mlr}'s forecasting framework we need a large set of possible time series to make sure our methods generalize well.
 
-The Makridakis competitions ~\cite{Makridakis2000451} is a set of forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency in areas such as finance, macroeconomics, climate, microeconomics, and industry. To show examples of how \pkg{mlr}'s forecasting features works we will look at a particular climate series. The data is daily with the training subset starting on September 6th, 2007 and ending on September 5th, 2009 while the testing subset is from September 6th, 2009 to October 10th, 2009 for a total of 640 training periods and 35 test periods to forecast.
+The Makridakis competition ~\cite{Makridakis2000451} is a set of forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency in areas such as finance, macroeconomics, climate, microeconomics, and industry. To show examples of how \pkg{mlr}'s forecasting features works we will look at a particular climate series. The data is daily with the training subset starting on September 6th, 2007 and ending on September 5th, 2009 while the testing subset is from September 6th, 2009 to October 10th, 2009 for a total of 640 training periods and 35 test periods to forecast.
 
 
 <<get_dat_weather, cache = TRUE, fig.height= 6, fig.width=8, fig.align='center', echo = FALSE>>=
@@ -129,9 +130,9 @@ colnames(m4.test) <- "target_var"
 plot(m4.train, main = "Daily Climate Data",ylab = "Temperature in Celcius")
 @
 
-This series was chosen for its obvious seasonality and time features. Our data set should be large enough that the tuning method can take multiple windows of the data. Some series in M4 only contain 12 observations, which is not enough data to accurately train a model. We can see figure one is what most people imagine when they think of a time series. There is a clear seasonal time trend with individual points moving about the seasonal periods. The data can be found in the package \pkg{M4comp} ~\cite{m4comp} under sets \code{M4[28]} and \code{M4[29]}. 
+This series was chosen for its obvious seasonality and time features. Some series in M4 only contain 12 observations, which is not enough data to accurately train a model. The example data set should be large enough that the tuning method can take multiple windows of the data. We can see figure one is what most people imagine when they think of a time series. There is a clear seasonal time trend with individual points moving about the seasonal periods. The data can be found in the package \pkg{M4comp} ~\cite{m4comp} under sets \code{M4[28]} and \code{M4[29]}. 
 
-For multivariate forecasting, we will use the EUStockMarkets data set from the \pkg{datasetes} ~\cite{datasets}. It contains a set of DAX, SMI, CAC, and FTSE European stock indices from July 1st, 1991 to August 24th, 1998 totaling 1828 training observations and 32 test observations.
+For multivariate forecasting, we will use the EUStockMarkets data set from the \pkg{datasets} ~\cite{datasets}. It contains a set of DAX, SMI, CAC, and FTSE European stock indices from July 1st, 1991 to August 24th, 1998 totaling 1828 training observations and 32 test observations.
 
 <<get_dat_stocks, cache = TRUE, fig.height= 6, fig.width=8, fig.align='center', echo = FALSE>>=
 data("EuStockMarkets")
@@ -156,11 +157,13 @@ Note that each stock index tends to follow a similar, but diverging, trend. This
 \section{Univariate and Multivariate Forecasting Tasks}
 \label{sec:task}
 
+\section{Univariate Tasks}
+
 \pkg{mlr} uses the S3 object system to clearly define a predictive modeling task. Tasks contain the data and other relevant information such as the task id and which variable you are targeting for supervised learning problems. Forecasting tasks are handled in \pkg{mlr} by the function \code{makeForecastRegrTask()}. The forecasting task inherets most of it's arguments from \code{makeRegrTask}, but has two noticable differences in arguments.
 
 \begin{itemize}
 \item[data:] Instead of a data frame, an xts object from \pkg{xts} ~\cite{xts} containing the time series.
-\item[frequency:] An integer with the number of periods your time series contains. For example, daily data with a weekly periodicity has a frequency of 7, daily data with a yearly periodicity has a frequency of 365, and weekly data with a yearly frequency has a periodicity of 52.
+\item[frequency:] An integer with the periodicity of the time series. For example, daily data with a weekly periodicity has a frequency of 7, daily data with a yearly periodicity has a frequency of 365, and weekly data with a yearly frequency has a periodicity of 52.
 \end{itemize}
 
 <<climate_task, eval = TRUE, cache=TRUE, message=FALSE, warning=FALSE>>=
@@ -175,9 +178,11 @@ climate.task
 
 Like a regression task, this records the type of the learning problem and basic information about the data set such as the start and end dates, frequency, and whether we have missing values. Note that there are zero features in our task because we only have a target variable, which the model itself will use to build features.
 
+\subsection{Multivariate Tasks}
+
 One common problem with forecasting is that it is difficult to use additional explanatory variables or forecast multiple targets that are dependent on one another. If we are at time $t$ and want to forecast 10 periods in the future, we need to know the values of the explanatory variables at time $t+10$, which is often not possible. A new set of models ~\cite{BigVAR} which treats explanatory variables endogenously instead of exogenously allows us to forecast not only our target, but addititional explanatory variables. This is done by treating all the variables as targets, making them endogeneous to the model. To use these models, we create a multivariate forecasting task. The function \code{makeMultiForecastRegrTask()} has the same arguments as \code{makeForecastRegrTask()} with one exception. The \code{target} argument can contain either a single target variable, multiple target variables, or \code{All} which treats all variables endogeneously.
 
-<<multivar_task1, eval = TRUE, message=FALSE, warning=FALSE>>=
+<<multivar_task1, cache = TRUE, eval = TRUE, message=FALSE, warning=FALSE>>=
 
 mfcregr.univar.task = makeMultiForecastRegrTask(id = "bigvar",
                                                 data = EuStockMarkets,
@@ -186,9 +191,9 @@ mfcregr.univar.task = makeMultiForecastRegrTask(id = "bigvar",
 mfcregr.univar.task
 @
 
-Like \code{makeForecastRegrTask()}, \code{mfcregr.univar.task} we get the standard output, but notice now that there are three three features. Alternatively, \code{mfcregr.all.task} contains multiple target values with no features. The difference between each of these multivariate tasks is that \code{mfcregr.univar.task} will act similar to \code{makeForecastRegrTask()}, giving the output, predictions, and even using the measures for univariate forecasting tasks. Both of these tasks will still forecast all of the underlying series, which allows us take exogeneous models and treat them endogeneously for multi-step forecasts.
+Like \code{makeForecastRegrTask()}, \code{mfcregr.univar.task} has the standard output, but notice now that there are three features. Alternatively, \code{mfcregr.all.task} contains multiple target values with no features. The difference between each of these multivariate tasks is that \code{mfcregr.univar.task} will act similar to \code{makeForecastRegrTask()}, giving the output, predictions, and even using the measures for univariate forecasting tasks. Both of these tasks will still forecast all of the underlying series, which allows us take exogeneous models and treat them endogeneously for n-step forecasts that use additional explanatory variables.
 
-<<multivar_task2, eval = TRUE, message=FALSE, warning=FALSE>>=
+<<multivar_task2, cache = TRUE, eval = TRUE, message=FALSE, warning=FALSE>>=
 mfcregr.all.task = makeMultiForecastRegrTask(id = "bigvar",
                                              data = eu.train,
                                              target = "all",
@@ -200,7 +205,9 @@ mfcregr.all.task
 
 \subsection{Univariate Forecasting}
 
-The \code{makeLearner()} function provides a structured model building framework to the several forecasting models currently implimented in \pkg{mlr}. As an example, we will build the Trigonometric exponential smoothing state space model with Box-Cox transformation, ARMA errors, Trend and Seasonal Components (TBATS)~\cite{tbats}. To creae the original BATS model we let $y_t^{\omega}$ be a box cox transformed observation with parameter $\omega$. Then let $m_T$ be the seasonal periods, $l_t$ be the local level in the period, $b$ the long term trend with $b_t$ being the short term trend, $s_t^i$ being the $i$th seasonal component, $d_t$ being an ARIMA($p,q$) model with gaussian white noise process $\epsilon_t$. Smoothing parameters are given by $\alpha$, $\beta$, and $\gamma$ and $\phi$ is the damping constant of the trend.
+The \code{makeLearner()} function provides a structured model building framework to the several forecasting models currently implimented in \pkg{mlr}. As an example, we will build the Trigonometric exponential smoothing state space model with Box-Cox transformation, ARMA errors, Trend and Seasonal Components (TBATS)~\cite{tbats}.
+\begin{comment}
+To create the original BATS model we let $y_t^{\omega}$ be a box cox transformed observation with parameter $\omega$. Then let $m_T$ be the seasonal periods, $l_t$ be the local level in the period, $b$ the long term trend with $b_t$ being the short term trend, $s_t^i$ being the $i$th seasonal component, $d_t$ being an ARIMA($p,q$) model with gaussian white noise process $\epsilon_t$. Smoothing parameters are given by $\alpha$, $\beta$, and $\gamma$ and $\phi$ is the damping constant of the trend.
 
 \begin{align}
 y_t^{\omega} &= \begin{cases} 
@@ -227,6 +234,8 @@ The smoothing parameters are defined by $\gamma_1^{(i)}$ and $\gamma_2^{(i)}$ wi
 \begin{equation}
 y_t^{\omega} = l_{t-1} + \phi b_{t-1} + \sum_{i=1}^T s_{t-1}^{(i)} + d_t
 \end{equation}
+
+\end{comment}
 
 TBATS is one of the most well known forecasting models and is available in mlr along with models such as BATS, ARIMA, ETS, several GARCH variants, and autoregressive neural networks. In addition, preprocessing features have been added to allow arbitrary supervised machine learning models to be used in the context of forecasting. To impliment the TBATS model we use  \code{makeLearner()}, supplying the class of learner, order, the number of steps to forecast, and any additional arguments to be passed to \code{tbats} for \pkg{forecast}. 
 
@@ -255,15 +264,15 @@ performance(predict.tbats, mase, task = climate.task)
 
 @
 
-MASE has favorable properties for calculating forecast errors relative to measures such as mean root mean squared error or median relative absolute error. Arguably one of the most important features, it's very interpretable. Let $y_t$ and $\tilde{y_t}$ be the target variable and prediction at time $t$ until the final time $T$ with $\epsilon_t = y_t - \tilde{y_t}$ being the forecast error. 
+MASE has favorable properties for calculating forecast errors relative to measures such as root mean squared error or median relative absolute error. Arguably one of the most important features, it's very interpretable. Let $y_t$ and $\tilde{y_t}$ be the target variable and prediction at time $t$ until the final time $T$ with $\epsilon_t = y_t - \tilde{y_t}$ being the forecast error. 
 
 \begin{equation}
-\text{MASE} = \frac{\sum_{t=1}^T |\epsilon_t|}{\frac{T}{T-1} \sum_{t=2}^T |y_t - y_{t-1}|}
+\text{MASE} = \frac{\sum_{t=1}^T |\epsilon_t|}{\frac{T}{T-1} \sum_{t=2}^T |y_{t, \text{insample}} - y_{t-1, \text{insample}}|}
 \end{equation}
 
-Where the denominator is the one step ahead naive forecast from the training data. When the numerator is equal to the denominator the model performed as good as a simple naive forecast method. Scores greater than one mean you are performing worse and scores less than one mean you are performing better.
+Where the denominator is the one step ahead naive forecast from the training data. When the numerator is equal to the denominator the model performed as good as a simple naive forecast method. Scores greater than one mean you are performing worse and scores less than one mean you are performing better than the naive forecasting method.
 
-The scale invariance of MASE means that it is independent of the scale of the data which allows models to be compared across data sets. The scale invariance of MASE has made it a favorite for comparing the accuracy of forecasts methods ~\cite{noteMase}. While scaling in measures such as the Mean Absolute Percentage Error can cause poor behavior as the target variable goes to zero, MASE does not become skewed when the target variable goes to zero. This allows MASE to be use in situations in which zeros occur frequently or zero is not meaningful such as predicting temperature. 
+The scale invariance of MASE means that it is independent of the scale of the data which allows models to be compared across data sets. The scale invariance of MASE has made it a favorite for comparing the accuracy of forecast methods ~\cite{noteMase} across datasets. While scaling in measures such as the Mean Absolute Percentage Error can cause poor behavior as the target variable goes to zero, MASE does not become skewed when the target variable approaches zero. This allows MASE to be use in situations in which zeros occur frequently or zero is not meaningful such as predicting temperature. 
 
 <<plotbatsTrain, cache = TRUE, echo = FALSE>>=
 pred.tbat.dat = zoo(predict.tbats$data, order.by = index(m4.test))
@@ -271,7 +280,7 @@ col_names = colnames(pred.tbat.dat)
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(pred.tbat.dat))
 # Plot the overlayed series
-plot(x = pred.tbat.dat, ylab = "Price", main = "Forecast of Temperature",
+plot(x = pred.tbat.dat, ylab = "Temperature", main = "Forecast of Temperature",
 col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
 legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
@@ -291,12 +300,13 @@ predict(update.tbats, task = climate.task)
 
 \subsection{Multivariate Forecasting}
 
-Need to write things for this
+The package \pkg{BigVAR} has been implemented for multivariate forecasting. \pkg{BigVAR} allows for estimation of high dimensional time series through including structured Lasso penalties to the vector autoregression framework~\cite{bigvarpaper}. 
 
 <<bigVarmod, cache=TRUE, message=FALSE, error=FALSE>>=
-bigvar.mod = makeLearner("mfcregr.BigVAR",p = 5, struct = "SparseLag",
+bigvar.mod = makeLearner("mfcregr.BigVAR",p = 25, struct = "SparseLag",
                          gran = c(50, 60),h = 35, n.ahead = 35)
 @
+
 
 <<bigVartrain, cache=TRUE, message=FALSE, error=FALSE, eval=FALSE>>=
 train.bigvar = train(learner = bigvar.mod, task = mfcregr.all.task )
@@ -306,10 +316,14 @@ train.bigvar
 <<bigVartrainreal, cache=TRUE, message=FALSE, error=FALSE, echo = FALSE>>=
 load("./bigvarmod.RData")
 train.bigvar
+
 @
+
+Predictions for \code{multiForecast} methods have a similar output to \code{multiclass} methods, returning multiple truth and response variables. A multivariate version of MASE has been implimented which takes the mean of each MASE score for the individual variables.
 
 <<bigVarpred, cache=TRUE, message=FALSE, error=FALSE>>=
 predict.bigvar = predict(train.bigvar, newdata = eu.test)
+predict.bigvar
 performance(predict.bigvar, multivar.mase, task = mfcregr.all.task)
 @
 
@@ -323,8 +337,11 @@ par(xpd = TRUE)
 plot(x = pred.bigvar.dat, ylab = "Price", main = "Forecast of Prices for Euro Stock Indices",
 col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
-legend(-.5,-5.2,, legend = col_names,lty = 1, bty = "n",
-       col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1,
+legend("topleft", legend = col_names[1:4],lty = 1, bty = "n",
+       col = tsRainbow[1:4], text.width = 500000, cex = .8,
+       ncol = 4)
+legend("bottomleft", legend = col_names[5:8],lty = 1, bty = "n",
+       col = tsRainbow[5:8], text.width = 600000, cex=.8,
        ncol = 4)
 
 @
@@ -411,7 +428,7 @@ tbatsTune
 @
 
 
-The best model's parameters are extracted using \code{setHyperPars()} and the best model is passed to \code{train()} to go over the full data set.
+The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
 
 <<bestmodtrain, cache = TRUE>>=
 lrn = setHyperPars(makeLearner("fcregr.tbats", h = 35),
@@ -426,13 +443,31 @@ climate.pred = predict(m, newdata = m4.test)
 performance(climate.pred, measures = mase, task = climate.task)
 @
 
+For comparison, TBATS is run in \pkg{forecast} with it's base parameters
+
+<<forecastTbats, cache = TRUE, message=FALSE, warning=FALSE>>=
+
+library(forecast)
+forecast.train.tbats <- tbats(ts(m4.train,frequency = 365))
+forecast.tbats <- forecast(forecast.train.tbats,h=35)
+# Calculate MASE
+sum(abs(coredata(m4.test)-forecast.tbats$mean)) / 
+ ((nrow(m4.test) / (nrow(m4.test) + 1)) *
+     sum(abs(diff(coredata(m4.test)))))
+
+@
+
+Now it's possible to see the clear benefit of the forecast extension to \pkg{mlr}. Normal tuning of this model would require extensive manual testing in an attempt to find the best model. By automating this process we come to a faster solution with minimal work.
+
 <<plottbatsTune, cache = TRUE, echo = FALSE>>=
-pred.tbat.dat = zoo(climate.pred$data, order.by = index(m4.test))
+
+pred.tbat.dat = zoo(cbind(climate.pred$data, as.data.frame(forecast.tbats$mean)), order.by = index(m4.test))
+colnames(pred.tbat.dat)[3] <- "forecast_tbats" 
 col_names = colnames(pred.tbat.dat)
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(pred.tbat.dat))
 # Plot the overlayed series
-plot(x = pred.tbat.dat, ylab = "Price", main = "Tuned Forecast of Temperature",
+plot(x = pred.tbat.dat, ylab = "Temperature", main = "Tuned Forecast of Temperature",
 col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
 legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
@@ -440,6 +475,7 @@ legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
 
 @
 
+To this author's knowledge, this is the first package in \proglang{R} that allows for tuning and training GARCH models ~\cite{garchengels}. It is possible to pass and train multiple types of GARCH models while also tuning the models respective parameters. In this example we also use `predict.type = "quantile"` to estimate confidence intervals for the forecast.
 
 <<tuneGarch, eval = FALSE>>=
 par_set = makeParamSet(
@@ -502,7 +538,7 @@ legend(-.5,-5.2, c("Truth", "Prediction", "Lower ConfInt .05", "Upper ConfInt .9
 
 \subsection{Forecasting with Regression Tasks}
 
-The forecasting extension of \pkg{mlr} includes a preprocessing function that allows supervised machine learning models.
+The forecasting extension of \pkg{mlr} includes a preprocessing function that allows supervised machine learning models. the function \code{createLagDiffFeatures()} allows for $AR(p,d)$ structures to be imbedded in machine learning models.
 
 <<lagdiffproc, cache= TRUE>>=
 climate.regr.task = makeRegrTask(id = "lagged gbm",
@@ -521,7 +557,13 @@ lag.gbm = makeLearner("regr.gbm", par.vals = list(n.trees = 100))
 gbm.train = train(lag.gbm, climate.task.lag)
 @
 
-The \code{forecast()} function allows machine learning models to do arbitary n-step ahead forecasts\footnote{Maybe explain what that means?}.
+The \code{forecast()} function allows machine learning models to do arbitary n-step ahead forecasts which in the package is defined as
+
+\begin{equation}
+\hat{y}_{t+n} = \sum_{p=t}^{n-1} \rho_p \Delta_d \hat{y}_{p} + \epsilon_{p}
+\end{equation}
+
+Where n is the number of steps ahead to forecast, p is the autoregressive order and d is the lag of the difference operator.
 
 <<forecastgbm, cache= TRUE>>=
 m4.test.df = as.data.frame(m4.test,row.names = index(m4.test))
@@ -545,7 +587,7 @@ legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
 
 \subsection{Forecasting with Classification Tasks}
 
-For developing trading strategies, we normally have a discrete set of choices such as to buy, sell, or hold onto a stock. Using forecasting in mlr we can now train classification models that forecast these choices. To example this, a simple buy, sell, or hold trading strategy will be built Using the \code{EuStockMarkets}'s DAX index. If the stock goes up by 5\% in a day we will buy, down 5\% we will sell, and otherwise we will hold onto the current stocks we have. 
+For developing trading strategies, we normally have a discrete set of choices such as to buy, sell, or hold onto a stock. Using forecasting in mlr we can now train classification models that forecast these choices~\cite{foreclassif}. To example this, a simple buy, sell, or hold trading strategy will be built Using the \code{EuStockMarkets}'s DAX index. If the stock goes up by 5\% in a day we will buy, down 5\% we will sell, and otherwise we will hold onto the current stocks we have. 
 
 <<classlag, cache = TRUE>>=
 DAX = EuStockMarkets$DAX/lag(EuStockMarkets$DAX,
@@ -555,9 +597,9 @@ trade.strat = ifelse(DAX > .02, "Buy",
 trade.strat = trade.strat[8:1860]
 euro.classif.data = data.frame(trade.strat = trade.strat ,
                                row.names = index(trade.strat))
-
-euro.classif.train = euro.classif.data[1:1821,,drop = FALSE]
-euro.classif.test  = euro.classif.data[1822:1853,,drop = FALSE]
+# Note: Error on multiples of the same observation
+euro.classif.train = euro.classif.data[1:1850,,drop = FALSE]
+euro.classif.test  = euro.classif.data[1851:1853,,drop = FALSE]
 classif.task = makeClassifTask(data = euro.classif.train,
                                target = "DAX")
 classif.task.lag = createLagDiffFeatures(classif.task,
@@ -569,8 +611,13 @@ classif.learn = makeLearner("classif.boosting", xval = 1,
 
 <<classlagtrain, eval = FALSE>>=
 classif.train = train(classif.learn, classif.task.lag)
-classif.fc = forecast(classif.train, h=32, newdata = euro.classif.test)
+classif.fc = forecast(classif.train, h=2, newdata = euro.classif.test)
 performance(classif.fc)
+@
+
+<<classifSave, eval = FALSE, echo = FALSE>>=
+save(classif.train, file = "classif_train.RData")
+save(classif.fc, file = "classif_fc.RData")
 @
 
 <<classlagtrainreal, echo = FALSE, cache = TRUE>>=
@@ -586,11 +633,11 @@ Many machine learning and time series models rely one the assumption that our da
 
 Let $U$ be a continuous random variable with cdf $F_U(u|\beta)$ and pdf $f_U(u|\beta)$ given $\beta$ is a parameter vector. Define a continuous location-scale random variable $X\sim F_X(x|\beta)$. A locaton-scale skewed Lambert $W\times F_X$ random variable is defined as 
 \begin{equation}
-Z = U\exp\left(\frac{\delta}{2}(U^2)^\right),\; \delta\ge 0
+test %Z = U\exp\left(\frac{\delta}{2}(U^2)^\right),\; \delta\ge 0
 \end{equation}
 And the heavy-tailed Lambert $W\times F_X$ random variable can be defined as
 \begin{equation}
-Z = U\exp\left(\frac{\delta}{2}(U^2)^\alpha\right),\; \delta\ge 0\; \alpha > 0
+test %Z = U\exp\left(\frac{\delta}{2}(U^2)^\alpha\right),\; \delta\ge 0\; \alpha > 0
 \end{equation}
 
 Given that $U = (X-\mu_X)/\sigma_X$ where $\mu_X$, $\sigma_X$, $\delta$, and $\alpha$ are the mean and standard deviation of X and the parameters to control skewness and asymetry , respectively. When $\delta = 0$, equation 12 reduces to a standard normal distribution. Equation 12 is the general form of Tukey's $h$ distribution ~\cite{ghdist} and the basis for Morgenthaler and Tukey's ~\cite{hhdist} skewed, heavy tailed family of $hh$ random variables.
@@ -631,9 +678,30 @@ performance(pred)
 @
 
 
-\section{Ensembles of Forecasting Models}
+\section{Stacking Forecasting Learners}
 
-<<ensembleModel, cache = TRUE, eval = FALSE>>=
+Stacking is a form of ensemble learning~\cite{ensembleOverview} in which a learning algorithm is trained on the predictions of several other learning algorithms. Let $y_{i,m}$ be the prediction at time $i$ of model $m$. Given an aggregation function $\phi$, a stacked forecast learner~\cite{combineForecast} is represented as
+
+\begin{equation}
+\tilde{y}_{i+1} = \phi(\tilde{y}_{i+1,1}, \tilde{y}_{i+1,2},\dots, \tilde{y}_{i+1,m}, \sum_{j=1}^m \epsilon_{i+1,j})
+\label{eq:ensemble}
+\end{equation}
+
+For a simple $\phi$ such as the ensemble average then equation~\ref{eq:ensemble} becomes
+
+\begin{equation}
+\tilde{y}_{i+1} = \frac{\tilde{y}_{i+1,1}, \tilde{y}_{i+1,2},\dots, \tilde{y}_{i+1,m}}{m}
+\label{eq:ensembleAverage}
+\end{equation}
+
+In section~\ref{sub:stackedUnivar} the simple model average is used to show how stacked forecast models are built in \pkg{mlr}. Section~\ref{sub:multiStack} does a more advanced method of ensemble averaging involving the forecast of endogeneous variables.
+
+\subsection{Stacking Univariate Learners}
+\label{sub:stackedUnivar}
+
+For this example the models TBATS, GARCH, and ARFIMA~\cite{arfima} are stacked together and averaged on the climate task data. A resample description is made, and the function \code{makeLearners()} is used to start multiple learners at the same time.
+<<ensembleModel1, cache = TRUE, eval = FALSE>>=
+
 resamp.sub = makeResampleDesc("GrowingCV",
                           horizon = 35L,
                           initial.window = .90,
@@ -642,49 +710,54 @@ resamp.sub = makeResampleDesc("GrowingCV",
                           )
 
 lrns = makeLearners(c("fcregr.tbats","fcregr.garch", "fcregr.arfima"))
+@
 
+The function \code{makeStackedLearner()} takes the initialized learners and sets the meta information for stacking. This method uses simple model averaging such as~\ref{eq:ensembleAveraging}, however a super learner~\cite{Wolpert92stackedgeneralization} can be used here, where $\phi()$ becomes another machine learning model.
+
+<<ensembleModel2, cache = TRUE, eval = FALSE>>=
                             
 stack.forecast = makeStackedLearner(base.learners = lrns,
                        predict.type = "response",
                        method = "average")
 
+@
+
+
+Each of the stacked learners are tuned over the cross product of all model parameters. This leads to a change in design where, given that some models may have the same argument names, the full name of the model is placed before the argument. This leads to longer code, but tuning over the cross product of the models allows for a more honest perspective of how each model interacts in the stack.
+
+<<ensembleModel3, cache = TRUE, eval = FALSE>>=
+
 # Simple param set for tuning sub learners
 ps = makeParamSet(
-  makeDiscreteParam("fcregr.tbats.h", values = 32),
-  makeDiscreteParam("fcregr.garch.n.ahead", values = 32),
-  makeDiscreteParam("fcregr.arfima.h", values = 32),
+  makeDiscreteParam("fcregr.tbats.h", values = 35),
+  makeDiscreteParam("fcregr.garch.n.ahead", values = 35),
+  makeDiscreteParam("fcregr.arfima.h", values = 35),
   makeDiscreteParam("fcregr.arfima.estim", values = "ls"),
-  makeIntegerParam("fcregr.arfima.max.P", lower = 0, upper = 3),
-  makeIntegerParam("fcregr.arfima.max.Q", lower = 0, upper = 2),
-  makeDiscreteParam("fcregr.arfima.ic", values = c("aicc","aic","bic")),
-  makeDiscreteParam(id = "model", values = c("sGARCH", "csGARCH")),
+  makeDiscreteParam(id = "fcregr.garch.model", values = c("csGARCH")),
   makeIntegerVectorParam(id = "fcregr.garch.garchOrder",
-                         len = 2L, lower = c(1,1),
-                         upper = c(4,4)),
+                         len = 2L, lower = c(1),
+                         upper = c(3)),
   makeIntegerVectorParam(id = "fcregr.garch.armaOrder",
-                         len = 2L, lower = c(5,1),
-                         upper = c(8,3)),
-  makeLogicalParam(id = "fcregr.garch.archm"),
-  makeDiscreteParam(id = "fcregr.garch.distribution.model",
-                    values = c("norm","std")),
-  makeLogicalParam(id = "fcregr.tbats.use.box.cox",
-                                default = FALSE,tunable = TRUE),
-  makeIntegerParam("fcregr.tbats.max.P", lower = 0, upper = 3),
-  makeIntegerParam("fcregr.tbats.max.Q", lower = 0, upper = 2),
-  makeDiscreteParam("fcregr.tbats.ic", values = c("aicc","aic","bic")),
+                         len = 2L, lower = c(1),
+                         upper = c(3)),
   makeDiscreteParam("fcregr.tbats.test", values = c("kpss","adf","pp"))
 )
 
 ## tuning
-parallelStartSocket(6)
+library(parallelMap)
+parallelStartSocket(4)
 configureMlr(on.learner.error = "warn")
 set.seed(1234)
-fore.tune = tuneParams(stack.forecast, fcregr.task, resampling = resamp.sub,
+fore.tune = tuneParams(stack.forecast, climate.task, resampling = resamp.sub,
                    par.set = ps, control = makeTuneControlGrid(),
                    measures = mase, show.info = FALSE)
 parallelStop()
 fore.tune
+@
 
+The rest of the modeling process flows in a way similar to normal models. the function \code{setHyperPars2()} takes the best parameter models from the tuning process and assigns it to the final model to train over all of the data. Training and prediction are handled in the same manner as univariate forecasters.
+
+<<ensembleModel4, cache = TRUE, eval = FALSE>>=
 # get hyper params
 stack.forecast.tune  = setHyperPars2(stack.forecast,fore.tune$x)
 stack.forecast.tune
@@ -694,6 +767,61 @@ stack.forecast.mod = train(stack.forecast.tune,fcregr.task)
 stack.forecast.pred = predict(stack.forecast.mod, newdata = dat.test)
 stack.forecast.pred
   
+@
+ 
+\subsection{Multivariate Stacked Learner}
+\label{sub:multiStack}
+<<multiforecast, eval = FALSE>>=
+multfore.task = makeMultiForecastRegrTask(id = "bigvar", data = eu.train, target = "FTSE")
+
+resamp.sub = makeResampleDesc("GrowingCV",
+                              horizon = 32L,
+                              initial.window = .90,
+                              size = nrow(getTaskData(multfore.task)),
+                              skip = .01
+)
+
+resamp.super = makeResampleDesc("CV", iters = 3)
+
+base = c("mfcregr.BigVAR")
+lrns = lapply(base, makeLearner)
+lrns = lapply(lrns, setPredictType, "response")
+lrns[[1]]$par.vals$verbose = FALSE
+
+
+stack.forecast = makeStackedLearner(base.learners = lrns,
+                                    predict.type = "response",
+                                    super.learner = makeLearner("regr.earth", penalty = 2),
+                                    method = "growing.cv",
+                                    resampling = resamp.sub)
+
+ps = makeParamSet(
+  makeDiscreteParam("mfcregr.BigVAR.p", values = 5),
+  makeDiscreteParam("mfcregr.BigVAR.struct", values = "Basic"),
+  makeNumericVectorParam("mfcregr.BigVAR.gran", len = 2L, lower = 25, upper = 30),
+  makeDiscreteParam("mfcregr.BigVAR.h", values = 32),
+  makeDiscreteParam("mfcregr.BigVAR.n.ahead", values = 32)
+)
+
+## tuning
+library(parallelMap)
+parallelStartSocket(4)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+multfore.tune = tuneParams(stack.forecast, multfore.task, resampling = resamp.sub,
+                   par.set = ps, control = makeTuneControlGrid(),
+                   measures = multivar.mase, show.info = FALSE)
+parallelStop()
+multfore.tune
+
+stack.forecast.f  = setHyperPars2(stack.forecast,multfore.tune$x)
+multfore.train = train(stack.forecast.f,multfore.task)
+multfore.train
+
+multfore.pred = predict(multfore.train, newdata = as.data.frame(eu.test))
+multfore.pred
+
+performance(multfore.pred, mase, task = multfore.task)
 @
 \newpage
 %\small

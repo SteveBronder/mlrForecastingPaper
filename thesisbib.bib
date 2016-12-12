@@ -256,7 +256,7 @@ keywords = "Forecasting methods, Forecasting accuracy "
  journal = {Journal of the American Statistical Association},
  number = {387},
  pages = {489-500},
- publisher = {[American Statistical Association, Taylor & Francis, Ltd.]},
+ publisher = {[American Statistical Association, Taylor \& Francis, Ltd.]},
  title = {Probability Forecasting in Meterology},
  volume = {79},
  year = {1984}
@@ -352,7 +352,6 @@ keywords = "Efficient markets"
 @article{hannanOrder,
  ISSN = {00063444},
  URL = {http://www.jstor.org/stable/2335856},
- abstract = {The order, (p,q), of an autoregressive-moving average sequence, y(t), may be estimated by minimizing a criterion, logσ̂2 + (p + q)log T/T, with respect to p and q, where σ̂2 is the maximum likelihood estimate of the variance of the innovations, ε(t). It is suggested that, instead, σ2 be estimated from a series of regressions of y(t) on y(t - 1), y(t - 2),...,y(t - p), ε̂(t - 1),...,ε̂(t - q), where the ε̂(t) are obtained by fitting a long autoregression to the data. It is shown how the sequence of regressions may, for p = q, be economically recursively calculated by embedding them in a sequence of bivariate autoregressions. Asymptotic properties of the procedure are established under very general conditions.},
  author = {E. J. Hannan, J. Rissanen},
  journal = {Biometrika},
  number = {1},
@@ -400,7 +399,6 @@ year="1997",
 volume="1",
 number="1",
 pages="55--77",
-abstract="The classification problem is considered in which an outputvariable y assumes discrete values with respectiveprobabilities that depend upon the simultaneous values of a set of input variablesx = {\{}x{\_}1,....,x{\_}n{\}}. At issue is how error in the estimates of theseprobabilities affects classification error when the estimates are used ina classification rule. These effects are seen to be somewhat counterintuitive in both their strength and nature. In particular the bias andvariance components of the estimation error combine to influenceclassification in a very different way than with squared error on theprobabilities themselves. Certain types of (very high) bias can becanceled by low variance to produce accurate classification. This candramatically mitigate the effect of the bias associated with some simpleestimators like ``naive'' Bayes, and the bias induced by thecurse-of-dimensionality on nearest-neighbor procedures. This helps explainwhy such simple methods are often competitive with and sometimes superiorto more sophisticated ones for classification, and why``bagging/aggregating'' classifiers can often improveaccuracy. These results also suggest simple modifications to theseprocedures that can (sometimes dramatically) further improve theirclassification performance.",
 issn="1573-756X",
 doi="10.1023/A:1009778005914",
 url="http://dx.doi.org/10.1023/A:1009778005914"
@@ -473,8 +471,6 @@ eprint = {
         http://dx.doi.org/10.1198/jasa.2011.tm09771
     
 }
-,
-    abstract = { An innovations state space modeling framework is introduced for forecasting complex seasonal time series such as those with multiple seasonal periods, high-frequency seasonality, non-integer seasonality, and dual-calendar effects. The new framework incorporates Box–Cox transformations, Fourier representations with time varying coefficients, and ARMA error correction. Likelihood evaluation and analytical expressions for point forecasts and interval predictions under the assumption of Gaussian errors are derived, leading to a simple, comprehensive approach to forecasting complex seasonal time series. A key feature of the framework is that it relies on a new method that greatly reduces the computational burden in the maximum likelihood estimation. The modeling framework is useful for a broad range of applications, its versatility being illustrated in three empirical studies. In addition, the proposed trigonometric formulation is presented as a means of decomposing complex seasonal time series, and it is shown that this decomposition leads to the identification and extraction of seasonal components which are otherwise not apparent in the time series plot itself. }
 }
 
 
@@ -533,7 +529,7 @@ eprint = {
 title = {Summarizing Shape Numerically: The g-and-h Distributions},
 author = {Hoaglin, David C.},
 author = {},
-publisher = {John Wiley & Sons, Inc.},
+publisher = {John Wiley \& Sons, Inc.},
 isbn = {9781118150702},
 url = {http://dx.doi.org/10.1002/9781118150702.ch11},
 doi = {10.1002/9781118150702.ch11},
@@ -551,7 +547,7 @@ year = {2006},
  journal = {Journal of Computational and Graphical Statistics},
  number = {1},
  pages = {180-195},
- publisher = {[American Statistical Association, Taylor & Francis, Ltd., Institute of Mathematical Statistics, Interface Foundation of America]},
+ publisher = {[American Statistical Association, Taylor \& Francis, Ltd., Institute of Mathematical Statistics, Interface Foundation of America]},
  title = {Fitting Quantiles: Doubling, HR, HQ, and HHH Distributions},
  volume = {9},
  year = {2000}
@@ -565,7 +561,7 @@ title = {The economic value of ensemble forecasts as a tool for risk assessment:
 journal = {Quarterly Journal of the Royal Meteorological Society},
 volume = {128},
 number = {581},
-publisher = {John Wiley & Sons, Ltd.},
+publisher = {John Wiley \& Sons, Ltd.},
 issn = {1477-870X},
 url = {http://dx.doi.org/10.1256/0035900021643593},
 doi = {10.1256/0035900021643593},
@@ -574,6 +570,109 @@ keywords = {Climate change, Cost/loss ratio, Probability forecasting, Seasonal f
 year = {2002},
 }
 
+@ARTICLE{bigvarpaper,
+   author = {{Nicholson}, W. and {Matteson}, D. and {Bien}, J.},
+    title = "{VARX-L: Structured Regularization for Large Vector Autoregressions with Exogenous Variables}",
+  journal = {ArXiv e-prints},
+archivePrefix = "arXiv",
+   eprint = {1508.07497},
+ primaryClass = "stat.AP",
+ keywords = {Statistics - Applications},
+     year = 2015,
+    month = aug,
+   adsurl = {http://adsabs.harvard.edu/abs/2015arXiv150807497N},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+@article{garchengels,
+ ISSN = {00129682, 14680262},
+ URL = {http://www.jstor.org/stable/1912773},
+ abstract = {Traditional econometric models assume a constant one-period forecast variance. To generalize this implausible assumption, a new class of stochastic processes called autoregressive conditional heteroscedastic (ARCH) processes are introduced in this paper. These are mean zero, serially uncorrelated processes with nonconstant variances conditional on the past, but constant unconditional variances. For such processes, the recent past gives information about the one-period forecast variance. A regression model is then introduced with disturbances following an ARCH process. Maximum likelihood estimators are described and a simple scoring iteration formulated. Ordinary least squares maintains its optimality properties in this set-up, but maximum likelihood is more efficient. The relative efficiency is calculated and can be infinite. To test whether the disturbances follow an ARCH process, the Lagrange multiplier procedure is employed. The test is based simply on the autocorrelation of the squared OLS residuals. This model is used to estimate the means and variances of inflation in the U.K. The ARCH effect is found to be significant and the estimated variances increase substantially during the chaotic seventies.},
+ author = {Robert F. Engle},
+ journal = {Econometrica},
+ number = {4},
+ pages = {987-1007},
+ publisher = {[Wiley, Econometric Society]},
+ title = {Autoregressive Conditional Heteroscedasticity with Estimates of the Variance of United Kingdom Inflation},
+ volume = {50},
+ year = {1982}
+}
+
+@article{foreclassif,
+title = "Forecasting stock indices: a comparison of classification and level estimation models ",
+journal = "International Journal of Forecasting ",
+volume = "16",
+number = "2",
+pages = "173 - 190",
+year = "2000",
+note = "",
+issn = "0169-2070",
+doi = "http://dx.doi.org/10.1016/S0169-2070(99)00048-5",
+url = "http://www.sciencedirect.com/science/article/pii/S0169207099000485",
+author = "Mark T. Leung and Hazem Daouk and An-Sing Chen",
+keywords = "Forecasting",
+keywords = "Multivariate classification",
+keywords = "Stock index",
+keywords = "Trading strategy "
+}
+
+@inproceedings{ensembleOverview,
+ author = {Dietterich, Thomas G.},
+ title = {Ensemble Methods in Machine Learning},
+ booktitle = {Proceedings of the First International Workshop on Multiple Classifier Systems},
+ series = {MCS '00},
+ year = {2000},
+ isbn = {3-540-67704-6},
+ pages = {1--15},
+ numpages = {15},
+ url = {http://dl.acm.org/citation.cfm?id=648054.743935},
+ acmid = {743935},
+ publisher = {Springer-Verlag},
+ address = {London, UK, UK},
+} 
+
+@article{combineForecast,
+title = "Combining forecasts: A review and annotated bibliography",
+journal = "International Journal of Forecasting",
+volume = "5",
+number = "4",
+pages = "559 - 583",
+year = "1989",
+note = "",
+issn = "0169-2070",
+doi = "http://dx.doi.org/10.1016/0169-2070(89)90012-5",
+url = "http://www.sciencedirect.com/science/article/pii/0169207089900125",
+author = "Robert T. Clemen",
+keywords = "Forecast combination",
+keywords = "Composite models",
+keywords = "Forecast aggregation",
+keywords = "Consensus",
+keywords = "Forecast synthesis"
+}
 
 
 
+
+@article {arfima,
+author = {Granger, C. W. J. and Joyeux, Roselyne},
+title = {AN INTRODUCTION TO LONG-MEMORY TIME SERIES MODELS AND FRACTIONAL DIFFERENCING},
+journal = {Journal of Time Series Analysis},
+volume = {1},
+number = {1},
+publisher = {Blackwell Publishing Ltd},
+issn = {1467-9892},
+url = {http://dx.doi.org/10.1111/j.1467-9892.1980.tb00297.x},
+doi = {10.1111/j.1467-9892.1980.tb00297.x},
+pages = {15--29},
+keywords = {Fractional differencing, long-memory, integrated models},
+year = {1980},
+}
+
+@ARTICLE{Wolpert92stackedgeneralization,
+author = {David H. Wolpert},
+title = {Stacked Generalization},
+journal = {Neural Networks},
+year = {1992},
+volume = {5},
+pages = {241--259}
+}

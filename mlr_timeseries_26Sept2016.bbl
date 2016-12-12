@@ -35,10 +35,28 @@ Thomas Chadefaux.
 \newblock Early warning signals for war in the news.
 \newblock {\em Journal of Peace Research}, 51(1):5--18, 2014.
 
+\bibitem{combineForecast}
+Robert~T. Clemen.
+\newblock Combining forecasts: A review and annotated bibliography.
+\newblock {\em International Journal of Forecasting}, 5(4):559 -- 583, 1989.
+
+\bibitem{ensembleOverview}
+Thomas~G. Dietterich.
+\newblock Ensemble methods in machine learning.
+\newblock In {\em Proceedings of the First International Workshop on Multiple
+  Classifier Systems}, MCS '00, pages 1--15, London, UK, UK, 2000.
+  Springer-Verlag.
+
 \bibitem{hannanOrder}
 J.~Rissanen E.~J.~Hannan.
 \newblock Recursive estimation of mixed autoregressive-moving average order.
 \newblock {\em Biometrika}, 69(1):81--94, 1982.
+
+\bibitem{garchengels}
+Robert~F. Engle.
+\newblock Autoregressive conditional heteroscedasticity with estimates of the
+  variance of united kingdom inflation.
+\newblock {\em Econometrica}, 50(4):987--1007, 1982.
 
 \bibitem{noteMase}
 Philip~Hans Franses.
@@ -82,6 +100,12 @@ Jan G.~De Gooijer and Rob~J. Hyndman.
 \newblock {\em International Journal of Forecasting}, 22(3):443 -- 473, 2006.
 \newblock Twenty five years of forecasting.
 
+\bibitem{arfima}
+C.~W.~J. Granger and Roselyne Joyeux.
+\newblock An introduction to long-memory time series models and fractional
+  differencing.
+\newblock {\em Journal of Time Series Analysis}, 1(1):15--29, 1980.
+
 \bibitem{GRANGER19923}
 Clive~W.J. Granger.
 \newblock Forecasting stock market prices: Lessons for forecasters.
@@ -91,7 +115,7 @@ Clive~W.J. Granger.
 David~C. Hoaglin.
 \newblock {\em Summarizing Shape Numerically: The g-and-h Distributions}, pages
   461--513.
-\newblock John Wiley & Sons, Inc., 2006.
+\newblock John Wiley \& Sons, Inc., 2006.
 
 \bibitem{hyndman2014forecasting}
 R.J. Hyndman and G.~Athanasopoulos.
@@ -114,6 +138,12 @@ Rob~J. Hyndman and Anne~B. Koehler.
 Max Kuhn.
 \newblock {caret} data splitting methods, 1999.
 
+\bibitem{foreclassif}
+Mark~T. Leung, Hazem Daouk, and An-Sing Chen.
+\newblock Forecasting stock indices: a comparison of classification and level
+  estimation models.
+\newblock {\em International Journal of Forecasting}, 16(2):173 -- 190, 2000.
+
 \bibitem{tbats}
 Alysha M.~De Livera, Rob~J. Hyndman, and Ralph~D. Snyder.
 \newblock Forecasting time series with complex seasonal patterns using
@@ -132,6 +162,12 @@ Stephan Morgenthaler and John~W. Tukey.
 \newblock Fitting quantiles: Doubling, hr, hq, and hhh distributions.
 \newblock {\em Journal of Computational and Graphical Statistics},
   9(1):180--195, 2000.
+
+\bibitem{bigvarpaper}
+W.~{Nicholson}, D.~{Matteson}, and J.~{Bien}.
+\newblock {VARX-L: Structured Regularization for Large Vector Autoregressions
+  with Exogenous Variables}.
+\newblock {\em ArXiv e-prints}, August 2015.
 
 \bibitem{BigVAR}
 Will Nicholson, David Matteson, and Jacob Bien.
@@ -172,10 +208,10 @@ Jeffrey~A. Ryan and Joshua~M. Ulrich.
 \newblock {\em xts: eXtensible Time Series}, 2016.
 \newblock R package version 0.10-0.
 
-\bibitem{fourierTrans}
-Mike West and Jeff Harrison.
-\newblock {\em Bayesian Forecasting and Dynamic Models (2Nd Ed.)}.
-\newblock Springer-Verlag New York, Inc., New York, NY, USA, 1997.
+\bibitem{Wolpert92stackedgeneralization}
+David~H. Wolpert.
+\newblock Stacked generalization.
+\newblock {\em Neural Networks}, 5:241--259, 1992.
 
 \bibitem{earthquakeYegu}
 Tuncel~M. Yegulalp.
