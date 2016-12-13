@@ -30,6 +30,12 @@ Bernd Bischl, Michel Lang, Jakob Richter, Jakob Bossek, Leonard Judt, Tobias
 \newblock {\em mlr: Machine Learning in R}, 2015.
 \newblock R package version 2.7.
 
+\bibitem{glmboost}
+Peter Buehlmann and Torsten Hothorn.
+\newblock Boosting algorithms: Regularization, prediction and model fitting
+  (with discussion).
+\newblock {\em Statistical Science}, 22(4):477--505, 2007.
+
 \bibitem{Chadefaux01012014}
 Thomas Chadefaux.
 \newblock Early warning signals for war in the news.
@@ -185,6 +191,11 @@ Will Nicholson, David Matteson, and Jacob Bien.
 \newblock {\em R: A Language and Environment for Statistical Computing}.
 \newblock R Foundation for Statistical Computing, Vienna, Austria, 2016.
 \newblock The data were kindly provided by Erste Bank AG, Vienna, Austria.
+
+\bibitem{bayesianAverage}
+Adrian~E. Raftery, Tilmann Gneiting, Fadoua Balabdaoui, and Michael Polakowski.
+\newblock Using bayesian model averaging to calibrate forecast ensembles.
+\newblock {\em Monthly Weather Review}, 133(5):1155--1174, 2005.
 
 \bibitem{reillyautobox}
 David Reilly.

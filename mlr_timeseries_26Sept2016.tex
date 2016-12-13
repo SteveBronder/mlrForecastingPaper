@@ -992,6 +992,7 @@ Each of the stacked learners are tuned over the cross product of all model param
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlstd{ma}
 \hlcom{# Simple param set for tuning sub learners}
 \hlstd{ps} \hlkwb{=} \hlkwd{makeParamSet}\hlstd{(}
   \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"fcregr.tbats.h"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlnum{35}\hlstd{),}
@@ -1013,9 +1014,10 @@ Each of the stacked learners are tuned over the cross product of all model param
 \hlkwd{parallelStartSocket}\hlstd{(}\hlnum{4}\hlstd{)}
 \hlkwd{configureMlr}\hlstd{(}\hlkwc{on.learner.error} \hlstd{=} \hlstr{"warn"}\hlstd{)}
 \hlkwd{set.seed}\hlstd{(}\hlnum{1234}\hlstd{)}
-\hlstd{fore.tune} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(stack.forecast, climate.task,} \hlkwc{resampling} \hlstd{= resamp.sub,}
-                   \hlkwc{par.set} \hlstd{= ps,} \hlkwc{control} \hlstd{=} \hlkwd{makeTuneControlGrid}\hlstd{(),}
-                   \hlkwc{measures} \hlstd{= mase,} \hlkwc{show.info} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+\hlstd{fore.tune} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(stack.forecast, climate.task,}
+                       \hlkwc{resampling} \hlstd{= resamp.sub,}
+                       \hlkwc{par.set} \hlstd{= ps,} \hlkwc{control} \hlstd{=} \hlkwd{makeTuneControlGrid}\hlstd{(),}
+                       \hlkwc{measures} \hlstd{= mase,} \hlkwc{show.info} \hlstd{=} \hlnum{FALSE}\hlstd{)}
 \hlkwd{parallelStop}\hlstd{()}
 \hlstd{fore.tune}
 \end{alltt}
@@ -1041,10 +1043,21 @@ The rest of the modeling process flows in a way similar to normal models. the fu
  
 \subsection{Multivariate Stacked Learner}
 \label{sub:multiStack}
+
+When there is a single target variable with multiple predictors stacked learning can be used with multivariate forecasters to forecast the predictors and have a machine learning model train over the forecasts of all variables. For this, equation~\ref{eq:ensemble} can be modified to include forecasts of other predictors $x_i,k$ where $k$ is the index for each predictor variable
+
+\begin{equation}
+\tilde{y}_{i+1} = \phi(\tilde{y}_{i+1,1},\dots, \tilde{y}_{i+1,m}, \tilde{x}_{i+1,1},\dots, \tilde{x}_{i+1,k}, \sum_{j=1}^m \epsilon_{i+1,j}, \sum_{j=1}^k \epsilon_{i+1,j})
+\label{eq:ensembleMulti}
+\end{equation}
+
+In the example below, a boosted glm~\cite{glmboost} is used as a super learner over a sparse lag multivariate VAR model to forecast FTSE prices. A resampling strategy is creating for both the underlying stacked learner and the super learner.
+
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{multfore.task} \hlkwb{=} \hlkwd{makeMultiForecastRegrTask}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"bigvar"}\hlstd{,} \hlkwc{data} \hlstd{= eu.train,} \hlkwc{target} \hlstd{=} \hlstr{"FTSE"}\hlstd{)}
+\hlstd{multfore.task} \hlkwb{=} \hlkwd{makeMultiForecastRegrTask}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"bigvar"}\hlstd{,} \hlkwc{data} \hlstd{= eu.train,}
+                                          \hlkwc{target} \hlstd{=} \hlstr{"FTSE"}\hlstd{)}
 
 \hlstd{resamp.sub} \hlkwb{=} \hlkwd{makeResampleDesc}\hlstd{(}\hlstr{"GrowingCV"}\hlstd{,}
                               \hlkwc{horizon} \hlstd{=} \hlnum{32L}\hlstd{,}
@@ -1054,7 +1067,15 @@ The rest of the modeling process flows in a way similar to normal models. the fu
 \hlstd{)}
 
 \hlstd{resamp.super} \hlkwb{=} \hlkwd{makeResampleDesc}\hlstd{(}\hlstr{"CV"}\hlstd{,} \hlkwc{iters} \hlstd{=} \hlnum{3}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
+In \code{makeStackedLearner()}, the super learner argument contains the boosted glm model.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
 \hlstd{base} \hlkwb{=} \hlkwd{c}\hlstd{(}\hlstr{"mfcregr.BigVAR"}\hlstd{)}
 \hlstd{lrns} \hlkwb{=} \hlkwd{lapply}\hlstd{(base, makeLearner)}
 \hlstd{lrns} \hlkwb{=} \hlkwd{lapply}\hlstd{(lrns, setPredictType,} \hlstr{"response"}\hlstd{)}
@@ -1062,15 +1083,25 @@ The rest of the modeling process flows in a way similar to normal models. the fu
 
 
 \hlstd{stack.forecast} \hlkwb{=} \hlkwd{makeStackedLearner}\hlstd{(}\hlkwc{base.learners} \hlstd{= lrns,}
-                                    \hlkwc{predict.type} \hlstd{=} \hlstr{"response"}\hlstd{,}
-                                    \hlkwc{super.learner} \hlstd{=} \hlkwd{makeLearner}\hlstd{(}\hlstr{"regr.earth"}\hlstd{,} \hlkwc{penalty} \hlstd{=} \hlnum{2}\hlstd{),}
-                                    \hlkwc{method} \hlstd{=} \hlstr{"growing.cv"}\hlstd{,}
-                                    \hlkwc{resampling} \hlstd{= resamp.sub)}
+                            \hlkwc{predict.type} \hlstd{=} \hlstr{"response"}\hlstd{,}
+                            \hlkwc{super.learner} \hlstd{=} \hlkwd{makeLearner}\hlstd{(}\hlstr{"regr.glmboost"}\hlstd{,}
+                                                        \hlkwc{family} \hlstd{=} \hlstr{"Laplace"}\hlstd{),}
+                            \hlkwc{method} \hlstd{=} \hlstr{"growing.cv"}\hlstd{,}
+                            \hlkwc{resampling} \hlstd{= resamp.sub)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
+Just as with univariate stacked forecasting models, a parameter set is created for the multivariate VAR model and tuning is done with \code{tuneParams()}.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
 \hlstd{ps} \hlkwb{=} \hlkwd{makeParamSet}\hlstd{(}
-  \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"mfcregr.BigVAR.p"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlnum{5}\hlstd{),}
-  \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"mfcregr.BigVAR.struct"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlstr{"Basic"}\hlstd{),}
-  \hlkwd{makeNumericVectorParam}\hlstd{(}\hlstr{"mfcregr.BigVAR.gran"}\hlstd{,} \hlkwc{len} \hlstd{=} \hlnum{2L}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{25}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{30}\hlstd{),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"mfcregr.BigVAR.p"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlnum{9}\hlstd{),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"mfcregr.BigVAR.struct"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlstr{"SparseLag"}\hlstd{),}
+  \hlkwd{makeNumericVectorParam}\hlstd{(}\hlstr{"mfcregr.BigVAR.gran"}\hlstd{,} \hlkwc{len} \hlstd{=} \hlnum{2L}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{35}\hlstd{,}
+                         \hlkwc{upper} \hlstd{=} \hlnum{50}\hlstd{),}
   \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"mfcregr.BigVAR.h"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlnum{32}\hlstd{),}
   \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"mfcregr.BigVAR.n.ahead"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlnum{32}\hlstd{)}
 \hlstd{)}
@@ -1080,24 +1111,88 @@ The rest of the modeling process flows in a way similar to normal models. the fu
 \hlkwd{parallelStartSocket}\hlstd{(}\hlnum{4}\hlstd{)}
 \hlkwd{configureMlr}\hlstd{(}\hlkwc{on.learner.error} \hlstd{=} \hlstr{"warn"}\hlstd{)}
 \hlkwd{set.seed}\hlstd{(}\hlnum{1234}\hlstd{)}
-\hlstd{multfore.tune} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(stack.forecast, multfore.task,} \hlkwc{resampling} \hlstd{= resamp.sub,}
-                   \hlkwc{par.set} \hlstd{= ps,} \hlkwc{control} \hlstd{=} \hlkwd{makeTuneControlGrid}\hlstd{(),}
-                   \hlkwc{measures} \hlstd{= multivar.mase,} \hlkwc{show.info} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+\hlstd{multfore.tune} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(stack.forecast, multfore.task,}
+                           \hlkwc{resampling} \hlstd{= resamp.sub,}
+                           \hlkwc{par.set} \hlstd{= ps,} \hlkwc{control} \hlstd{=} \hlkwd{makeTuneControlGrid}\hlstd{(),}
+                           \hlkwc{measures} \hlstd{= mase,} \hlkwc{show.info} \hlstd{=} \hlnum{FALSE}\hlstd{)}
 \hlkwd{parallelStop}\hlstd{()}
 \hlstd{multfore.tune}
-
-\hlstd{stack.forecast.f}  \hlkwb{=} \hlkwd{setHyperPars2}\hlstd{(stack.forecast,multfore.tune}\hlopt{$}\hlstd{x)}
-\hlstd{multfore.train} \hlkwb{=} \hlkwd{train}\hlstd{(stack.forecast.f,multfore.task)}
-\hlstd{multfore.train}
-
-\hlstd{multfore.pred} \hlkwb{=} \hlkwd{predict}\hlstd{(multfore.train,} \hlkwc{newdata} \hlstd{=} \hlkwd{as.data.frame}\hlstd{(eu.test))}
-\hlstd{multfore.pred}
-
-\hlkwd{performance}\hlstd{(multfore.pred, mase,} \hlkwc{task} \hlstd{= multfore.task)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
-\newpage
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## Tune result:
+## Op. pars: mfcregr.BigVAR.p=5; mfcregr.BigVAR.struct=SparseLag; mfcregr.BigVAR.gran=30,30; mfcregr.BigVAR.h=32; mfcregr.BigVAR.n.ahead=32
+## multivar.mase.test.mean=0.453
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+Once the tuning is complete, the best model can be extracted with \code{setHyperPar2()} and the final model will be trained on all of the data. Since we are using the multivariate model to produce forecasts for an singel variable, univariate MASE is use instead of the multivariate form of MASE.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{stack.forecast.f}  \hlkwb{=} \hlkwd{setHyperPars2}\hlstd{(stack.forecast,multfore.tune}\hlopt{$}\hlstd{x)}
+\hlstd{multfore.train} \hlkwb{=} \hlkwd{train}\hlstd{(stack.forecast.f,multfore.task)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{multfore.train}
+\end{alltt}
+\begin{verbatim}
+## Model for learner.id=stack; learner.class=StackedLearner
+## Trained on: task.id = bigvar; obs = 1828; features = 3
+## Hyperparameters: mfcregr.BigVAR.verbose=FALSE,mfcregr.BigVAR.p=5,mfcregr.BigVAR.struct=SparseLag,mfcregr.BigVAR.gran=30,30,mfcregr.BigVAR.h=32,mfcregr.BigVAR.n.ahead=32
+\end{verbatim}
+\begin{alltt}
+\hlstd{multfore.pred} \hlkwb{=} \hlkwd{predict}\hlstd{(multfore.train,} \hlkwc{newdata} \hlstd{=} \hlkwd{as.data.frame}\hlstd{(eu.test))}
+\hlstd{multfore.pred}
+\end{alltt}
+\begin{verbatim}
+## Prediction: 32 observations
+## predict.type: response
+## threshold: 
+## time: 0.06
+##                      truth response
+## 1998-07-12 07:50:46 5960.2 5629.466
+## 1998-07-13 17:32:18 5988.4 5629.378
+## 1998-07-15 03:13:50 5990.3 5629.423
+## 1998-07-16 12:55:23 6003.4 5629.519
+## 1998-07-17 22:36:55 6009.6 5629.655
+## 1998-07-19 08:18:27 5969.7 5629.759
+## ... (32 rows, 2 cols)
+\end{verbatim}
+\begin{alltt}
+\hlkwd{performance}\hlstd{(multfore.pred, mase,} \hlkwc{task} \hlstd{= multfore.task)}
+\end{alltt}
+\begin{verbatim}
+##      mase 
+## 0.2363337
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/multiForecast8-1} 
+
+\end{knitrout}
+
+\section{Conclusion}
+
+The results of this paper show that creating a unified interface for forecasting models in \proglang{R} allows for better models through an automated methedology of resampling, preprocessing, model selection, stacking tuning, and training. Building on the wide range of forecasting packages available in \proglang{R}, automating tasks such as windowing cross validation and model selection allow applied forecasters to spend less time dealing with the beauracracy of modeling and more time testing new models. New methods such as multivariate stacked learners, Lambert W transforms, and the ability to create arbitary AR($p,d$) machine learning models allows researchers to easily experiment with new ideas. While the example models here are not perfect, this was mostly due to time. It will be easy for researchers to beat the models created in this paper.
+
+Multivariate stacked learners are quite new, and to this researchers knowledge have not been used in this context. Future research based on this package would involve tuning these models to see how useful they are in the real world. Classification forecast made available in this extension is a very new field, and with the ease of making these models new research in this area can progress much quicker. Updates to this package will include more multivariate and univariate forecast learners as well as new methods to stack models such as Bayesian averaging~\cite{bayesianAverage}.
+
 %\small
 \bibliography{thesisbib}{}
 \bibliographystyle{plain}

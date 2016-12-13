@@ -726,7 +726,7 @@ stack.forecast = makeStackedLearner(base.learners = lrns,
 Each of the stacked learners are tuned over the cross product of all model parameters. This leads to a change in design where, given that some models may have the same argument names, the full name of the model is placed before the argument. This leads to longer code, but tuning over the cross product of the models allows for a more honest perspective of how each model interacts in the stack.
 
 <<ensembleModel3, cache = TRUE, eval = FALSE>>=
-
+ma
 # Simple param set for tuning sub learners
 ps = makeParamSet(
   makeDiscreteParam("fcregr.tbats.h", values = 35),
@@ -748,9 +748,10 @@ library(parallelMap)
 parallelStartSocket(4)
 configureMlr(on.learner.error = "warn")
 set.seed(1234)
-fore.tune = tuneParams(stack.forecast, climate.task, resampling = resamp.sub,
-                   par.set = ps, control = makeTuneControlGrid(),
-                   measures = mase, show.info = FALSE)
+fore.tune = tuneParams(stack.forecast, climate.task,
+                       resampling = resamp.sub,
+                       par.set = ps, control = makeTuneControlGrid(),
+                       measures = mase, show.info = FALSE)
 parallelStop()
 fore.tune
 @
@@ -771,8 +772,19 @@ stack.forecast.pred
  
 \subsection{Multivariate Stacked Learner}
 \label{sub:multiStack}
-<<multiforecast, eval = FALSE>>=
-multfore.task = makeMultiForecastRegrTask(id = "bigvar", data = eu.train, target = "FTSE")
+
+When there is a single target variable with multiple predictors stacked learning can be used with multivariate forecasters to forecast the predictors and have a machine learning model train over the forecasts of all variables. For this, equation~\ref{eq:ensemble} can be modified to include forecasts of other predictors $x_i,k$ where $k$ is the index for each predictor variable
+
+\begin{equation}
+\tilde{y}_{i+1} = \phi(\tilde{y}_{i+1,1},\dots, \tilde{y}_{i+1,m}, \tilde{x}_{i+1,1},\dots, \tilde{x}_{i+1,k}, \sum_{j=1}^m \epsilon_{i+1,j}, \sum_{j=1}^k \epsilon_{i+1,j})
+\label{eq:ensembleMulti}
+\end{equation}
+
+In the example below, a boosted glm~\cite{glmboost} is used as a super learner over a sparse lag multivariate VAR model to forecast FTSE prices. A resampling strategy is creating for both the underlying stacked learner and the super learner.
+
+<<multiforecast1, cache = TRUE>>=
+multfore.task = makeMultiForecastRegrTask(id = "bigvar", data = eu.train,
+                                          target = "FTSE")
 
 resamp.sub = makeResampleDesc("GrowingCV",
                               horizon = 32L,
@@ -782,7 +794,11 @@ resamp.sub = makeResampleDesc("GrowingCV",
 )
 
 resamp.super = makeResampleDesc("CV", iters = 3)
+@
 
+In \code{makeStackedLearner()}, the super learner argument contains the boosted glm model.
+
+<<multiforecast2, eval = FALSE>>=
 base = c("mfcregr.BigVAR")
 lrns = lapply(base, makeLearner)
 lrns = lapply(lrns, setPredictType, "response")
@@ -790,15 +806,21 @@ lrns[[1]]$par.vals$verbose = FALSE
 
 
 stack.forecast = makeStackedLearner(base.learners = lrns,
-                                    predict.type = "response",
-                                    super.learner = makeLearner("regr.earth", penalty = 2),
-                                    method = "growing.cv",
-                                    resampling = resamp.sub)
+                            predict.type = "response",
+                            super.learner = makeLearner("regr.glmboost",
+                                                        family = "Laplace"),
+                            method = "growing.cv",
+                            resampling = resamp.sub)
+@
 
+Just as with univariate stacked forecasting models, a parameter set is created for the multivariate VAR model and tuning is done with \code{tuneParams()}.
+
+<<multiforecast3, eval = FALSE>>=
 ps = makeParamSet(
-  makeDiscreteParam("mfcregr.BigVAR.p", values = 5),
-  makeDiscreteParam("mfcregr.BigVAR.struct", values = "Basic"),
-  makeNumericVectorParam("mfcregr.BigVAR.gran", len = 2L, lower = 25, upper = 30),
+  makeDiscreteParam("mfcregr.BigVAR.p", values = 9),
+  makeDiscreteParam("mfcregr.BigVAR.struct", values = "SparseLag"),
+  makeNumericVectorParam("mfcregr.BigVAR.gran", len = 2L, lower = 35,
+                         upper = 50),
   makeDiscreteParam("mfcregr.BigVAR.h", values = 32),
   makeDiscreteParam("mfcregr.BigVAR.n.ahead", values = 32)
 )
@@ -808,22 +830,55 @@ library(parallelMap)
 parallelStartSocket(4)
 configureMlr(on.learner.error = "warn")
 set.seed(1234)
-multfore.tune = tuneParams(stack.forecast, multfore.task, resampling = resamp.sub,
-                   par.set = ps, control = makeTuneControlGrid(),
-                   measures = multivar.mase, show.info = FALSE)
+multfore.tune = tuneParams(stack.forecast, multfore.task,
+                           resampling = resamp.sub,
+                           par.set = ps, control = makeTuneControlGrid(),
+                           measures = mase, show.info = FALSE)
 parallelStop()
 multfore.tune
+@
 
+<<multiforecast4, cache=TRUE, echo = FALSE>>=
+load("multfore_tune.RData")
+multfore.tune
+@
+Once the tuning is complete, the best model can be extracted with \code{setHyperPar2()} and the final model will be trained on all of the data. Since we are using the multivariate model to produce forecasts for an singel variable, univariate MASE is use instead of the multivariate form of MASE.
+
+<<multiforecast5, eval = FALSE>>=
 stack.forecast.f  = setHyperPars2(stack.forecast,multfore.tune$x)
 multfore.train = train(stack.forecast.f,multfore.task)
+@
+
+<<multiforecast6, cache=TRUE, echo = FALSE>>=
+load("multfore_train.RData")
+@
+
+<<multiforecast7, cache=TRUE>>=
 multfore.train
 
 multfore.pred = predict(multfore.train, newdata = as.data.frame(eu.test))
 multfore.pred
-
 performance(multfore.pred, mase, task = multfore.task)
 @
-\newpage
+
+<<multiForecast8, cache = TRUE, echo = FALSE>>=
+col_names = colnames(multfore.pred$data)
+# Set a color scheme:
+tsRainbow <- rainbow(ncol(multfore.pred$data))
+# Plot the overlayed series
+plot(x = as.zoo(multfore.pred$data), ylab = "Price", main = "Daily Price of European Stock Indices",
+col = tsRainbow, screens = 1)
+# Set a legend in the upper left hand corner to match color to return series
+legend(x = "topleft", legend = col_names,lty = 1, bty = "n",
+       col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+@
+
+\section{Conclusion}
+
+The results of this paper show that creating a unified interface for forecasting models in \proglang{R} allows for better models through an automated methedology of resampling, preprocessing, model selection, stacking tuning, and training. Building on the wide range of forecasting packages available in \proglang{R}, automating tasks such as windowing cross validation and model selection allow applied forecasters to spend less time dealing with the beauracracy of modeling and more time testing new models. New methods such as multivariate stacked learners, Lambert W transforms, and the ability to create arbitary AR($p,d$) machine learning models allows researchers to easily experiment with new ideas. While the example models here are not perfect, this was mostly due to time. It will be easy for researchers to beat the models created in this paper.
+
+Multivariate stacked learners are quite new, and to this researchers knowledge have not been used in this context. Future research based on this package would involve tuning these models to see how useful they are in the real world. Classification forecast made available in this extension is a very new field, and with the ease of making these models new research in this area can progress much quicker. Updates to this package will include more multivariate and univariate forecast learners as well as new methods to stack models such as Bayesian averaging~\cite{bayesianAverage}.
+
 %\small
 \bibliography{thesisbib}{}
 \bibliographystyle{plain}
