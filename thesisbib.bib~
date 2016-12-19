@@ -1,0 +1,765 @@
+@book{adams1995hitchhiker,
+  title={The Hitchhiker's Guide to the Galaxy},
+  author={Adams, D.},
+  isbn={9781417642595},
+  url={http://books.google.com/books?id=W-xMPgAACAAJ},
+  year={1995},
+  publisher={San Val}
+}
+
+@TechReport{Hyndman2006,
+  author={Rob J. Hyndman and Anne B. Koehler},
+  title={{Another Look at Measures of Forecast Accuracy}},
+  year=2005,
+  month=May,
+  institution={Monash University, Department of Econometrics and Business Statistics},
+  type={Monash Econometrics and Business Statistics Working Papers},
+  url={https://ideas.repec.org/p/msh/ebswps/2005-13.html},
+  number={13/05},
+  abstract={We discuss and compare measures of accuracy of univariate time series forecasts. The methods used in the M-competition and the M3-competition, and many of the measures recommended by previous authors on this topic, are found to be inadequate, and many of them are degenerate in commonly occurring situations. Instead, we propose that the mean absolute scaled error become the standard measure for comparing forecast accuracy across multiple time series.},
+  keywords={Forecast accuracy; Forecast evaluation; Forecast error measures; M-competition; Mean absolute scaled},
+  doi={},
+}
+
+@Article{noteMase,
+  author={Franses, Philip Hans},
+  title={{A note on the Mean Absolute Scaled Error}},
+  journal={International Journal of Forecasting},
+  year=2016,
+  volume={32},
+  number={1},
+  pages={20-22},
+  month={},
+  keywords={Forecast accuracy; Forecast error measures; Statistical testing},
+  doi={10.1016/j.ijforecast.2015},
+  abstract={Hyndman and Koehler (2006) recommend that the Mean Absolute Scaled Error (MASE) should become the standard when comparing forecast accuracies. This note supports their claim by showing that the MASE fits nicely within the standard statistical procedures initiated by Diebold and Mariano (1995) for testing equal forecast accuracies. Various other criteria do not fit, as they do not imply the relevant moment properties, and this is illustrated in some simulation experiments.},
+  url={https://ideas.repec.org/a/eee/intfor/v32y2016i1p20-22.html}
+}
+
+
+@ARTICLE{Spyros1993,
+title = {Accuracy measures: theoretical and practical concerns},
+author = {Makridakis, Spyros},
+year = {1993},
+journal = {International Journal of Forecasting},
+volume = {9},
+number = {4},
+pages = {527-529},
+url = {http://EconPapers.repec.org/RePEc:eee:intfor:v:9:y:1993:i:4:p:527-529}
+}
+
+@ARTICLE{Armstrong1992,
+title = {Error measures for generalizing about forecasting methods: Empirical comparisons},
+author = {Armstrong, J. and Collopy, Fred},
+year = {1992},
+journal = {International Journal of Forecasting},
+volume = {8},
+number = {1},
+pages = {69-80},
+url = {http://EconPapers.repec.org/RePEc:eee:intfor:v:8:y:1992:i:1:p:69-80}
+}
+
+@article{kullback1951,
+author = "Kullback, S. and Leibler, R. A.",
+doi = "10.1214/aoms/1177729694",
+fjournal = "The Annals of Mathematical Statistics",
+journal = "Ann. Math. Statist.",
+month = "03",
+number = "1",
+pages = "79--86",
+publisher = "The Institute of Mathematical Statistics",
+title = "On Information and Sufficiency",
+url = "http://dx.doi.org/10.1214/aoms/1177729694",
+volume = "22",
+year = "1951"
+}
+
+@article{THOMPSON1990,
+title = "An MSE statistic for comparing forecast accuracy across series",
+journal = "International Journal of Forecasting",
+volume = "6",
+number = "2",
+pages = "219 - 227",
+year = "1990",
+note = "",
+issn = "0169-2070",
+doi = "http://dx.doi.org/10.1016/0169-2070(90)90007-X",
+url = "http://www.sciencedirect.com/science/article/pii/016920709090007X",
+author = "Patrick A. Thompson",
+keywords = "Forecast accuracy",
+keywords = "Forecasting competitions",
+keywords = "Mean squared error"
+}
+
+@article{Lin1991,
+ author = {Lin, J.},
+ title = {Divergence Measures Based on the Shannon Entropy},
+ journal = {IEEE Trans. Inf. Theor.},
+ issue_date = {January 1991},
+ volume = {37},
+ number = {1},
+ month = sep,
+ year = {2006},
+ issn = {0018-9448},
+ pages = {145--151},
+ numpages = {7},
+ url = {http://dx.doi.org/10.1109/18.61115},
+ doi = {10.1109/18.61115},
+ acmid = {2267073},
+ publisher = {IEEE Press},
+ address = {Piscataway, NJ, USA},
+} 
+
+@article{Ebrahimi1995,
+ ISSN = {00219002},
+ URL = {http://www.jstor.org/stable/3214930},
+ abstract = {A new partial ordering among life distributions in terms of their uncertainties is introduced. Our measure of uncertainty is Shannon information applied to the residual lifetime. The relationship between this ordering and various existing orderings of life distributions are discussed. Various properties of our proposed concept are examined. Based on our proposed ordering and various existing orderings, the notion of a 'better system' is introduced.},
+ author = {Nader Ebrahimi, Franco Pellerey},
+ journal = {Journal of Applied Probability},
+ number = {1},
+ pages = {202-211},
+ publisher = {Applied Probability Trust},
+ title = {New Partial Ordering of Survival Functions Based on the Notion of Uncertainty},
+ volume = {32},
+ year = {1995}
+}
+
+@article{Kang2016,
+title = "Some new results on the \{LQE\} ordering ",
+journal = "Statistical Methodology ",
+volume = "",
+number = "",
+pages = " - ",
+year = "2016",
+note = "",
+issn = "1572-3127",
+doi = "http://dx.doi.org/10.1016/j.stamet.2016.06.001",
+url = "http://www.sciencedirect.com/science/article/pii/S1572312716300120",
+author = "Dian-tong Kang",
+keywords = "Residual entropy",
+keywords = "Residual quantile entropy order",
+keywords = "Closure and reversed closure property",
+keywords = "Proportional odds model",
+keywords = "Survival copula "
+}
+
+@article{Hyndman25,
+title = "25 years of time series forecasting ",
+journal = "International Journal of Forecasting ",
+volume = "22",
+number = "3",
+pages = "443 - 473",
+year = "2006",
+note = "Twenty five years of forecasting ",
+issn = "0169-2070",
+doi = "http://dx.doi.org/10.1016/j.ijforecast.2006.01.001",
+url = "http://www.sciencedirect.com/science/article/pii/S0169207006000021",
+author = "Jan G. De Gooijer and Rob J. Hyndman",
+keywords = "Accuracy measures",
+keywords = "ARCH",
+keywords = "ARIMA",
+keywords = "Combining",
+keywords = "Count data",
+keywords = "Densities",
+keywords = "Exponential smoothing",
+keywords = "Kalman filter",
+keywords = "Long memory",
+keywords = "Multivariate",
+keywords = "Neural nets",
+keywords = "Nonlinearity",
+keywords = "Prediction intervals",
+keywords = "Regime-switching",
+keywords = "Robustness",
+keywords = "Seasonality",
+keywords = "State space",
+keywords = "Structural models",
+keywords = "Transfer function",
+keywords = "Univariate",
+keywords = "VAR "
+}
+
+@Article{HyndForecast,
+    title = {Automatic time series forecasting: the forecast package
+      for {R}},
+    author = {Rob J Hyndman and Yeasmin Khandakar},
+    journal = {Journal of Statistical Software},
+    volume = {26},
+    number = {3},
+    pages = {1--22},
+    year = {2008},
+    url = {http://www.jstatsoft.org/article/view/v027i03},
+}
+
+@Manual{Rbase,
+    title = {R: A Language and Environment for Statistical Computing},
+    author = {{R Core Team}},
+    organization = {R Foundation for Statistical Computing},
+    address = {Vienna, Austria},
+    year = {2015},
+    url = {https://www.R-project.org/},
+}
+
+@Manual{rugarch,
+    title = {rugarch: Univariate GARCH models.},
+    author = {Alexios Ghalanos},
+    year = {2015},
+    note = {R package version 1.3-6.},
+}
+
+
+@Manual{mlr,
+    title = {mlr: Machine Learning in R},
+    author = {Bernd Bischl and Michel Lang and Jakob Richter and Jakob Bossek and Leonard Judt and Tobias Kuehn and Erich Studerus and Lars Kotthoff},
+    year = {2015},
+    note = {R package version 2.7},
+    url = {https://CRAN.R-project.org/package=mlr},
+ }
+
+@Manual{caret,
+    title = {caret: Classification and Regression Training},
+    author = {Max Kuhn. Contributions from Jed Wing and Steve Weston and Andre Williams and Chris Keefer and Allan Engelhardt and Tony Cooper and Zachary Mayer and Brenton Kenkel and the R Core Team and Michael Benesty and Reynald Lescarbeau and Andrew Ziem and Luca Scrucca and Yuan Tang and Can Candan.},
+    year = {2015},
+    note = {R package version 6.0-62},
+    url = {https://CRAN.R-project.org/package=caret},
+}
+
+@article{Makridakis2000451,
+title = "The M3-Competition: results, conclusions and implications ",
+journal = "International Journal of Forecasting ",
+volume = "16",
+number = "4",
+pages = "451 - 476",
+year = "2000",
+note = "The M3- Competition ",
+issn = "0169-2070",
+doi = "http://dx.doi.org/10.1016/S0169-2070(00)00057-1",
+url = "http://www.sciencedirect.com/science/article/pii/S0169207000000571",
+author = "Spyros Makridakis and Michèle Hibon",
+keywords = "Comparative methods — time series: univariate",
+keywords = "Forecasting competitions",
+keywords = "M-Competition",
+keywords = "Forecasting methods, Forecasting accuracy "
+}
+
+@Manual{m4comp,
+    title = {M4comp: Data from the M4 Time Series Forecasting Competition},
+    author = {Souhaib BenTaieb},
+    year = {2016},
+    note = {R package version 0.0.1},
+    url = {https://CRAN.R-project.org/package=M4comp},
+}
+
+@article{MurphymeteoForecast,
+ ISSN = {01621459},
+ URL = {http://www.jstor.org/stable/2288395},
+ author = {Allan H. Murphy, Robert L. Winkler},
+ journal = {Journal of the American Statistical Association},
+ number = {387},
+ pages = {489-500},
+ publisher = {[American Statistical Association, Taylor \& Francis, Ltd.]},
+ title = {Probability Forecasting in Meterology},
+ volume = {79},
+ year = {1984}
+}
+
+@article{Chadefaux01012014,
+author = {Chadefaux, Thomas}, 
+title = {Early warning signals for war in the news},
+volume = {51}, 
+number = {1}, 
+pages = {5-18}, 
+year = {2014}, 
+doi = {10.1177/0022343313507302}, 
+URL = {http://jpr.sagepub.com/content/51/1/5.abstract}, 
+eprint = {http://jpr.sagepub.com/content/51/1/5.full.pdf+html}, 
+journal = {Journal of Peace Research} 
+}
+
+@article{earthquakeYegu,
+ ISSN = {00251909, 15265501},
+ URL = {http://www.jstor.org/stable/2629612},
+ abstract = {The primary concern of this paper is the establishment of a forecasting procedure for largest earthquake magnitudes of the next n years. It is shown that the use of the third-type asymptotic distribution of the largest values as an approximation to the exact distribution provides for an expression for the expected value and the mode of the largest earthquake magnitude in the next n years. An example of the application of this procedure is given and the results are compared with actual observations.},
+ author = {Tuncel M. Yegulalp},
+ journal = {Management Science},
+ number = {4},
+ pages = {418-421},
+ publisher = {INFORMS},
+ title = {Forecasting for Largest Earthquakes},
+ volume = {21},
+ year = {1974}
+}
+
+
+@book{TrippiNueralForecast,
+ editor = {Trippi, Robert R. and Turban, Efraim},
+ title = {Neural Networks in Finance and Investing: Using Artificial Intelligence to Improve Real World Performance},
+ year = {1992},
+ isbn = {1557384525},
+ publisher = {McGraw-Hill, Inc.},
+ address = {New York, NY, USA},
+} 
+
+@Article{Cao2001,
+author="Cao, Lijuan
+and Tay, E.H Francis",
+title="Financial Forecasting Using Support Vector Machines",
+journal="Neural Computing {\&} Applications",
+year="2001",
+volume="10",
+number="2",
+pages="184--192",
+issn="1433-3058",
+doi="10.1007/s005210170010",
+url="http://dx.doi.org/10.1007/s005210170010"
+}
+
+@article{GRANGER19923,
+title = "Forecasting stock market prices: Lessons for forecasters",
+journal = "International Journal of Forecasting",
+volume = "8",
+number = "1",
+pages = "3 - 13",
+year = "1992",
+note = "",
+issn = "0169-2070",
+doi = "http://dx.doi.org/10.1016/0169-2070(92)90003-R",
+url = "http://www.sciencedirect.com/science/article/pii/016920709290003R",
+author = "Clive W.J. Granger",
+keywords = "Forecastability",
+keywords = "Stock returns",
+keywords = "Non-linear models",
+keywords = "Efficient markets"
+}
+
+
+@book{hyndman2014forecasting,
+  title={Forecasting: principles and practice: },
+  author={Hyndman, R.J. and Athanasopoulos, G.},
+  isbn={9780987507105},
+  url={https://books.google.com/books?id=gDuRBAAAQBAJ},
+  year={2014},
+  publisher={OTexts}
+}
+
+@Manual{xts,
+    title = {xts: eXtensible Time Series},
+    author = {Jeffrey A. Ryan and Joshua M. Ulrich},
+    year = {2016},
+    note = {R package version 0.10-0},
+    url = {https://github.com/joshuaulrich/xts},
+}
+
+@article{hannanOrder,
+ ISSN = {00063444},
+ URL = {http://www.jstor.org/stable/2335856},
+ author = {E. J. Hannan, J. Rissanen},
+ journal = {Biometrika},
+ number = {1},
+ pages = {81-94},
+ publisher = {[Oxford University Press, Biometrika Trust]},
+ title = {Recursive Estimation of Mixed Autoregressive-Moving Average Order},
+ volume = {69},
+ year = {1982}
+}
+
+@article{forecastpro,
+ author = {Goodrich RL},
+ journal = {International Journal of Forecasting},
+ number = {4},
+ pages = {533-535},
+ title = {The Forecast Pro Methodology},
+ volume = {16},
+ year = {2000}
+}
+
+@article{reillyautobox,
+  title={The AUTOBOX system},
+  author={Reilly, David},
+  journal={International Journal of Forecasting},
+  volume={16},
+  number={4},
+  pages={531--533},
+  year={2000},
+  publisher={Elsevier}
+}
+
+@online{windowingcaret,
+  author = {Max Kuhn},
+  title = {{caret} data splitting methods},
+  year = 1999,
+  url = {http://caret.r-forge.r-project.org/splitting.html},
+  urldate = {2014-05-30}
+}
+
+@Article{Friedman1997,
+author="Friedman, Jerome H.",
+title="On Bias, Variance, 0/1---Loss, and the Curse-of-Dimensionality",
+journal="Data Mining and Knowledge Discovery",
+year="1997",
+volume="1",
+number="1",
+pages="55--77",
+issn="1573-756X",
+doi="10.1023/A:1009778005914",
+url="http://dx.doi.org/10.1023/A:1009778005914"
+}
+
+@ARTICLE{rodriguezkfold,
+author={J. D. Rodriguez and A. Perez and J. A. Lozano},
+journal={IEEE Transactions on Pattern Analysis and Machine Intelligence},
+title={Sensitivity Analysis of k-Fold Cross Validation in Prediction Error Estimation},
+year={2010},
+volume={32},
+number={3},
+pages={569-575},
+keywords={Bayes methods;estimation theory;learning (artificial intelligence);pattern classification;probability;statistical analysis;classification error estimator;k-fold cross-validation;machine learning;naive Bayes method;nearest neighbor algorithm;prediction error estimation;probability distribution;sensitivity analysis;statistical properties;bias and variance;decomposition of the variance;error estimation;k-fold cross validation;prediction error;sources of sensitivity;supervised classification.},
+doi={10.1109/TPAMI.2009.187},
+ISSN={0162-8828},
+month={March}
+}
+
+@Manual{paramhelper,
+    title = {ParamHelpers: Helpers for Parameters in Black-Box Optimization, Tuning and
+Machine Learning},
+    author = {Bernd Bischl and Michel Lang and Jakob Bossek and Daniel Horn and Jakob Richter and Pascal Kerschke},
+    year = {2016},
+    note = {R package version 1.9},
+    url = {https://CRAN.R-project.org/package=ParamHelpers},
+}
+
+@Manual{thief,
+    title = {thief: Temporal Hierarchical Forecasting},
+    author = {Rob Hyndman and Nikolaos Kourentzes},
+    year = {2016},
+    note = {R package version 0.2},
+    url = {https://CRAN.R-project.org/package=thief},
+}
+
+@article{Bergstra,
+ author = {Bergstra, James and Bengio, Yoshua},
+ title = {Random Search for Hyper-parameter Optimization},
+ journal = {J. Mach. Learn. Res.},
+ issue_date = {January 2012},
+ volume = {13},
+ number = {1},
+ month = feb,
+ year = {2012},
+ issn = {1532-4435},
+ pages = {281--305},
+ numpages = {25},
+ url = {http://dl.acm.org/citation.cfm?id=2503308.2188395},
+ acmid = {2188395},
+ publisher = {JMLR.org},
+ keywords = {deep learning, global optimization, model selection, neural networks, response surface modeling},
+} 
+
+@article{tbats,
+author = {Alysha M. De Livera and Rob J. Hyndman and Ralph D. Snyder},
+title = {Forecasting Time Series With Complex Seasonal Patterns Using Exponential Smoothing},
+journal = {Journal of the American Statistical Association},
+volume = {106},
+number = {496},
+pages = {1513-1527},
+year = {2011},
+doi = {10.1198/jasa.2011.tm09771},
+
+URL = { 
+        http://dx.doi.org/10.1198/jasa.2011.tm09771
+    
+},
+eprint = { 
+        http://dx.doi.org/10.1198/jasa.2011.tm09771
+    
+}
+}
+
+
+@Manual{bigvar,
+    title = {BigVAR: Dimension Reduction Methods for Multivariate Time Series},
+    author = {Will Nicholson and David Matteson and Jacob Bien},
+    year = {2016},
+    note = {R package version 1.0.1},
+    url = {https://CRAN.R-project.org/package=BigVAR},
+  }
+
+@Manual{datasets,
+    title = {R: A Language and Environment for Statistical Computing},
+    author = {{R Core Team}},
+    organization = {R Foundation for Statistical Computing},
+    address = {Vienna, Austria},
+    year = {2016},
+    note = {The data were kindly provided by Erste Bank AG, Vienna, Austria. },
+    url = {https://www.R-project.org/},
+  }
+  
+@book{fourierTrans,
+ author = {West, Mike and Harrison, Jeff},
+ title = {Bayesian Forecasting and Dynamic Models (2Nd Ed.)},
+ year = {1997},
+ isbn = {0-387-94725-6},
+ publisher = {Springer-Verlag New York, Inc.},
+ address = {New York, NY, USA},
+} 
+
+@Article{LambertGeneral,
+    title = {Lambert W random variables - a new family of generalized
+      skewed distributions with applications to risk estimation},
+    author = {Georg M. Goerg},
+    year = {2011},
+    journal = {Annals of Applied Statistics},
+    volume = {5},
+    number = {3},
+    pages = {2197-2230},
+}
+
+@Article{GaussLam,
+    title = {The Lambert Way to Gaussianize heavy-tailed data with the
+      inverse of Tukey's h transformation as a special case},
+    author = {Georg M. Goerg},
+    year = {2015},
+    journal = {The Scientific World Journal: Special Issue on
+      Probability and Statistics with Applications in Finance and
+      Economics},
+    volume = {2015},
+    number = {2015},
+    pages = {16},
+}
+
+﻿@inbook {ghdist,
+title = {Summarizing Shape Numerically: The g-and-h Distributions},
+author = {Hoaglin, David C.},
+author = {},
+publisher = {John Wiley \& Sons, Inc.},
+isbn = {9781118150702},
+url = {http://dx.doi.org/10.1002/9781118150702.ch11},
+doi = {10.1002/9781118150702.ch11},
+pages = {461--513},
+keywords = {skewness, elongation, frequency distributions, moments, Gaussian random variable},
+booktitle = {Exploring Data Tables, Trends, and Shapes},
+year = {2006},
+}
+
+@article{hhdist,
+ ISSN = {10618600},
+ URL = {http://www.jstor.org/stable/1390620},
+ abstract = {This article introduces a family of distributional shapes which is flexible in the sense that it contains skewed and symmetric laws as well as heavy-tailed and light-tailed laws. The proposed family is also practically convenient because it is easy to fit to a table of quantiles from any distribution. Inversely, for each of the distributional shapes it is trivial to compute quantiles for any desired probability, and it is possible to compute the corresponding densities.},
+ author = {Stephan Morgenthaler and John W. Tukey},
+ journal = {Journal of Computational and Graphical Statistics},
+ number = {1},
+ pages = {180-195},
+ publisher = {[American Statistical Association, Taylor \& Francis, Ltd., Institute of Mathematical Statistics, Interface Foundation of America]},
+ title = {Fitting Quantiles: Doubling, HR, HQ, and HHH Distributions},
+ volume = {9},
+ year = {2000}
+}
+
+
+
+@article {forecastbest,
+author = {Palmer, T. N.},
+title = {The economic value of ensemble forecasts as a tool for risk assessment: From days to decades},
+journal = {Quarterly Journal of the Royal Meteorological Society},
+volume = {128},
+number = {581},
+publisher = {John Wiley \& Sons, Ltd.},
+issn = {1477-870X},
+url = {http://dx.doi.org/10.1256/0035900021643593},
+doi = {10.1256/0035900021643593},
+pages = {747--774},
+keywords = {Climate change, Cost/loss ratio, Probability forecasting, Seasonal forecasts, User application models},
+year = {2002},
+}
+
+@ARTICLE{bigvarpaper,
+   author = {{Nicholson}, W. and {Matteson}, D. and {Bien}, J.},
+    title = "{VARX-L: Structured Regularization for Large Vector Autoregressions with Exogenous Variables}",
+  journal = {ArXiv e-prints},
+archivePrefix = "arXiv",
+   eprint = {1508.07497},
+ primaryClass = "stat.AP",
+ keywords = {Statistics - Applications},
+     year = 2015,
+    month = aug,
+   adsurl = {http://adsabs.harvard.edu/abs/2015arXiv150807497N},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+@article{garchengels,
+ ISSN = {00129682, 14680262},
+ URL = {http://www.jstor.org/stable/1912773},
+ abstract = {Traditional econometric models assume a constant one-period forecast variance. To generalize this implausible assumption, a new class of stochastic processes called autoregressive conditional heteroscedastic (ARCH) processes are introduced in this paper. These are mean zero, serially uncorrelated processes with nonconstant variances conditional on the past, but constant unconditional variances. For such processes, the recent past gives information about the one-period forecast variance. A regression model is then introduced with disturbances following an ARCH process. Maximum likelihood estimators are described and a simple scoring iteration formulated. Ordinary least squares maintains its optimality properties in this set-up, but maximum likelihood is more efficient. The relative efficiency is calculated and can be infinite. To test whether the disturbances follow an ARCH process, the Lagrange multiplier procedure is employed. The test is based simply on the autocorrelation of the squared OLS residuals. This model is used to estimate the means and variances of inflation in the U.K. The ARCH effect is found to be significant and the estimated variances increase substantially during the chaotic seventies.},
+ author = {Robert F. Engle},
+ journal = {Econometrica},
+ number = {4},
+ pages = {987-1007},
+ publisher = {[Wiley, Econometric Society]},
+ title = {Autoregressive Conditional Heteroscedasticity with Estimates of the Variance of United Kingdom Inflation},
+ volume = {50},
+ year = {1982}
+}
+
+@article{foreclassif,
+title = "Forecasting stock indices: a comparison of classification and level estimation models ",
+journal = "International Journal of Forecasting ",
+volume = "16",
+number = "2",
+pages = "173 - 190",
+year = "2000",
+note = "",
+issn = "0169-2070",
+doi = "http://dx.doi.org/10.1016/S0169-2070(99)00048-5",
+url = "http://www.sciencedirect.com/science/article/pii/S0169207099000485",
+author = "Mark T. Leung and Hazem Daouk and An-Sing Chen",
+keywords = "Forecasting",
+keywords = "Multivariate classification",
+keywords = "Stock index",
+keywords = "Trading strategy "
+}
+
+@inproceedings{ensembleOverview,
+ author = {Dietterich, Thomas G.},
+ title = {Ensemble Methods in Machine Learning},
+ booktitle = {Proceedings of the First International Workshop on Multiple Classifier Systems},
+ series = {MCS '00},
+ year = {2000},
+ isbn = {3-540-67704-6},
+ pages = {1--15},
+ numpages = {15},
+ url = {http://dl.acm.org/citation.cfm?id=648054.743935},
+ acmid = {743935},
+ publisher = {Springer-Verlag},
+ address = {London, UK, UK},
+} 
+
+@article{combineForecast,
+title = "Combining forecasts: A review and annotated bibliography",
+journal = "International Journal of Forecasting",
+volume = "5",
+number = "4",
+pages = "559 - 583",
+year = "1989",
+note = "",
+issn = "0169-2070",
+doi = "http://dx.doi.org/10.1016/0169-2070(89)90012-5",
+url = "http://www.sciencedirect.com/science/article/pii/0169207089900125",
+author = "Robert T. Clemen",
+keywords = "Forecast combination",
+keywords = "Composite models",
+keywords = "Forecast aggregation",
+keywords = "Consensus",
+keywords = "Forecast synthesis"
+}
+
+
+
+
+@article {arfima,
+author = {Granger, C. W. J. and Joyeux, Roselyne},
+title = {AN INTRODUCTION TO LONG-MEMORY TIME SERIES MODELS AND FRACTIONAL DIFFERENCING},
+journal = {Journal of Time Series Analysis},
+volume = {1},
+number = {1},
+publisher = {Blackwell Publishing Ltd},
+issn = {1467-9892},
+url = {http://dx.doi.org/10.1111/j.1467-9892.1980.tb00297.x},
+doi = {10.1111/j.1467-9892.1980.tb00297.x},
+pages = {15--29},
+keywords = {Fractional differencing, long-memory, integrated models},
+year = {1980},
+}
+
+@ARTICLE{Wolpert92stackedgeneralization,
+author = {David H. Wolpert},
+title = {Stacked Generalization},
+journal = {Neural Networks},
+year = {1992},
+volume = {5},
+pages = {241--259}
+}
+
+@Article{glmboost,
+    title = {Boosting Algorithms: Regularization, Prediction and Model
+      Fitting (with Discussion)},
+    author = {Peter Buehlmann and Torsten Hothorn},
+    journal = {Statistical Science},
+    year = {2007},
+    volume = {22},
+    number = {4},
+    pages = {477--505},
+}
+
+@article{bayesianAverage,
+author = { Adrian E.  Raftery  and  Tilmann  Gneiting  and  Fadoua  Balabdaoui  and  Michael  Polakowski },
+title = {Using Bayesian Model Averaging to Calibrate Forecast Ensembles},
+journal = {Monthly Weather Review},
+volume = {133},
+number = {5},
+pages = {1155-1174},
+year = {2005},
+doi = {10.1175/MWR2906.1},
+
+URL = { 
+        http://dx.doi.org/10.1175/MWR2906.1
+    
+},
+eprint = { 
+        http://dx.doi.org/10.1175/MWR2906.1
+    
+}
+}
+
+@article{ElliotBinary,
+title = "Predicting binary outcomes ",
+journal = "Journal of Econometrics ",
+volume = "174",
+number = "1",
+pages = "15 - 26",
+year = "2013",
+note = "",
+issn = "0304-4076",
+doi = "http://dx.doi.org/10.1016/j.jeconom.2013.01.003",
+url = "http://www.sciencedirect.com/science/article/pii/S0304407613000171",
+author = "Graham Elliott and Robert P. Lieli"
+}
+
+@InBook{forecastBinary,
+  author={Lahiri, Kajal and Yang, Liu},
+  title={{Forecasting Binary Outcomes}},
+  publisher={Elsevier},
+  year=2013,
+  month={May/June},
+  volume={2},
+  number={},
+  series={Handbook of Economic Forecasting},
+  edition={},
+  chapter={0},
+  pages={1025-1106},
+  keywords={Probability prediction; Point prediction; Skill; Value; Joint distribution; Loss function},
+  doi={10.1016/B978-0-444-62731-},
+  abstract={Binary events are involved in many economic decision problems. In recent years, considerable progress has been made in diverse disciplines in developing models for forecasting binary outcomes. We distinguish between two types of forecasts for binary events that are generally obtained as the output of regression models: probability forecasts and point forecasts. We summarize specification, estimation, and evaluation of binary response models for the purpose of forecasting in a unified framework that is characterized by the joint distribution of forecasts and actuals, and a general loss function. Analysis of both the skill and the value of probability and point forecasts can be carried out within this framework. Parametric, semi-parametric, non-parametric, and Bayesian approaches are covered. The emphasis is on the basic intuitions underlying each methodology, abstracting away from the mathematical details.},
+  url={https://ideas.repec.org/h/eee/ecofch/2-1025.html}
+}
+
+
+@article{ markClassifStock,
+title = "Forecasting stock indices: A comparison of classification and level estimation models",
+keywords = "Forecasting, Multivariate classification, Stock index, Trading strategy",
+author = "Leung, {Mark T.} and Hazem Daouk and Chen, {An Sing}",
+year = "2000",
+month = "4",
+volume = "16",
+pages = "173--190",
+journal = "International Journal of Forecasting",
+issn = "0169-2070",
+publisher = "Elsevier",
+number = "2",
+
+}
+
+@inproceedings{Chen2015UsingEV,
+  title={Using Extreme Value Theory Approaches to Forecast the Probability of Outbreak of Highly Pathogenic Influenza in Zhejiang, China},
+  author={Jiangpeng Chen and Xun Lei and Li Zhang and Bin Peng},
+  booktitle={PloS one},
+  year={2015}
+}
+

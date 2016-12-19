@@ -153,8 +153,8 @@ class: small-code
 
 ```{r resampleScheme, cache = TRUE}
 resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
-                               initial.window = 400L,
-                               size = nrow(getTaskData(climate.task)), skip = 6L)
+                               initial.window = .90,
+                               size = nrow(getTaskData(climate.task)), skip = .01)
 resampDesc
 ```
 
@@ -216,115 +216,136 @@ matplot(climate.pred$data, type = "l", main = "Prediction Vs. Real Data \n With 
 
 ```
 
-Using an ML Model: Making Lagged Tasks
+Using an ML Model: Ensemble Forecasts
 =========================================
 class: small-code 
 
+1. Train multiple forecasting models
+2. Perform windowed cross validation, saving each forecast
+3. Train an ML model on the forecasts
+
+
+
+Using an ML Model: Ensemble Forecasts Covariance Parameter Space
+=========================================
+
+class: small-code 
 ```{r mlLagTask, cache = TRUE}
-climateLagTask = createLagDiffFeatures(climate.task, lag = 35L:100L, na.pad = FALSE, return.nonlag = TRUE)
-climateLagTask$env$data <- climateLagTask$env$data[,-1]
-climateLagTask$task.desc$type <- "regr"
-climateLagTask
+ps = makeParamSet(
+  makeLogicalParam(id = "fcregr.tbats.use.box.cox", default = FALSE, tunable = TRUE),
+  makeLogicalParam(id = "fcregr.tbats.use.trend", default = FALSE, tunable = TRUE),
+  makeLogicalParam(id = "fcregr.tbats.use.damped.trend", default = FALSE, tunable = TRUE),
+  makeLogicalParam(id = "fcregr.tbats.seasonal.periods", default = FALSE, tunable = TRUE),
+  makeIntegerParam(id = "fcregr.tbats.max.p", upper = 10, lower = 0),
+  makeIntegerParam(id = "fcregr.tbats.start.p", upper = 5, lower = 1, 
+                   trafo = function(x) x*2),
+  makeIntegerParam(id = "fcregr.tbats.max.q", upper = 10, lower = 0),
+  makeIntegerParam(id = "fcregr.tbats.start.q", upper = 5,lower = 1,
+                   trafo = function(x) x*2),
+  makeIntegerParam("fcregr.tbats.max.P", lower = 0, upper = 2),
+  makeIntegerParam("fcregr.tbats.max.Q", lower = 0, upper = 2),
+  makeDiscreteParam("fcregr.tbats.ic", values = c("aic","bic")),
+  makeDiscreteParam("fcregr.tbats.test", values = c("kpss","adf")),
+  makeDiscreteParam("fcregr.tbats.seasonal.test", values = c("ocsb", "ch")),
+  makeLogicalParam("fcregr.tbats.biasadj", default = FALSE),
+  makeDiscreteParam("fcregr.garch.model", values = c("sGARCH","csGARCH")),
+  makeIntegerVectorParam(id = "fcregr.garch.garchOrder",
+                         len = 2L,
+                         lower = 0L,
+                         upper = 2L,
+                         tunable = TRUE),
+  makeLogicalParam(id = "fcregr.garch.include.mean",
+                   default = FALSE,
+                   tunable = TRUE),
+  makeDiscreteParam("fcregr.garch.distribution.model", values = c("snorm","sged")),
+  makeDiscreteLearnerParam("fcregr.garch.solver", values = c("nloptr"))
+)
 ```
 
-Using an ML Model: Making Lagged Tasks
+Using an ML Model: Ensemble Forecasts Super Learner Parameter Set
+=========================================
+
+```{r superset, cache = TRUE}
+super.ps = makeParamSet(
+  makeIntegerLearnerParam("committees", lower = 1, upper = 100),
+  makeIntegerLearnerParam("rules", lower = 40, upper = 80),
+  makeIntegerLearnerParam("neighbors", lower = 0, upper = 2)
+)
+ctrl = makeTuneControlIrace(maxExperiments = 300L, n.instances = 50L, minNbSurvival = 2L)
+super.mod = makeTuneWrapper(makeLearner("regr.cubist"), resampling = resamp.super,
+                            par.set = super.ps, control = ctrl )
+```
+
+Using an ML Model: Ensemble Forecasts Sampling Scheme
+=========================================
+
+class: small-code 
+```{r ensembleResample, cache = TRUE}
+resamp.sub = makeResampleDesc("GrowingCV",
+                          horizon = 35L,
+                          initial.window = .75,
+                          size = nrow(getTaskData(climate.task)),
+                          #skip = .01
+                          )
+                          
+resamp.super = makeResampleDesc("CV", iters = 20)
+```
+
+Using an ML Model: Ensemble Forecasts
 =========================================
 class: small-code 
-
-```{r mlLagTrain, cache = TRUE}
-regrGbm = makeLearner("regr.gbm",
-                      par.vals = list(n.trees = 2000,
-                                      interaction.depth = 8,
-                                      distribution = "laplace"))
-gbmMod = train(regrGbm, climateLagTask)
+```{r ensembleStackLearner, cache = TRUE}
+base = c("fcregr.tbats", "fcregr.garch")
+lrns = lapply(base, makeLearner)
+lrns = lapply(lrns, setPredictType, "response")
+lrns[[1]]$par.vals$h = 35
+lrns[[2]]$par.vals$n.ahead = 35
+stack.forecast = makeStackedLearner(base.learners = lrns,
+                       predict.type = "response",
+                       method = "average")
 ```
 
-Make Resampling Scheme
-===========================================
+Using an ML Model: Ensemble Forecasts Tune
+=========================================
 class: small-code 
-
-```{r resampleSchemegbm, cache = TRUE}
-resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
-                               initial.window = 300L,
-                               size = nrow(getTaskData(climateLagTask)),
-                               skip = 6L)
-resampDesc
-```
-
-Make Tuning Set and Search Scheme
-===========================================
-class: small-code 
-
-```{r gbmtuning, cache = TRUE}
-ps = makeParamSet(
-  makeDiscreteParam("distribution", values = c("laplace", "tdist")),
-  #
-  makeIntegerParam("n.trees",lower = 1, upper = 3,
-                   trafo = function(x) x * 100),
-  #
-  makeIntegerParam("interaction.depth", lower = 1, upper = 3,
-                   trafo = function(x) x * 5),
-  #
-  makeNumericParam("shrinkage", lower = 1, upper = 2)
-)
-ctrl = makeTuneControlIrace(maxExperiments = 300L)
-```
-
-Tuning GBM Model
-===========================================
-class: small-code 
-
-```{r tuneSpacegbm, cache = TRUE, eval = FALSE}
+```{r ensembleStackLearner, cache = TRUE}
 library("parallelMap")
-parallelStartSocket(6)
-configureMlr(on.learner.error = "warn")
-set.seed(1234)
-res = tuneParams("regr.gbm", task = climateLagTask,
-                 resampling = resampDesc,
-                 par.set = ps, control = ctrl,
-                 measures = mase)
+parallelStartSocket(7)
+fore.tune = tuneParams(stack.forecast, climate.task, resampling = resamp.sub,
+                   par.set = ps, control = ctrl,
+                   measures = mase)
 parallelStop()
-res
-```
-
-```{r loadgbmTune, echo = FALSE, cache = TRUE}
-load("./gbmTune.RData")
-res
 ```
 
 
-Tuning GBM Model
-===========================================
-class: small-code 
+```{r ensembleTrain, cache = TRUE}
+super.ps = makeParamSet(
+  makeIntegerParam("ntree", lower = 500, upper = 1000),
+  makeIntegerParam("mtry", lower = 1, upper = 2),
+  makeIntegerParam("nodesize",lower = 1, upper = 200),
+  makeLogicalParam("replace")
+)
+ctrl = makeTuneControlIrace(maxExperiments = 1000L)
+super.mod = makeTuneWrapper(makeLearner("regr.randomForest"), resampling = resamp.super,
+                            par.set = super.ps, control = ctrl, measure = mase )
 
-```{r fitgbm, cache = TRUE, eval = TRUE}
-lrn = setHyperPars(makeLearner("regr.gbm"), par.vals = res$x)
-m = train(lrn, climateLagTask)
-m
+# Now we will tune a super learner over the base learners
+stack.forecast = makeStackedLearner(base.learners = lrns,
+                       predict.type = "response",
+                       method = "growing.cv",
+                       resampling = resamp.sub,
+                       super.learner = super.mod)
+
+stack.forecast.tune  = setHyperPars2(stack.forecast,fore.tune$x)
+stack.forecast.tune
+#start parallel
+library("parallelMap")
+parallelStartSocket(7)
+stack.forecast.mod = train(stack.forecast.tune,climate.task)
+parallelStop()
+stack.forecast.pred = predict(stack.forecast.mod, newdata = m4Test1)
+stack.forecast.pred
+performance(stack.forecast.pred, task = climate.task, measure = mase)
+matplot(stack.forecast.pred$data,type = "l")
+matplot(stack.forecast.pred$data, type = "l")
 ```
-Forecast with ML Model
-======================================================
-class: small-code 
-
-```{r mlPred, cache = TRUE, eval = TRUE}
-m4Full <- rbind(m4Train1,m4Test1)
-climateLagData = createLagDiffFeatures(m4Full, lag = 35L:100L,
-                                       na.pad = FALSE,
-                                       return.nonlag = TRUE)
-climateLagTest = climateLagData[I(nrow(climateLagData) - 
-                                    35):I(nrow(climateLagData)),]
-testp <- predict(gbmMod, newdata = climateLagTest)
-performance(testp, mase, climateLagTask)
-```
-
-Plot Forecast
-===========================================
-class: small-code 
-```{r mlPredictGraph, eval = TRUE, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = FALSE}
-nn <- ncol(testp$data)
-par(xpd = TRUE)
-matplot(testp$data,type="l", xlab = "Forecast Horizon", ylab = "Temperature",
-        main = "Forecast of Daily Climate Data\n With Confidence Intervals")
-legend(10,15, c("Truth", "Prediction"),col=seq_len(nn),cex=0.8,fill=seq_len(nn), ncol = 4, bty = "n")
-```
-

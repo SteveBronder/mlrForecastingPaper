@@ -41,6 +41,12 @@ Thomas Chadefaux.
 \newblock Early warning signals for war in the news.
 \newblock {\em Journal of Peace Research}, 51(1):5--18, 2014.
 
+\bibitem{Chen2015UsingEV}
+Jiangpeng Chen, Xun Lei, Li~Zhang, and Bin Peng.
+\newblock Using extreme value theory approaches to forecast the probability of
+  outbreak of highly pathogenic influenza in zhejiang, china.
+\newblock In {\em PloS one}, 2015.
+
 \bibitem{combineForecast}
 Robert~T. Clemen.
 \newblock Combining forecasts: A review and annotated bibliography.
@@ -57,6 +63,11 @@ Thomas~G. Dietterich.
 J.~Rissanen E.~J.~Hannan.
 \newblock Recursive estimation of mixed autoregressive-moving average order.
 \newblock {\em Biometrika}, 69(1):81--94, 1982.
+
+\bibitem{ElliotBinary}
+Graham Elliott and Robert~P. Lieli.
+\newblock Predicting binary outcomes.
+\newblock {\em Journal of Econometrics}, 174(1):15 -- 26, 2013.
 
 \bibitem{garchengels}
 Robert~F. Engle.
@@ -144,11 +155,23 @@ Rob~J. Hyndman and Anne~B. Koehler.
 Max Kuhn.
 \newblock {caret} data splitting methods, 1999.
 
+\bibitem{forecastBinary}
+Kajal Lahiri and Liu Yang.
+\newblock {\em {Forecasting Binary Outcomes}}, volume~2 of {\em Handbook of
+  Economic Forecasting}, chapter~0, pages 1025--1106.
+\newblock Elsevier, May/June 2013.
+
 \bibitem{foreclassif}
 Mark~T. Leung, Hazem Daouk, and An-Sing Chen.
 \newblock Forecasting stock indices: a comparison of classification and level
   estimation models.
 \newblock {\em International Journal of Forecasting}, 16(2):173 -- 190, 2000.
+
+\bibitem{markClassifStock}
+{Mark T.} Leung, Hazem Daouk, and {An Sing} Chen.
+\newblock Forecasting stock indices: A comparison of classification and level
+  estimation models.
+\newblock {\em International Journal of Forecasting}, 16(2):173--190, 4 2000.
 
 \bibitem{tbats}
 Alysha M.~De Livera, Rob~J. Hyndman, and Ralph~D. Snyder.
