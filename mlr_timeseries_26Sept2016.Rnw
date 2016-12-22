@@ -438,8 +438,9 @@ parallelStartSocket(8)
 configureMlr(on.learner.error = "warn")
 set.seed(1234)
 tbatsTune = tuneParams(makeLearner("fcregr.tbats", h = 35),
-                       task = climate.task, resampling = resampDesc,
-                       par.set = parSet, control = ctrl, measures = mase)
+                       task = climate.task,
+                       resampling = resampDesc, par.set = parSet,
+                       control = ctrl, measures = mase)
 parallelStop()
 tbatsTune$y
 
@@ -448,6 +449,7 @@ tbatsTune$y
 <<loadTuneTbats,echo = FALSE, cache = TRUE>>=
 load("./tbatsTune.RData")
 tbatsTune$y
+
 @
 
 Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed graphically using partial dependence plots ~\ref{partialdep}. Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{tbatsTune} and coerces them to numeric.
@@ -459,19 +461,23 @@ for (i in 1:4)
  tbats.hyp$data[,i] = as.numeric(tbats.hyp$data[,i])
 tbats.hyp$data[,14] = as.numeric(tbats.hyp$data[,14])
 plotHyperParsEffect(tbats.hyp, x= "max.q", y = "mase.test.mean",
+                     plot.type = "line", 
+                     partial.dep.learn = "regr.randomForest")
+plotHyperParsEffect(tbats.hyp, x= "max.P", y = "mase.test.mean",
                      plot.type = "line",
                      partial.dep.learn = "regr.randomForest")
 
 @
 \doublespacing
 
-For this model the best maximum number of moving average coefficients is two. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
+For this model the best maximum number of moving average coefficients is two while the best number of seasonal autoregressive terms is five. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
 
 \singlespacing
 <<bestmodtrain, cache = TRUE>>=
 lrn = setHyperPars(makeLearner("fcregr.tbats", h = 35),
                    par.vals = tbatsTune$x)
 m = train(lrn, climate.task)
+
 @
 \doublespacing
 
@@ -481,6 +487,7 @@ To make predictions for our test set we simply pass our model, task, and test da
 <<predbestArima, cache = TRUE>>=
 climate.pred = predict(m, newdata = m4.test)
 performance(climate.pred, measures = mase, task = climate.task)
+
 @
 \doublespacing
 
@@ -496,14 +503,12 @@ forecast.tbats = forecast(forecast.train.tbats,h=35)
 sum(abs(coredata(m4.test)-forecast.tbats$mean)) / 
  ((nrow(m4.test) / (nrow(m4.test) + 1)) *
      sum(abs(diff(coredata(m4.test)))))
-
 @
 \doublespacing
 
 Now it's possible to see the clear benefit of the forecast extension to \pkg{mlr}. While \pkg{forecast} does some automated tuning, this model would still require extensive manual testing in an attempt to find the best model. By automating this process we come to a faster solution with minimal work.
 
 <<plottbatsTune, cache = TRUE, echo = FALSE>>=
-
 pred.tbat.dat = zoo(cbind(climate.pred$data, as.data.frame(forecast.tbats$mean)), order.by = index(m4.test))
 colnames(pred.tbat.dat)[3] <- "forecast_tbats" 
 col_names = colnames(pred.tbat.dat)

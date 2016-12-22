@@ -643,8 +643,9 @@ Using \code{tuneParams()} the model is tuned for the task using the specified re
 \hlkwd{configureMlr}\hlstd{(}\hlkwc{on.learner.error} \hlstd{=} \hlstr{"warn"}\hlstd{)}
 \hlkwd{set.seed}\hlstd{(}\hlnum{1234}\hlstd{)}
 \hlstd{tbatsTune} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(}\hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.tbats"}\hlstd{,} \hlkwc{h} \hlstd{=} \hlnum{35}\hlstd{),}
-                       \hlkwc{task} \hlstd{= climate.task,} \hlkwc{resampling} \hlstd{= resampDesc,}
-                       \hlkwc{par.set} \hlstd{= parSet,} \hlkwc{control} \hlstd{= ctrl,} \hlkwc{measures} \hlstd{= mase)}
+                       \hlkwc{task} \hlstd{= climate.task,}
+                       \hlkwc{resampling} \hlstd{= resampDesc,} \hlkwc{par.set} \hlstd{= parSet,}
+                       \hlkwc{control} \hlstd{= ctrl,} \hlkwc{measures} \hlstd{= mase)}
 \hlkwd{parallelStop}\hlstd{()}
 \hlstd{tbatsTune}\hlopt{$}\hlstd{y}
 \end{alltt}
@@ -655,7 +656,7 @@ Using \code{tuneParams()} the model is tuned for the task using the specified re
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
 ## mase.test.mean 
-##     0.06877628
+##     0.06195313
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -671,10 +672,17 @@ Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyz
 
 
 
+
+{\centering \includegraphics[width=\maxwidth]{figure/loadTuneTbats2-2} 
+
+}
+
+
+
 \end{knitrout}
 \doublespacing
 
-For this model the best maximum number of moving average coefficients is two. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
+For this model the best maximum number of moving average coefficients is two while the best number of seasonal autoregressive terms is five. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
 
 \singlespacing
 \begin{knitrout}
@@ -698,8 +706,8 @@ To make predictions for our test set we simply pass our model, task, and test da
 \hlkwd{performance}\hlstd{(climate.pred,} \hlkwc{measures} \hlstd{= mase,} \hlkwc{task} \hlstd{= climate.task)}
 \end{alltt}
 \begin{verbatim}
-##       mase 
-## 0.06145902
+##      mase 
+## 0.0562274
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
