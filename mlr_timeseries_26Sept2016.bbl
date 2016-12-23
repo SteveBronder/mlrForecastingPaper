@@ -1,5 +1,9 @@
 \begin{thebibliography}{10}
 
+\bibitem{cmaes}
+{\em {CMA-ES: A Function Value Free Second Order Optimization Method}}, Paris,
+  France, 2014.
+
 \bibitem{MurphymeteoForecast}
 Robert L.~Winkler Allan H.~Murphy.
 \newblock Probability forecasting in meterology.
