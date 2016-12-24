@@ -33,6 +33,7 @@
 \usepackage{longtable}
 \usepackage{verbatim}
 \usepackage{setspace}
+\usepackage{subcaption}
 \doublespacing
 
 \newtheorem{theorem}{Theorem}[section]
@@ -69,7 +70,7 @@
 % if LaTeX puts 3 of 4 authors names on the first line, and the last
 % on the second line, try using \AND instead of \And before the third
 % author name.
-
+\singlespacing
 \author{
   Steve Bronder \\
   %Quantitative Methods of the Social Sciences\\
@@ -96,6 +97,7 @@
   %% Address \\
   %% \texttt{email} \\
 }
+\doublespacing
 
 \begin{document}
 % \nipsfinalcopy is no longer used
@@ -337,7 +339,7 @@ bigvar.mod = makeLearner("mfcregr.BigVAR",p = 25, struct = "SparseLag",
                          gran = c(50, 60),h = 35, n.ahead = 35)
 @
 
-This section uses the multivariate forecast task which has all variables as targets, while section~\ref{sub:multiStack} uses the single target multivariate forecast with a stacked predictor.
+This section uses the multivariate forecast task which has all variables as targets, while section~\ref{sub:multiStack} performs the single target multivariate forecast with a stacked predictor.
 
 <<bigVartrain, cache=TRUE, message=FALSE, error=FALSE, eval=FALSE>>=
 train.bigvar = train(learner = bigvar.mod, task = mfcregr.all.task )
@@ -415,7 +417,7 @@ resampDesc
 @
 \doublespacing
 
-The methods in package \pkg{ParamHelpers}~\cite{paramhelper} allow \pkg{mlr} to have a simple and rigorous interface for creating parameter spaces. There are several types of tools to help us search our parameter space including grid search, random search ~\cite{Bergstra}, iterated F-racing, Simulated Annealing, and CMA-ES~\cite{cmaes}  to search our parameter space for the most optimal model.
+The methods in package \pkg{ParamHelpers}~\cite{paramhelper} allow \pkg{mlr} to have a simple and rigorous interface for creating parameter spaces. There are several types of tools to help us search our parameter space including grid search, random search ~\cite{Bergstra}, iterated F-racing, Simulated Annealing, and CMA-ES~\cite{cmaes}  to search the parameter space for the most optimal model.
 
 
 \singlespacing                                      
@@ -451,11 +453,11 @@ ctrl = makeTuneControlIrace(maxExperiments = 500L)
 @
 \doublespacing
 
-Using \code{tuneParams()} the model is tuned for the task using the specified resampling scheme, parameter set, tune control, and measure. The \code{trafo} argument allows the tuning process to take values on a seperate scale than the one described. In the tuning scheme above, trafo will look search over $1, 4, 9, ..., 81$, and $100$ values of lag, selecting the model with the best lag structure. For this tuning task we use MASE ~\cite{Hyndman2006} as a measure of performance \footnote{Models with a seasonal difference $> 0$ may be favorably biased as we use the non-seasonal MASE score}.
+Using \code{tuneParams()} the model is tuned for the task using the specified resampling scheme, parameter set, tune control, and measure. The \code{trafo} argument allows the tuning process to take values on a seperate scale than the one described. In the tuning scheme above, trafo will search over $1, 4, 9, ..., 81$, and $100$ values of lag, selecting the model with the best lag structure. For this tuning task we use MASE ~\cite{Hyndman2006} as a measure of performance \footnote{Models with a seasonal difference $> 0$ may be favorably biased as we use the non-seasonal MASE score}. The model is also tuned in parallel using the package \pkg{parallelMap}~\cite{parallel} for it's built in compatability with \pkg{mlr}.
 
 \singlespacing
 <<tuneparam, eval = FALSE>>=
-#
+#Tune the TBATS Model
 library("parallelMap")
 parallelStartSocket(8)
 configureMlr(on.learner.error = "warn")
@@ -465,6 +467,7 @@ tbatsTune = tuneParams(makeLearner("fcregr.tbats", h = 35),
                        resampling = resampDesc, par.set = parSet,
                        control = ctrl, measures = mase)
 parallelStop()
+# Output the test mean of best model
 tbatsTune$y
 
 @
@@ -475,14 +478,20 @@ tbatsTune$y
 
 @
 
-Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed graphically using partial dependence plots ~\ref{partialdep}. Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{tbatsTune} and coerces them to numeric.
+Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed graphically using partial dependence plots~\cite{partialdep}. Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{tbatsTune} and coerces them to numeric.
 
-<<loadTuneTbats2, cache = TRUE, fig.height= 6, fig.width=8, fig.align='center', echo = FALSE>>=
+<<loadTuneTbats2, cache = TRUE, echo = FALSE, results = 'hide'>>=
+# Make data for dependence plot 
 tbats.hyp = generateHyperParsEffectData(tbatsTune, partial.dep = TRUE,
                                         trafo = TRUE)
+# Cleaning
 for (i in 1:4)
  tbats.hyp$data[,i] = as.numeric(tbats.hyp$data[,i])
 tbats.hyp$data[,14] = as.numeric(tbats.hyp$data[,14])
+@
+
+<<loadTuneTbats3, eval = FALSE>>=
+# Making graphics
 plotHyperParsEffect(tbats.hyp, x= "max.q", y = "mase.test.mean",
                      plot.type = "line", 
                      partial.dep.learn = "regr.randomForest")
@@ -491,12 +500,43 @@ plotHyperParsEffect(tbats.hyp, x= "max.P", y = "mase.test.mean",
                      partial.dep.learn = "regr.randomForest")
 
 @
+
+<<loadTuneTbatsReal, cache = TRUE, echo = FALSE, message=FALSE, error=FALSE>>=
+library(ggthemes)
+q = plotHyperParsEffect(tbats.hyp, x= "max.q", y = "mase.test.mean",
+                     plot.type = "line", 
+                     partial.dep.learn = "regr.randomForest")
+q = q + theme_tufte()
+ggsave("./tbats_dep_plot_max_q.png",q)
+p = plotHyperParsEffect(tbats.hyp, x= "max.P", y = "mase.test.mean",
+                     plot.type = "line",
+                     partial.dep.learn = "regr.randomForest")
+p = p + theme_tufte()
+ggsave("./tbats_dep_plot_max_p.png",p)
+@
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{tbats_dep_plot_max_q.png}
+  \label{fig:tbatsDep1}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{tbats_dep_plot_max_p.png}
+  \label{fig:tbatsDep2}
+\end{minipage}
+\caption{The figure on the left shows the dependence of the MASE score averaged over all windows for each value of the maximum number of moving average terms $q$. The figure on the right does the same, but for the autoregressive term $p$}
+\end{figure}
+
 \doublespacing
 
 For this model the best maximum number of moving average coefficients is two while the best number of seasonal autoregressive terms is five. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
 
 \singlespacing
 <<bestmodtrain, cache = TRUE>>=
+# Train best model over full data
 lrn = setHyperPars(makeLearner("fcregr.tbats", h = 35),
                    par.vals = tbatsTune$x)
 m = train(lrn, climate.task)
@@ -504,7 +544,7 @@ m = train(lrn, climate.task)
 @
 \doublespacing
 
-To make predictions for our test set we simply pass our model, task, and test data to \code{predict()}
+To make predictions the task test data are passed to \code{predict()}
 
 \singlespacing
 <<predbestArima, cache = TRUE>>=
@@ -518,7 +558,6 @@ For comparison, TBATS is run in \pkg{forecast} with it's base parameters
 
 \singlespacing
 <<forecastTbats, cache = TRUE, message=FALSE, warning=FALSE>>=
-
 library(forecast)
 forecast.train.tbats = tbats(ts(m4.train,frequency = 365))
 forecast.tbats = forecast(forecast.train.tbats,h=35)
@@ -531,10 +570,11 @@ sum(abs(coredata(m4.test)-forecast.tbats$mean)) /
 
 Now it's possible to see the clear benefit of the forecast extension to \pkg{mlr}. While \pkg{forecast} does some automated tuning, this model would still require extensive manual testing in an attempt to find the best model. By automating this process we come to a faster solution with minimal work.
 
-<<plottbatsTune, cache = TRUE, echo = FALSE>>=
+<<plottbatsTune, cache = TRUE, echo = FALSE, results='hide'>>=
 pred.tbat.dat = zoo(cbind(climate.pred$data, as.data.frame(forecast.tbats$mean)), order.by = index(m4.test))
 colnames(pred.tbat.dat)[3] <- "forecast_tbats" 
 col_names = colnames(pred.tbat.dat)
+dev.copy(png,'plot_tbats_vs_forecast.png')
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(pred.tbat.dat))
 # Plot the overlayed series
@@ -543,13 +583,22 @@ col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
 legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
        col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+dev.off()
 
 @
 
-To this author's knowledge, this is the first package in \proglang{R} that allows for automated tuning and training of GARCH models ~\cite{garchengels}. It is possible to pass and train multiple types of GARCH models while also tuning the models respective parameters. In this example we also use \code{predict.type = "quantile"} to estimate confidence intervals for the forecast.
+\begin{figure}[H]
+\caption{The TBATS model forecasts tuned in \pkg{mlr} Vs. the base TBATS model in forecast}
+  \includegraphics[width=\linewidth]{plot_tbats_vs_forecast.png}
+  \centering
+  \label{fig:mlrvsforecast}
+\end{figure}
+
+To this author's knowledge, this is the first package in \proglang{R} that allows for automated tuning and training of GARCH models~\cite{garchengels}. It is possible to pass and train multiple types of GARCH models while also tuning the models respective parameters. In this example \code{predict.type = "quantile"} is used to estimate confidence intervals for the forecast.
 
 \singlespacing
 <<tuneGarch, eval = FALSE>>=
+# Make a tuning grid for GARCH
 par_set = makeParamSet(
   makeDiscreteParam(id = "model", values = c("sGARCH", "csGARCH")),
   makeIntegerVectorParam(id = "garchOrder", len = 2L, lower = c(1,1),
@@ -565,9 +614,10 @@ par_set = makeParamSet(
   makeDiscreteParam(id = "solver", values = "nloptr")
 )
 
-#Specify tune by grid estimation
+#Specify tune by F-racing
 ctrl = makeTuneControlIrace(maxExperiments = 400L)
 
+#Tuning in parallel
 parallelStartSocket(6)
 configureMlr(on.learner.error = "warn")
 set.seed(1234)
@@ -587,10 +637,11 @@ garchTune$y
 @
 
 
-Because the partial dependence plots are still in development they do not work well with \code{makeNumericVectorParams()} such as \code{garchOrder} and \code{armaOrder}. Instead of looking at each $p,q$ individually, we simply sum them and look at the maximum coefficient values for the $p,q$ order of the GARCH component and the ARMA component.
+Because the partial dependence plots are still in development they do not work well with \code{makeNumericVectorParams()} such as \code{garchOrder} and \code{armaOrder}. Instead of looking at each $p,q$ individually, the sum of the coefficient values for the $p,q$ order of the GARCH component and the ARMA component are plotted.
 
 \singlespacing
 <<makeHyperPlot,cache=TRUE>>=
+# Make hyper parameter data
 garch.hyperpar = generateHyperParsEffectData(garchTune,
                     trafo = TRUE, include.diagnostics = FALSE,
                     partial.dep = TRUE)
@@ -607,6 +658,9 @@ garch.hyperpar$data$armaOrder2 = NULL
 colnames(garch.hyperpar$data)[3] = "armaOrder"
 garch.hyperpar$data$include.mean = as.numeric(garch.hyperpar$data$include.mean)
 garch.hyperpar$data$archm = as.numeric(garch.hyperpar$data$archm)
+@
+
+<<garchdepPlot2, eval = FALSE>>=
 plotHyperParsEffect(garch.hyperpar, x= "garchOrder", y = "mase.test.mean",
                      plot.type = "line",
                      partial.dep.learn = "regr.randomForest")
@@ -614,12 +668,41 @@ plotHyperParsEffect(garch.hyperpar, x= "armaOrder", y = "mase.test.mean",
                      plot.type = "line",
                      partial.dep.learn = "regr.randomForest")
 @
+
+<<garchdepPlot3, echo=FALSE, cache = TRUE, results='hide'>>=
+p = plotHyperParsEffect(garch.hyperpar, x= "garchOrder", y = "mase.test.mean",
+                     plot.type = "line",
+                     partial.dep.learn = "regr.randomForest")
+p = p + theme_tufte()
+ggsave("garch_order.png",p)
+q = plotHyperParsEffect(garch.hyperpar, x= "armaOrder", y = "mase.test.mean",
+                     plot.type = "line",
+                     partial.dep.learn = "regr.randomForest")
+q = q + theme_tufte()
+ggsave("arma_order.png",q)
+@
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{garch_order.png}
+  \label{fig:test1}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{arma_order.png}
+  \label{fig:test2}
+\end{minipage}
+\caption{The figure on the left shows the dependence of the MASE score averaged over all windows for each value of the maximum number of $p,q$ terms in the GARCH order. The figure on the right does the same, but for the ARMA order}
+\end{figure}
 \doublespacing
 
-The dependence plots show that for both the GARCH and ARMA orders, as the order is increased, the MASE score decreases. We would most likely find a better model if we allowed the order of the model to increase up to around fifteen or twenty or both. Forecasting models with quantiles are treated the same as any other learner post-tuning. The best hyperparameters are taken and a final model is trained over the entire dataset.
+The dependence plots show that for both the GARCH and ARMA orders, as the order is increased, the MASE score decreases. A better model would arise if order of both the GARCH and ARMA components increased up to twenty or more. Forecasting models with quantiles are treated the same as any other learner post-tuning. The best hyperparameters are taken and a final model is trained over the entire dataset.
 
 \singlespacing
 <<trainGarchTuned1, cache = TRUE>>=
+# Get the hyperpars and train the best GARCH model
 tuned.lrn = setHyperPars(makeLearner("fcregr.garch",
                                      predict.type = "quantile"),
                          par.vals = garchTune$x)
@@ -633,27 +716,41 @@ garch.train$learner$par.vals$n.ahead = 35
 <<trainGarchTuned3, cache = TRUE>>=
 climate.pred = predict(garch.train, newdata = m4.test)
 climate.pred
-performance(climate.pred, measures = mase, task = climate.task)
 @
 
-<<trainGarchTuned4, cache = TRUE, echo = FALSE>>=
+<<trainGarchTuned4, cache = TRUE, echo = FALSE, results='hide'>>=
 nn <- ncol(climate.pred$data)
+dev.copy(png,'plot_garch_final.png')
 par(xpd = TRUE)
 matplot(climate.pred$data,type="l", xlab = "Forecast Horizon", ylab = "Temperature",
         main = "Forecast of Daily Climate Data\n With Confidence Intervals")
 legend(-.5,-5.2, c("Truth", "Prediction", "Lower ConfInt .05", "Upper ConfInt .95"),
        col=seq_len(nn),cex=0.8,fill=seq_len(nn), ncol = 4, bty = "n")
+dev.off()
 @
+
+\begin{figure}[H]
+\includegraphics[width=.75\linewidth]{plot_garch_final.png}
+\centering
+\caption{The GARCH model with confidence intervals}
+\label{fig:garch_final}
+\end{figure}
+
+<<tunegarch5, cache =TRUE>>=
+performance(climate.pred, measures = mase, task = climate.task)
+@
+
 \doublespacing
 
-The simple model here performs relatively well. The extremes of the test data are almost all within the given bounds of the 95\% confidence interval. With a bit more tuning and perhaps an alternative control for the search over the parameter space, the reader would easily find a better model. While GARCH is excellent at catching the conditional heteroskedasticity of the past series, the TBATS model performs well in terms of catching long or multiseasonal type periods. Section~\ref{sub:stackedUnivar} goes over how to combine forecasting models to make benefit of both models of their strengths.
+The simple model here performs relatively well. The extremes of the test data are almost all within the given bounds of the 95\% confidence interval. With a bit more tuning and perhaps an alternative control for the search over the parameter space, the reader would easily find a better model. While GARCH is excellent at catching the conditional heteroskedasticity of the past series, the TBATS model performs well in terms of catching long or multiseasonal type periods. Section~\ref{sub:stackedUnivar} goes over how to stack forecasting models to make use of the best characteristics of each.
 
 
 \section{Forecasting with Machine Learning Models}
 \label{sec:preproc}
 \subsection{Forecasting with Regression Tasks}
 \label{sec:preprocAR}
-The forecasting extension of \pkg{mlr} includes a preprocessing function that allows supervised machine learning models. the function \code{createLagDiffFeatures()} allows for $AR(p,d)$ structures to be imbedded in machine learning models.
+\doublespacing
+The forecasting extension of \pkg{mlr} includes a preprocessing function that allows forcasting with supervised machine learning models. the function \code{createLagDiffFeatures()} allows for $AR(p,d)$ structures to be imbedded in machine learning models.
 \singlespacing
 <<lagdiffproc, cache= TRUE>>=
 climate.regr.task = makeRegrTask(id = "lagged gbm",
@@ -671,6 +768,7 @@ Notice that \code{createLagDiffFeatures()} returns a new task with the lagged va
 
 \singlespacing
 <<laggbm, cache= TRUE>>=
+# make Gradient Boosting Machine
 lag.gbm = makeLearner("regr.gbm", par.vals = list(n.trees = 20000,
                                                   shrinkage = .000001,
                                                   interaction.depth = 15,
@@ -684,7 +782,7 @@ The \code{forecast()} function allows machine learning models to do arbitary n-s
 \begin{equation}
 \hat{y}_{t+1} = \sum_{i=1}^p \left(\rho_i \Delta_d y_{i} + \epsilon_{i}\right)
 \end{equation}
-where $\rho_i$ is the autoregressiver parameter of order $p$ and $d$ is the lag of the difference operator $\Delta$. Then the $n$-step ahead forecast is defined as
+where $\rho_i$ is the autoregressive parameter of order $p$ and $d$ is the lag of the difference operator $\Delta$. Then the $n$-step ahead forecast is defined as
 
 \begin{equation}
 \hat{y}_{t+n} = \sum_{i=t+1}^{n} \left(\rho_i \Delta_d \hat{y}_{i} + \epsilon_{i}\right)
@@ -693,12 +791,16 @@ where $\rho_i$ is the autoregressiver parameter of order $p$ and $d$ is the lag 
 
 \singlespacing
 <<forecastgbm2, eval = FALSE>>=
+# Forecast with GBM
 gbm.forecast = forecast(gbm.train, h = 35L,
                         newdata = as.data.frame(m4.test))
-performance(gbm.forecast,mase,climate.task.lag)
 @
+
 <<forecastgbm3, cache = TRUE, echo = FALSE>>=
 load("./gbm_forecast.RData")
+@
+
+<<forecastgbm4, cache = TRUE>>=
 gbm.forecast
 performance(pred = gbm.forecast,
             measures = mase,
@@ -707,25 +809,37 @@ performance(pred = gbm.forecast,
 
 \doublespacing
 
-<<forecastgbmplot, cache = TRUE, echo = FALSE>>=
+<<forecastgbmplot, cache = TRUE, echo = FALSE, results='hide'>>=
 pred.gbm.dat = zoo(gbm.forecast$data, order.by = index(m4.test))
 col_names = colnames(pred.gbm.dat)
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(pred.gbm.dat))
 # Plot the overlayed series
-plot(x = pred.gbm.dat, ylab = "Price", main = "Tuned Forecast of Temperature",
+dev.copy(png,'plot_gbm_fore.png')
+plot(x = pred.gbm.dat, ylab = "Temperature", main = "Tuned Forecast of Temperature",
 col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
 legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
        col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+dev.off()
 @
+
+\begin{figure}[H]
+\includegraphics[width=\linewidth]{plot_gbm_fore.png}
+\centering
+\caption{The forecast of the M4 data using a Gradient Boosting Machine}
+\label{fig:gbm_final}
+\end{figure}
+
+The forecasts drift quickly to an average value, which may be due to the modeling placing the highest value on the most recent data.  
 
 \subsection{Forecasting with Classification Tasks}
 
-Forecasting for binary or multiclass outcomes~\cite{forecastBinary} is a common problem in the real world. However, research in this area of forecasting only started picking up speed in the last decade~\cite{ElliotBinary}. With a this new extension to \pkg{mlr} researchers now have the ability to take all the classification models in \pkg{mlr} and apply them to the forecasting context. For developing trading strategies, we normally have a discrete set of choices such as to buy, sell, or hold onto a stock. Using forecasting in mlr we can now train classification models that forecast these choices~\cite{foreclassif}. To example this, a simple buy, sell, or hold trading strategy will be built Using the \code{EuStockMarkets}'s DAX index. If the stock goes up by 5\% in a day we will buy, down 5\% we will sell, and otherwise we will hold onto the current stocks we have. 
+Forecasting for binary or multiclass outcomes~\cite{forecastBinary} is a common problem in the real world. However, research in this area of forecasting only started picking up speed in the last decade~\cite{ElliotBinary}. The forecasting extension of \pkg{mlr} gives econometricians the ability to take all the classification models in \pkg{mlr} and apply them to the forecasting context. For developing trading strategies, we normally have a discrete set of choices such as to buy, sell, or hold onto a stock. Using forecasting in mlr we can now train classification models that forecast these choices~\cite{foreclassif}. To example this, a simple buy, sell, or hold trading strategy will be built Using the \code{EuStockMarkets}'s DAX index. If the stock goes up by 5\% in a day a buy is executed, down 5\% a sell is executed, and otherwise no action will be taken. 
 
 \singlespacing
 <<classlag, cache = TRUE>>=
+# Make Trading Strategy
 DAX = EuStockMarkets$DAX/lag(EuStockMarkets$DAX,
                              7,nap.pad = FALSE) - 1
 trade.strat = ifelse(DAX > .05, "Buy",
@@ -733,11 +847,12 @@ trade.strat = ifelse(DAX > .05, "Buy",
 trade.strat = trade.strat[8:1860]
 euro.classif.data = data.frame(trade.strat = trade.strat ,
                                row.names = index(trade.strat))
-# Note: Error on multiples of the same observation
 euro.classif.train = euro.classif.data[1:1838,,drop = FALSE]
 euro.classif.test  = euro.classif.data[1839:1853,,drop = FALSE]
 classif.task = makeClassifTask(data = euro.classif.train,
                                target = "DAX")
+
+# Make Lagged Task and Learner
 classif.task.lag = createLagDiffFeatures(classif.task,
                                          lag = 1L:565L,
                                          na.pad = FALSE)
@@ -749,6 +864,7 @@ classif.learn = makeLearner("classif.boosting", xval = 1,
 <<classlagtrain, eval = FALSE>>=
 classif.train = train(classif.learn, classif.task.lag)
 classif.fc = forecast(classif.train, h=15, newdata = euro.classif.test)
+classif.fc
 performance(classif.fc)
 @
 
@@ -769,18 +885,21 @@ With the models and methedologies available in \pkg{mlr}, forecasting binary out
 
 \section{Lambert W Transforms}
 
-Many machine learning and time series models rely one the assumption that our data or errors fit a normal distribution. This assumption becomes precarious when modeling the asymmetric and fat-tailed data of the real world. Lambert W Transforms are a family of generalized skewed distributions ~\cite{LambertGeneral} that have bijecetive and parametric functions that allow heavy tailed and asymettric data to appear more Gaussian  ~\cite{GaussLam}. 
+Many machine learning and time series models rely one the assumption that our data or errors fit a normal distribution. This assumption becomes precarious when modeling the asymmetric and fat-tailed data of the real world. Lambert $W\times F()$ transforms are a family of generalized skewed distributions~\cite{LambertGeneral} that have bijecetive and parametric functions that allow heavy tailed and asymettric data to appear more Gaussian~\cite{GaussLam}. 
 
 Let $U$ be a continuous random variable with cdf $F_U(u|\beta)$ and pdf $f_U(u|\beta)$ given $\beta$ is a parameter vector. Define a continuous location-scale random variable $X\sim F_X(x|\beta)$. A locaton-scale skewed Lambert $W\times F_X$ random variable is defined as 
 \begin{equation}
-test %Z = U\exp\left(\frac{\delta}{2}(U^2)^\right),\; \delta\ge 0
-\end{equation}
-And the heavy-tailed Lambert $W\times F_X$ random variable can be defined as
-\begin{equation}
-test %Z = U\exp\left(\frac{\delta}{2}(U^2)^\alpha\right),\; \delta\ge 0\; \alpha > 0
+Z = U\exp \left(\frac{\delta}{2} (U^2)\right),\; \delta\ge 0
+\label{eq:hdist}
 \end{equation}
 
-Given that $U = (X-\mu_X)/\sigma_X$ where $\mu_X$, $\sigma_X$, $\delta$, and $\alpha$ are the mean and standard deviation of X and the parameters to control skewness and asymetry , respectively. When $\delta = 0$, equation 12 reduces to a standard normal distribution. Equation 12 is the general form of Tukey's $h$ distribution ~\cite{ghdist} and the basis for Morgenthaler and Tukey's ~\cite{hhdist} skewed, heavy tailed family of $hh$ random variables.
+And the heavy-tailed Lambert $W\times F_X$ random variable can be defined as
+
+\begin{equation}
+Z = U\exp\left(\frac{\delta}{2}(U^2)^\alpha\right),\; \delta\ge 0\; \alpha > 0
+\end{equation}
+
+Given that $U = (X-\mu_X)/\sigma_X$ where $\mu_X$, $\sigma_X$, $\delta$, and $\alpha$ are the mean and standard deviation of X and the parameters to control skewness and asymetry , respectively. When $\delta = 0$, equation~\ref{eq:hdist} reduces to a standard normal distribution. Equation~\ref{eq:hdist} is the general form of Tukey's $h$ distribution~\cite{ghdist} and the basis for Morgenthaler and Tukey's~\cite{hhdist} skewed, heavy tailed family of $hh$ random variables.
 
 \begin{equation}
   Z = \begin{cases}
@@ -790,7 +909,7 @@ Given that $U = (X-\mu_X)/\sigma_X$ where $\mu_X$, $\sigma_X$, $\delta$, and $\a
 \end{equation}
 
 \singlespacing
-<<lambertWplots, cache= TRUE, message=FALSE, echo = FALSE>>=
+<<lambertWplots, cache= TRUE, message=FALSE, echo = FALSE, results='hide', eval = FALSE>>=
 # Univariate example
 library(LambertW)
 set.seed(20)
@@ -800,16 +919,26 @@ x1 <- get_input(y1, c(out$tau.mat[, 1]))  # same as out$input
 par(mfrow = c(2,1))
 plot(y1, ylab = "", main = "Cauchy Samples")
 plot(x1, ylab = "", main =  "Cauchy Samples With Lambert 'h' Transform")
+dev.copy(png, "./cauchy_h_train.png")
+dev.off()
 @
+
+\begin{figure}[H]
+\includegraphics[width=\linewidth]{cauchy_h_train.png}
+\centering
+\caption{The top plot are samples from the cauchy distribution where the bottom plot represents the cauchy transformed variables with the $hh$ distribution to make the samples approximately normal.}
+\label{fig:cauchy_lambert}
+\end{figure}
+
 \doublespacing
 
-The function \code{Gaussianize} is available in the package \pkg{LambertW} and has been made into a preprocessing function in \pkg{mlr}. Instead of calling \code{makeLearner()} to create a model, the function \code{makePreprocWrapperLambert()} can be used to create the model. Wrapping the model in this way allows the pre-processing function to be intertwined with the model itself. There are opportunities for users to accidentally bias there own results due to improperly applying pre-processing schemes. For instance, if a user demeaned their entire data set and then split the data into train and test subsets, the training data will be biased because demeaning the model over both the train and test data gives the training data information about the mean of the test data. What should happen instead is, the user first splits the data into training and test data, and then demeans each seperatly. But than what about cross-validation? The goal of cross-validation follows the above schema as well and it is very easy for a user, who assumes they have made a good faith attempt to not bias their model, will end up with overconfident results. Making the preprocessing part of the model itself allows \pkg{mlr} to overcome this. 
+The function \code{Gaussianize()} is available in the package \pkg{LambertW} and has been made into a preprocessing function in \pkg{mlr}. Instead of calling \code{makeLearner()} to create a model, the function \code{makePreprocWrapperLambert()} can be used to create the model. Wrapping the model in this way allows the pre-processing function to be embedded with the model itself. This stops users from accidentally biasing their models due to improperly applying pre-processing processes. For instance, if a user demeaned their entire data set and then split the data into train and test subsets, the training data will be biased because demeaning the model over both the train and test data gives the training data information about the mean of the test data. What should happen instead is, the user first splits the data into training and test data, and then demeans each seperatly. Similary, cross-validation follows the above schema whereby each cross validation will be biased if the user demeaned all of the training data at one time. It is very easy for a user, who assumes they have made a good faith attempt to not bias their model, to receive overconfident results. Embedding the preprocessing within the model itself allows \pkg{mlr} to overcome this. 
 
-There will be a step for the training data or subset, for example to demean it, and then there will be a function for prediction on the testing data, or in the example above to demean the test set alone. In the context of Lambert W$\times$ F$()$ transforms, the $h$, $hh$, or $s$ distribution that gaussianizes the data is estimated from the training data. Then the estimated parameter values from the training set are used during prediction to gaussianize the test observations. The code below follows this methedology, creating the model with Lambert preprocessing, training the model, and then performing prediction. The end result to the user appears the same, but a significant amount of bias is reduced in the background.
+The preprocessign scheme is broken down into two main components. One function to gather and estimate necessary parameters in the training data, then a function to apply the learned preprocess over the training and test data. In the context of Lambert $W\times F()$ transforms, the $h$, $hh$, or $s$ distribution that gaussianizes the data is estimated from the training data. Then the estimated parameter values from the training set are used during prediction to gaussianize the test observations. The code below follows this methedology, creating the model with Lambert preprocessing, training the model, and then performing prediction. The end result to the user appears the same, but a significant amount of bias is reduced in the background.
 
 \singlespacing
 <<lambertWtransform, cache = TRUE>>=
-# Need to make this more dramatic
+# Make a Learner with Lambert WxF() learner 
 lamb.lrn = makePreprocWrapperLambert("classif.lda", type = "h")
 lamb.lrn
 lamb.trn = train(lamb.lrn,iris.task, subset = 1:120)
@@ -835,7 +964,7 @@ Stacking is a form of ensemble learning~\cite{ensembleOverview} in which a learn
 For a simple $\phi$ such as the ensemble average then equation~\ref{eq:ensemble} becomes
 
 \begin{equation}
-\tilde{y}_{i+1} = \frac{\tilde{y}_{i+1,1}, \tilde{y}_{i+1,2},\dots, \tilde{y}_{i+1,m}}{m}
+\tilde{y}_{i+1} = \frac{\tilde{y}_{i+1,1} + \tilde{y}_{i+1,2} +\dots + \tilde{y}_{i+1,m}}{m}
 \label{eq:ensembleAverage}
 \end{equation}
 
@@ -860,7 +989,7 @@ lrns = makeLearners(c("fcregr.tbats","fcregr.garch",
 @
 \doublespacing
 
-The function \code{makeStackedLearner()} takes the initialized learners and sets the meta information for stacking. This method uses simple model averaging such as~\ref{eq:ensembleAveraging}, however a super learner~\cite{Wolpert92stackedgeneralization} can be used here, where $\phi()$ becomes another machine learning model.
+The function \code{makeStackedLearner()} takes the initialized learners and sets the meta information for stacking. This method uses simple model averaging such as~\ref{eq:ensembleAverage}, however a super learner~\cite{Wolpert92stackedgeneralization} can be used here, where $\phi()$ becomes another machine learning model.
 
 \singlespacing
 <<ensembleModel2, cache = TRUE, eval = TRUE>>=
@@ -935,17 +1064,27 @@ stack.forecast.pred
 performance(stack.forecast.pred,mase,climate.task)  
 @
 
-<<ensembleForecast5, cache = TRUE, echo = FALSE>>=
+<<ensembleForecast5, cache = TRUE, echo = FALSE, results = 'hide'>>=
 col_names = colnames(stack.forecast.pred$data)
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(stack.forecast.pred$data))
+dev.copy(png,"ensemble_pred.png")
 # Plot the overlayed series
 plot(x = as.zoo(stack.forecast.pred$data), ylab = "Price", main = "Daily Price of European Stock Indices",
 col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
 legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
        col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+dev.off()
 @
+
+\begin{figure}[H]
+\includegraphics[width=\linewidth]{ensemble_pred.png}
+\centering
+\caption{The forecast of the M4 data using the Stacked ARFIMA, TBATS, and GARCH model}
+\label{fig:ensemble_final}
+\end{figure}
+
 \doublespacing
 
 \subsection{Multivariate Stacked Learner}
@@ -962,14 +1101,15 @@ In the example below, a boosted glm~\cite{glmboost} is used as a super learner o
 
 \singlespacing
 <<multiforecast1, cache = TRUE>>=
-multfore.task = makeMultiForecastRegrTask(id = "bigvar", data = eu.train,
+multfore.task = makeMultiForecastRegrTask(id = "bigvar",
+                                          data = eu.train,
                                           target = "FTSE")
 
 resamp.sub = makeResampleDesc("GrowingCV",
-                              horizon = 32L,
-                              initial.window = .90,
-                              size = nrow(getTaskData(multfore.task)),
-                              skip = .01
+                          horizon = 32L,
+                          initial.window = .90,
+                          size = nrow(getTaskData(multfore.task)),
+                          skip = .01
 )
 
 resamp.super = makeResampleDesc("CV", iters = 3)
@@ -987,11 +1127,11 @@ lrns[[1]]$par.vals$verbose = FALSE
 
 
 stack.forecast = makeStackedLearner(base.learners = lrns,
-                            predict.type = "response",
-                            super.learner = makeLearner("regr.glmboost",
-                                                        family = "Laplace"),
-                            method = "growing.cv",
-                            resampling = resamp.sub)
+                    predict.type = "response",
+                    super.learner = makeLearner("regr.glmboost",
+                                            family = "Laplace"),
+                    method = "growing.cv",
+                    resampling = resamp.sub)
 @
 \doublespacing
 
@@ -1001,9 +1141,10 @@ Just as with univariate stacked forecasting models, a parameter set is created f
 <<multiforecast3, eval = FALSE>>=
 ps = makeParamSet(
   makeDiscreteParam("mfcregr.BigVAR.p", values = 9),
-  makeDiscreteParam("mfcregr.BigVAR.struct", values = "SparseLag"),
-  makeNumericVectorParam("mfcregr.BigVAR.gran", len = 2L, lower = 35,
-                         upper = 50),
+  makeDiscreteParam("mfcregr.BigVAR.struct",
+                    values = "SparseLag"),
+  makeNumericVectorParam("mfcregr.BigVAR.gran", len = 2L,
+                         lower = 35, upper = 50),
   makeDiscreteParam("mfcregr.BigVAR.h", values = 32),
   makeDiscreteParam("mfcregr.BigVAR.n.ahead", values = 32)
 )
@@ -1014,24 +1155,23 @@ parallelStartSocket(4)
 configureMlr(on.learner.error = "warn")
 set.seed(1234)
 multfore.tune = tuneParams(stack.forecast, multfore.task,
-                           resampling = resamp.sub,
-                           par.set = ps, control = makeTuneControlGrid(),
-                           measures = mase, show.info = FALSE)
+                    resampling = resamp.sub, par.set = ps,
+                    control = makeTuneControlGrid(),
+                    measures = mase, show.info = FALSE)
 parallelStop()
-multfore.tune
 @
 
 <<multiforecast4, cache=TRUE, echo = FALSE>>=
 load("multfore_tune.RData")
-multfore.tune
 @
 \doublespacing
 
-Once the tuning is complete, the best model can be extracted with \code{setHyperPar2()} and the final model will be trained on all of the data. Since we are using the multivariate model to produce forecasts for an singel variable, univariate MASE is use instead of the multivariate form of MASE.
+Once the tuning is complete, the best model can be extracted with \code{setHyperPar2()} and the final model will be trained on all of the data. Since the multivariate model is used to produce forecasts for an single variable, univariate MASE is used instead of the multivariate form of MASE.
 
 \singlespacing
 <<multiforecast5, eval = FALSE>>=
-stack.forecast.f  = setHyperPars2(stack.forecast,multfore.tune$x)
+stack.forecast.f  = setHyperPars2(stack.forecast,
+                                  multfore.tune$x)
 multfore.train = train(stack.forecast.f,multfore.task)
 @
 
@@ -1041,28 +1181,40 @@ load("multfore_train.RData")
 
 <<multiforecast7, cache=TRUE>>=
 
-multfore.pred = predict(multfore.train, newdata = as.data.frame(eu.test))
+multfore.pred = predict(multfore.train,
+                  newdata = as.data.frame(eu.test))
 multfore.pred
 performance(multfore.pred, mase, task = multfore.task)
 @
 \doublespacing
-<<multiForecast8, cache = TRUE, echo = FALSE>>=
+<<multiForecast8, cache = TRUE, echo = FALSE, results='hide'>>=
 col_names = colnames(multfore.pred$data)
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(multfore.pred$data))
 # Plot the overlayed series
-plot(x = as.zoo(multfore.pred$data), ylab = "Price", main = "Daily Price of European Stock Indices",
+dev.copy(png,"multfore_tune.png")
+plot(x = as.zoo(multfore.pred$data), ylab = "Price",
+     main = "Daily Price of European Stock Indices",
 col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
 legend(x = "topleft", legend = col_names,lty = 1, bty = "n",
        col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+dev.off()
 @
+
+
+\begin{figure}[H]
+\includegraphics[width=\linewidth]{multfore_tune.png}
+\centering
+\caption{The forecast of the M4 data using the Stacked ARFIMA, TBATS, and GARCH model}
+\label{fig:multfore_tune}
+\end{figure}
 
 \section{Conclusion}
 
 The results of this paper show that creating a unified interface for forecasting models in \proglang{R} allows for better models through an automated methedology of resampling, preprocessing, model selection, stacking tuning, and training. Building on the wide range of forecasting packages available in \proglang{R}, automating tasks such as windowing cross validation and model selection allow applied forecasters to spend less time dealing with the beauracracy of modeling and more time testing new models. New methods such as multivariate stacked learners, Lambert W transforms, and the ability to create arbitary AR($p,d$) machine learning models allows researchers to easily experiment with new ideas. While the example models here are not perfect, this was mostly due to time. It will be easy for researchers to beat the models created in this paper.
 
-Multivariate stacked learners are quite new, and to this researchers knowledge have not been used in this context. Future research based on this package would involve tuning these models to see how useful they are in the real world. Classification forecast made available in this extension is a very new field, and with the ease of making these models new research in this area can progress much quicker. Updates to this package will include more multivariate and univariate forecast learners as well as new methods to stack models such as Bayesian averaging~\cite{bayesianAverage}.
+Future research based on this package would involve tuning these models to see how useful they are in the real world. The classification forecast learners made available in the forecasting extension of \pkg{mlr} is a rising field, and with the ease of making models in \pkg{mlr} new research in this area can progress be easily replicatable. Updates to this package will include more multivariate and univariate forecast learners as well as new methods to stack models such as Bayesian averaging~\cite{bayesianAverage}.
 
 %\small
 \bibliography{thesisbib}{}

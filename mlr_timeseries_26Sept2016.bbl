@@ -21,6 +21,12 @@ James Bergstra and Yoshua Bengio.
 \newblock Random search for hyper-parameter optimization.
 \newblock {\em J. Mach. Learn. Res.}, 13(1):281--305, February 2012.
 
+\bibitem{parallel}
+Bernd Bischl and Michel Lang.
+\newblock {\em parallelMap: Unified Interface to Parallelization Back-Ends},
+  2015.
+\newblock R package version 1.3.
+
 \bibitem{paramhelper}
 Bernd Bischl, Michel Lang, Jakob Bossek, Daniel Horn, Jakob Richter, and Pascal
   Kerschke.
@@ -114,6 +120,13 @@ Georg~M. Goerg.
   tukey's h transformation as a special case.
 \newblock {\em The Scientific World Journal: Special Issue on Probability and
   Statistics with Applications in Finance and Economics}, 2015(2015):16, 2015.
+
+\bibitem{partialdep}
+Alex Goldstein, Adam Kapelner, Justin Bleich, and Emil Pitkin.
+\newblock Peeking inside the black box: Visualizing statistical learning with
+  plots of individual conditional expectation.
+\newblock {\em Journal of Computational and Graphical Statistics},
+  24(1):44--65, 2015.
 
 \bibitem{Hyndman25}
 Jan G.~De Gooijer and Rob~J. Hyndman.
