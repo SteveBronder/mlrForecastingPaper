@@ -155,21 +155,21 @@
 \maketitle
 
 \begin{abstract}
-The \pkg{mlr} package is a unified interface for machine learning tasks such as classification, regression, cluster analysis, and survival analysis. \pkg{mlr} handles the data pipeline of preprocessing, resampling, model selection, model tuning, ensembling, and prediction. This paper details new methods for developing time series  models in \pkg{mlr}. It includes standard and novel tools such as autoregressive and Lambert $W\times F()$ transform data generating processes, fixed and growing window cross validation, and forecasting models in the context of univariate and multivariate time series. Examples from forecasting competitions will be given in order to demonstrate the benefits of a unified framework for machine learning and time series.
-  \end{abstract}
+The \pkg{mlr} package is a unified interface for machine learning tasks such as classification, regression, cluster analysis, and survival analysis. \pkg{mlr} handles the data pipeline of preprocessing, resampling, model selection, model tuning, ensembling, and prediction. This paper details new methods for developing time series models in \pkg{mlr}. It includes standard and novel tools such as autoregressive and Lambert $W\times F()$ transform data generating processes, fixed and growing window cross-validation, and forecasting models in the context of univariate and multivariate time series. Examples from forecasting competitions will be given to demonstrate the benefits of a unified framework for machine learning and time series.
+\end{abstract}
 
 
 \section{Introduction}
-There has been a rapid developement in time series methods over the last 25 years~\cite{Hyndman25} whereby time series models have not only become more common, but more complex. The \proglang{R} language~\cite{Rbase} has several task views that list the extensive amount of packages available for forecasting, time series methods, and empirical finance. However, the open source nature of R has left users without a standard framework whereby packages will have their own sub-culture of style, syntax, and output. The \pkg{mlr}~\cite{mlr} package, short for Machine Learning in R, works to give a strong syntatic framework for the modeling pipeline. By automating many of the standard tools in machine learning such as preprocessing and cross validation, \pkg{mlr} reduces error from the user during the modeling process. 
+There has been a rapid development in time series methods over the last 25 years~\cite{Hyndman25} whereby time series models have not only become more common, but more complex. The \proglang{R} language~\cite{Rbase} has several task views that list the extensive amount of packages available for forecasting, time series methods, and empirical finance. However, the open source nature of R has left users without a standard framework whereby packages will have a sub-culture of style, syntax, and output. The \pkg{mlr}~\cite{mlr} package, short for Machine Learning in R, works to give a strong syntatic framework for the modeling pipeline. By automating many of the standard tools in machine learning such as preprocessing and cross-validation, \pkg{mlr} reduces error from the user during the modeling process. 
 
-While there are some time series methods available in \pkg{caret}~\cite{caret}, development of forecasting models in \pkg{caret} is difficult due to computational constraints and design choices within the package. The highly modular structure of \pkg{mlr} makes it the best choice for implementing time series methods and models. This paper will show how using \pkg{mlr}'s strong syntatic structure allows for time series packages such as \pkg{forecast}~\cite{HyndForecast}, \pkg{rugarch}~\cite{rugarch}, and \pkg{BigVAR}~\cite{BigVAR} to use machine learning methedologies such as automated parameter tuning, data preprocessing, model blending, cross validation, performance evaluation, and parallel processing techniques for decreasing model build time.
+While there are some time series methods available in \pkg{caret}~\cite{caret}, development of forecasting models in \pkg{caret} is difficult due to computational constraints and design choices within the package. The highly modular structure of \pkg{mlr} makes it the best option for implementing time series methods and models. This paper will show how using \pkg{mlr}'s strong syntactic structure allows for time series packages such as \pkg{forecast}~\cite{HyndForecast}, \pkg{rugarch}~\cite{rugarch}, and \pkg{BigVAR}~\cite{BigVAR} to use machine learning methodologies such as automated parameter tuning, data preprocessing, model blending, cross-validation, performance evaluation, and parallel processing techniques for decreasing model build time.
 
 \section{Forecasting Example with the M4 Competition}
 \label{sec:m4data}
 
-Professional forecasters attempt to predict the future of a series based on its past values. Forecasting can be used in a wide range of tasks including forecasting stock prices~\cite{GRANGER19923}, weather patterns~\cite{MurphymeteoForecast}, international conficts~\cite{Chadefaux01012014}, and earthquakes ~\cite{earthquakeYegu}. In order to evaluate \pkg{mlr}'s forecasting framework we need a large set of possible time series to make sure our methods generalize well.
+Professional forecasters attempt to predict the future of a series based on its past values. Forecasting has applications in a wide range of tasks including forecasting stock prices~\cite{GRANGER19923}, weather patterns~\cite{MurphymeteoForecast}, international conficts~\cite{Chadefaux01012014}, and earthquakes ~\cite{earthquakeYegu}. This paper uses data from the Makridakis competition To evaluate \pkg{mlr}'s forecasting framework as it is well known and provides several types of time series.
 
-The Makridakis competition ~\cite{Makridakis2000451} is a set of forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency in areas such as finance, macroeconomics, climate, microeconomics, and industry. To show examples of how \pkg{mlr}'s forecasting features works we will look at a particular climate series. The data is daily with the training subset starting on September 6th, 2007 and ending on September 5th, 2009 while the testing subset is from September 6th, 2009 to October 10th, 2009 for a total of 640 training periods and 35 test periods to forecast.
+The Makridakis competition ~\cite{Makridakis2000451} is a set of forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency in areas such as finance, macroeconomics, climate, microeconomics, and industry. A particular climate series is used to example \pkg{mlr}'s forecasting features. The data is daily with the training subset starting on September 6th, 2007 and ending on September 5th, 2009 while the testing subset is from September 6th, 2009 to October 10th, 2009 for a total of 640 training periods and 35 test periods to forecast.
 
 \singlespacing
 \begin{knitrout}
@@ -199,9 +199,9 @@ The Makridakis competition ~\cite{Makridakis2000451} is a set of forecasting cha
 \label{fig:m4_train}
 \end{figure}
 \doublespacing
-This series was chosen for its obvious seasonality and time features, which will give the forecasting tools in \pkg{mlr} a challenge. Figure~\ref{fig:m4_train} is what most would imagine when they think of a time series. There is a clear seasonal time trend with individual points moving about the seasonal periods. The data can be found in the package \pkg{M4comp}~\cite{m4comp} under sets\code{M4[8836]}.
+This series has distinct seasonality and time features, which will give the forecasting tools in \pkg{mlr} a challenge. Figure~\ref{fig:m4_train} is what most would imagine when they think of a time series. There is a clear seasonal time trend with individual points moving about the annual periods. The data can be found in the package \pkg{M4comp}~\cite{m4comp} under sets\code{M4[8836]}.
 
-For multivariate forecasting, we will use the EUStockMarkets data set from the \pkg{datasets}~\cite{datasets} package. It contains a subset of DAX, SMI, CAC, and FTSE European stock indices from July 1st, 1991 to August 24th, 1998 totaling 1828 training observations and 32 test observations.
+This paper uses the EUStockMarkets data set from the \pkg{datasets}~\cite{datasets} package to showcase the multivariate forecasting tools. It contains a subset of DAX, SMI, CAC, and FTSE European stock indices from July 1st, 1991 to August 24th, 1998 totaling 1828 training observations and 32 test observations.
 
 \singlespace
 \begin{knitrout}
@@ -229,7 +229,7 @@ For multivariate forecasting, we will use the EUStockMarkets data set from the \
 
 \doublespacing
 
-Note that each stock index tends to follow a similar, but diverging, trend. This will be important to note when we perform windowing cross validation as it will let us see how well the models adapt to what appears to be nonstationary data.
+Note that each stock index tends to follow a similar, but diverging, trend. This will be important to note when performing windowed cross-validation as it will be a real test to see how well the models adapt to what appears to be nonstationary data.
 
 \section{Univariate and Multivariate Forecasting Tasks}
 \label{sec:task}
@@ -274,11 +274,13 @@ Note that each stock index tends to follow a similar, but diverging, trend. This
 \end{kframe}
 \end{knitrout}
 \doublespacing
-Like a regression task, this records the type of the learning problem and basic information about the data set such as the start and end dates, frequency, and whether we have missing values. Note that there are zero features in our task because we only have a target variable, which the model itself will use to build features.
+Like a regression task, this records the type of the learning problem and basic information about the data set such as the start and end dates, frequency, and whether there are missing values. Note that there are zero features in the task because there is only a target variable, which the model itself will use to build features.
 
 \subsection{Multivariate Tasks}
 \label{sec:multivarTask}
-One common problem with forecasting is that it is difficult to use additional explanatory variables or forecast multiple targets that are dependent on one another. If we are at time $t$ and want to forecast 10 periods in the future, we need to know the values of the explanatory variables at time $t+10$, which is often not possible. A new set of models~\cite{BigVAR} which treats explanatory variables endogenously instead of exogenously allows us to forecast not only our target, but addititional explanatory variables. This is done by treating all the variables as targets, making them endogeneous to the model. To use these models, we create a multivariate forecasting task. The function \code{makeMultiForecastRegrTask()} has the same arguments as \code{makeForecastRegrTask()} with one exception. The \code{target} argument can contain either a single target variable, multiple target variables, or \code{All} which treats all variables endogeneously.
+
+One common problem with forecasting is that it is hard to use additional explanatory variables or forecast multiple targets that are dependent on one another. If the model is at time $t$ and is designed to predict ten periods in the future, it needs to know the values of the explanatory variables at time $t+10$, which is often not possible. A new set of models~\cite{BigVAR} which treats explanatory variables endogenously instead of exogenously allows us to forecast not only the target but additional explanatory variables. Forecasting exogenous variables works by treating all the variables as targets, making them endogenous to the model. A multivariate forecasting task is first created to hold the data and meta-information for the model. The function \code{makeMultiForecastRegrTask()} has the same arguments as \code{makeForecastRegrTask()} with one exception. The \code{target} argument can contain either a single target variable, multiple target variables, or \code{All} which treats all variables endogenously.
+
 \singlespacing
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -345,9 +347,10 @@ Like \code{makeForecastRegrTask()}, \code{mfcregr.univar.task} has the standard 
 \label{seq:buildAndTune}
 \subsection{Univariate Forecasting}
 \label{seq:buildAndTuneUni}
-The \code{makeLearner()} function provides a structured model building framework to the several forecasting models currently implimented in \pkg{mlr}. As an example, we will build the Trigonometric exponential smoothing state space model with Box-Cox transformation, ARMA errors, Trend and Seasonal Components (TBATS)~\cite{tbats}.
 
-TBATS is one of the most well known forecasting models and is available in \pkg{mlr} along with models such as BATS, ARIMA, ETS, several GARCH variants, and autoregressive neural networks. In addition, Section~\ref{sec:preprocAR} shows preprocessing features which allow arbitrary supervised machine learning models to be used in the context of forecasting. To impliment the TBATS model we use  \code{makeLearner()}, supplying the class of learner, order, the number of steps to forecast, and any additional arguments to be passed to \code{tbats} for \pkg{forecast}. 
+The \code{makeLearner()} function provides a structured model building framework to the several forecasting models currently implemented in \pkg{mlr}. The Trigonometric, exponential smoothing state space model with Box-Cox transformation, ARMA errors, Trend and Seasonal Components (TBATS)~\cite{tbats} is built to show how to create forecasting models in \pkg{mlr}.
+
+TBATS is one of the most popular forecasting models and is available in \pkg{mlr} along with models such as BATS, ARIMA, ETS, several GARCH variants, and autoregressive neural networks. Also, Section~\ref{sec:preprocAR} shows preprocessing features which allow arbitrary supervised machine learning models to in the context of forecasting. A TBATS model is created by calling the function \code{makeLearner()}, supplying the class of learner, order, the number of steps to forecast, and any additional arguments to be passed to \code{tbats()} for \pkg{forecast}. 
 
 \singlespacing
 \begin{knitrout}
@@ -363,7 +366,7 @@ TBATS is one of the most well known forecasting models and is available in \pkg{
 \end{knitrout}
 \doublespacing
 
-We can also supply a predict type for forecasting models to either receive point estimates (\code{response}) or point estimates with quantiles of confidence intervals (\code{quantile}). To train the model we simply call train, supplying the forecasting model and task.
+The predict type for forecasting models can either be a point estimate (\code{response}) or point estimates with quantiles of confidence intervals (\code{quantile}). The function \code{train()} is called, supplying both the learner and task to build the final model over the full data set.
 
 \singlespace
 \begin{knitrout}
@@ -375,7 +378,7 @@ We can also supply a predict type for forecasting models to either receive point
 \end{knitrout}
 \doublespace
 
-After training the model forecasts can be made by calling \code{predict()}. Optionally supplying the test data as an additional argument will allow \pkg{mlr} to return a nicely coalesced data frame with both the test and train data, returning an object containing meta information for the forecasts along with the prediction and test data in columns \code{truth} and \code{response}, respectively.
+The forecasts are generated by calling \code{predict()}. Optionally supplying the test data as an additional argument will allow \pkg{mlr} to return a nicely coalesced data frame with both the test and train data, returning an object containing meta information for the forecasts along with the prediction and test data in columns \code{truth} and \code{response}, respectively.
 
 \singlespacing
 \begin{knitrout}
@@ -402,7 +405,7 @@ After training the model forecasts can be made by calling \code{predict()}. Opti
 \end{knitrout}
 \doublespacing
 
-To measure the performane of TBATS we call \code{performance()} with the Mean Absolute Scaled Error (MASE) ~\cite{Hyndman2006} measure.
+The model is evaluated by calling \code{performance()} with the Mean Absolute Scaled Error (MASE) ~\cite{Hyndman2006} measure.
 
 \singlespacing
 \begin{knitrout}
@@ -418,15 +421,15 @@ To measure the performane of TBATS we call \code{performance()} with the Mean Ab
 \end{kframe}
 \end{knitrout}
 \doublespacing
-MASE has favorable properties for calculating forecast errors relative to measures such as root mean squared error or median relative absolute error. Arguably one of the most important features, it's very interpretable. Let $y_t$ and $\tilde{y}_t$ be the target variable and prediction at time $t$ until the final time $T$ such that $t>T$ with $\epsilon_t = y_t - \tilde{y}_t$ being the forecast error. 
+MASE has favorable properties for calculating forecast errors relative to measures such as root mean squared error or median relative absolute error. Arguably one of the most important features, it is very interpretable. Let $y_t$ and $\tilde{y}_t$ be the target variable and prediction at time $t$ until the final time $T$ such that $t>T$ with $\epsilon_t = y_t - \tilde{y}_t$ being the forecast error. 
 
 \begin{equation}
 \text{MASE} = \frac{\sum_{t=1}^T |\epsilon_t|}{\frac{T}{T-1} \sum_{t=2}^T |y_{t, \text{insample}} - y_{t-1, \text{insample}}|}
 \end{equation}
 
-Where the denominator is the one step ahead naive forecast from the training data. When the numerator is equal to the denominator the model performed as good as a simple naive forecast method. A MASE score greater than one indicates a model is performing worse than the naive forecasting method while scores less than one mean the model is performing better than the naive forecasting method.
+Where the denominator is the one step ahead naive forecast from the training data. When the numerator is equal to the denominator, the model performed as well as a simple naive forecast method. A MASE score greater than one indicates a model is performing worse than the naive forecasting method while scores less than one mean the model is performing better than the naive forecasting method.
 
-The scale invariance of MASE means that it is independent of the scale of the data which allows models to be compared across data sets. The scale invariance of MASE has made it a favorite for comparing the accuracy of forecast methods~\cite{noteMase} across datasets. While scaling in measures such as the Mean Absolute Percentage Error can cause poor behavior as the target variable goes to zero, MASE does not become skewed when the target variable approaches zero. This allows MASE to be use in situations in which zeros occur frequently or zero is not meaningful such as predicting temperature. 
+The scale invariance of MASE means that it is independent of the scale of the data allows model comparison across data sets. The scale invariance of MASE has made it a favorite for comparing the accuracy of forecast methods~\cite{noteMase} across datasets. While scaling in measures such as the Mean Absolute Percentage Error can cause poor behavior as the target variable goes to zero, MASE does not become skewed when the target variable approaches zero. Having good properties near zero allows the use of MASE in situations in which zeros occur frequently or zero is not meaningful such as predicting temperature. 
 
 \singlespacing
 
@@ -439,7 +442,7 @@ The scale invariance of MASE means that it is independent of the scale of the da
 
 \doublespacing
 
-The model does a successful job of catching the downward trend, but figure~\ref{fig:tbats_train} shows the downward bias of the model which does not allow it to account for the sharp upward swings. Forcasting models are designed to predict the next $n$ values that will appear in the series. This means that without a way to update the model with new data the model will have to be completly rebuilt for each new set of forecasts. The \code{updateModel} function allows forecasters to avoid the expensive cost of retraining the model. The function updates the model with new points which are then allows for updated forecasts. 
+The model does a successful job of catching the downward trend, but figure~\ref{fig:tbats_train} shows the downward bias of the model which does not allow it to account for the sharp upward swings. Forecasting models are designed to predict the next $n$ values that will appear in the series. Without a way to update the model with new data, the model will have to be completely rebuilt for each new set of forecasts. The \code{updateModel} function allows forecasters to avoid the expensive cost of retraining the model. The function updates the model with new points which then allows for updated forecasts. 
 
 \singlespacing
 \begin{knitrout}
@@ -469,7 +472,7 @@ The model does a successful job of catching the downward trend, but figure~\ref{
 \subsection{Multivariate Forecasting}
 \label{seq:buildAndTuneMulti}
 
-The package \pkg{BigVAR}~\cite{bigvarpaper} has been implemented for multivariate forecasting. \pkg{BigVAR} allows for estimation of high dimensional time series through a structured Lasso penalties method that finds the best autoregressive structure through cross-sections and time.
+Multivariate forecasting in \pkg{mlr} uses the package \pkg{BigVAR}~\cite{bigvarpaper}. \pkg{BigVAR} allows for estimation of high dimensional time series through a structured Lasso penalties method that finds the best autoregressive structure through cross-sections and time.
 
 \singlespacing
 \begin{knitrout}
@@ -503,7 +506,7 @@ This section uses the multivariate forecast task which has all variables as targ
 \end{knitrout}
 \doublespacing
 
-Predictions for \code{multiForecast} methods have a similar output to \code{multiclass} methods, returning multiple truth and response variables. A multivariate version of MASE has been implimented which takes the mean of each MASE score for the individual variables.
+Predictions for \code{multiForecast} methods have a similar output to \code{multiclass} methods, returning multiple truth and response variables. For multivariate forecasts, a multivariate version of MASE takes the mean of each MASE score for the individual variables as the performance measure.
 
 \singlespacing
 \begin{knitrout}
@@ -554,9 +557,11 @@ Predictions for \code{multiForecast} methods have a similar output to \code{mult
 
 \section{Resampling with Time}
 \label{sec:resamp}
-While TBATS is one of the most well known time series models, the order selection process or the ARIMA errors and whether to include trend, damped trend, or seasonal periods can be a subjective process that makes finding the best model difficult for users. One of the first proposals for automated forecasting methods comes from ~\cite{hannanOrder} for automatic order selection of ARIMA models. Innovations are obtained by fitting high order autoregressive models to the data and then computing the likelihood of potential models through a series of standard regresssions. Proprietary algorithms from software such as \proglang{Forecast Pro} ~\cite{forecastpro} and \proglang{Autobox} ~\cite{reillyautobox} are well known and have performed to high standards in competitions such as the M3 forecasting competition ~\cite{Makridakis2000451}. One of the most well known R packages for automated forecast is \pkg{forecast} ~\cite{HyndForecast} which contains several methods for automated forecasting including exponential smoothing based methods and step-wise algorithms for forecasting with ARIMA models.
 
-Forecasting in \pkg{mlr} takes a machine learning approach, creating a parameter set for a given model and using an optimization method to search over the parameter space. To do this, we will use a windowing resampling scheme to train over the possible models. Resampling schemes such as cross-validation, bootstrapping, etc. are common in machine learning for dealing with the bias-variance tradeoff ~\cite{Friedman1997} ~\cite{rodriguezkfold}. When their is a time component to the data, windowing schemes are useful in allowing a valid resampling scheme while still accounting for the time properties of the series. Figure~\ref{fig:caret} gives an example of fixed and growing window cross validation. Let $h$ be a forecast horizon where the index of the starting and end points of the training data are $\text{start}_i$ and $\text{end}_i$ where $i$ is the index for each window. The first model will train on data between $\text{start}_i$ and $\text{end}_i$ while testing on data indexed between $\text{end}_i + h$. After each iteration the window slides forward $h$ steps such that $\text{end}_{i+1} = \text{end}_{i} + h$. In the case of the fixed window, the starting index will also shift such that $\text{start}_{i+1} = \text{start}_{i} + h$ while $\text{start}_i$ will remain constant in the growing case. This type of growing and fixed window resampling~\cite{hyndman2014forecasting} are now available in the \code{resampling()} function of \pkg{mlr}. 
+
+While TBATS is one of the most popular time series models, the order selection process or the ARIMA errors and whether to include trend, damped trend, or seasonal periods can be a subjective process that makes finding the best model difficult for users. One of the first proposals for automated forecasting methods comes from ~\cite{hannanOrder} for automatic order selection of ARIMA models. Innovations are obtained by fitting high order autoregressive models to the data and then computing the likelihood of potential models through a series of standard regression. Proprietary algorithms from software such as \proglang{Forecast Pro} ~\cite{forecastpro} and \proglang{Autobox} ~\cite{reillyautobox} are well known and have performed to high standards in competitions such as the M3 forecasting competition ~\cite{Makridakis2000451}. One of the most prominent R packages for automated forecast is \pkg{forecast} ~\cite{HyndForecast} which contains several methods for automated forecasting including exponential smoothing based methods and step-wise algorithms for forecasting with ARIMA models.
+
+Forecasting in \pkg{mlr} takes a machine learning approach, creating a parameter set for a given model and using an optimization method to search over the parameter space. The forecasting extension of \pkg{mlr} includes growing and fixed window resampling schemes to train over the possible models. Resampling schemes such as cross-validation and bootstrapping are common in machine learning for dealing with the bias-variance tradeoff ~\cite{Friedman1997} ~\cite{rodriguezkfold}. When there is a time component to the data, windowing schemes are useful in allowing a valid resampling scheme while still accounting for the time properties of the series. Figure~\ref{fig:caret} gives an example of fixed and growing window cross validation. Let $h$ be a forecast horizon where the index of the starting and end points of the training data are $\text{start}_i$ and $\text{end}_i$ where $i$ is the index for each window. The first model will train on data between $\text{start}_i$ and $\text{end}_i$ while testing on data indexed between $\text{end}_i + h$. After each iteration the window slides forward $h$ steps such that $\text{end}_{i+1} = \text{end}_{i} + h$. In the case of the fixed window, the starting index will also shift such that $\text{start}_{i+1} = \text{start}_{i} + h$ while $\text{start}_i$ will remain constant in the growing case. This type of growing and fixed window resampling~\cite{hyndman2014forecasting} are now available in the \code{resampling()} function of \pkg{mlr}. 
 
 \begin{figure}[ht]
 \caption{Resampling with a window scheme as exampled by \pkg{caret} ~\cite{windowingcaret}. The top graphs are fixed window cross validation while the bottom graphs are growing window cross validation. }
@@ -567,7 +572,7 @@ Forecasting in \pkg{mlr} takes a machine learning approach, creating a parameter
 %% Note: If there is markup in \(sub)section, then it has to be escape as above.
 \newpage
 
-A windowing resampling process is created in the function \code{makeResampleDesc()} by supplying the resampling type, horizon, initial window, the length of the series, and an optional argument to skip over some windows for the sake of time.
+To create a windowing resampling process, the function \code{makeResampleDesc()} uses the resampling type, the horizon, initial window, the length of the series, and an optional argument to skip over some windows for the sake of time.
 
 \singlespacing
 \begin{knitrout}
@@ -590,7 +595,7 @@ A windowing resampling process is created in the function \code{makeResampleDesc
 \end{knitrout}
 \doublespacing
 
-The methods in package \pkg{ParamHelpers}~\cite{paramhelper} allow \pkg{mlr} to have a simple and rigorous interface for creating parameter spaces. There are several types of tools to help us search our parameter space including grid search, random search ~\cite{Bergstra}, iterated F-racing, Simulated Annealing, and CMA-ES~\cite{cmaes}  to search the parameter space for the most optimal model.
+The methods in package \pkg{ParamHelpers}~\cite{paramhelper} allow \pkg{mlr} to have a simple and rigorous interface for creating parameter spaces. There are several types of tools to help us search the parameter space including grid search, random search ~\cite{Bergstra}, iterated F-racing, Simulated Annealing, and CMA-ES~\cite{cmaes}  to search the parameter space for the most optimal model.
 
 
 \singlespacing                                      
@@ -630,7 +635,7 @@ The methods in package \pkg{ParamHelpers}~\cite{paramhelper} allow \pkg{mlr} to 
 \end{knitrout}
 \doublespacing
 
-Using \code{tuneParams()} the model is tuned for the task using the specified resampling scheme, parameter set, tune control, and measure. The \code{trafo} argument allows the tuning process to take values on a seperate scale than the one described. In the tuning scheme above, trafo will search over $1, 4, 9, ..., 81$, and $100$ values of lag, selecting the model with the best lag structure. For this tuning task we use MASE ~\cite{Hyndman2006} as a measure of performance \footnote{Models with a seasonal difference $> 0$ may be favorably biased as we use the non-seasonal MASE score}. The model is also tuned in parallel using the package \pkg{parallelMap}~\cite{parallel} for it's built in compatability with \pkg{mlr}.
+Using \code{tuneParams()} the model is tuned for the task using the specified resampling scheme, parameter set, tune control, and measure. The \code{trafo} argument allows the tuning process to take values on a separate scale than the one described. In the tuning scheme above, trafo will search over $1, 4, 9, ..., 81$, and $100$ values of lag, selecting the model with the best lag structure. This tuning task uses MASE ~\cite{Hyndman2006} as a measure of performance \footnote{Models with a seasonal difference $> 0$ may be favorably biased as \pkg{mlr}'s forecasting extension uses the non-seasonal MASE score}. The model is also tuned in parallel using the package \pkg{parallelMap}~\cite{parallel} for it's built in compatibility with \pkg{mlr}.
 
 \singlespacing
 \begin{knitrout}
@@ -661,7 +666,7 @@ Using \code{tuneParams()} the model is tuned for the task using the specified re
 \end{kframe}
 \end{knitrout}
 
-Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed graphically using partial dependence plots~\cite{partialdep}. Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{tbatsTune} and coerces them to numeric.
+Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed graphically using partial dependence plots~\cite{partialdep}. Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{tbatsTune} and coerces them to be numeric.
 
 
 
@@ -751,7 +756,7 @@ For comparison, TBATS is run in \pkg{forecast} with it's base parameters
 \end{knitrout}
 \doublespacing
 
-Now it's possible to see the clear benefit of the forecast extension to \pkg{mlr}. While \pkg{forecast} does some automated tuning, this model would still require extensive manual testing in an attempt to find the best model. By automating this process we come to a faster solution with minimal work.
+Now it is possible to see the clear benefit of the forecast extension to \pkg{mlr}. While \pkg{forecast} does some automatic tuning, this model would still require extensive manual testing in an attempt to find the best model. The automation of the modeling process allows for a faster and better solution with minimal work.
 
 
 
@@ -762,7 +767,7 @@ Now it's possible to see the clear benefit of the forecast extension to \pkg{mlr
   \label{fig:mlrvsforecast}
 \end{figure}
 
-To this author's knowledge, this is the first package in \proglang{R} that allows for automated tuning and training of GARCH models~\cite{garchengels}. It is possible to pass and train multiple types of GARCH models while also tuning the models respective parameters. In this example \code{predict.type = "quantile"} is used to estimate confidence intervals for the forecast.
+To this author's knowledge, this is the first package in \proglang{R} that allows for automated tuning and training of GARCH models~\cite{garchengels}. It is possible to pass and train multiple types of GARCH models while also tuning the model's respective parameters. In this example \code{predict.type = "quantile"} is used to estimate confidence intervals for the forecast.
 
 \singlespacing
 \begin{knitrout}
@@ -875,7 +880,7 @@ Because the partial dependence plots are still in development they do not work w
 \end{figure}
 \doublespacing
 
-The dependence plots show that for both the GARCH and ARMA orders, as the order is increased, the MASE score decreases. A better model would arise if order of both the GARCH and ARMA components increased up to twenty or more. Forecasting models with quantiles are treated the same as any other learner post-tuning. The best hyperparameters are taken and a final model is trained over the entire dataset.
+The dependence plots show that for both the GARCH and ARMA orders, as the order increases, the MASE score decreases. A better model would arise if the order of both the GARCH and ARMA components increased up to twenty or more. The forecasting extension of \pkg{mlr} treats forecasting models with quantiles the same as any other learner post-tuning. The best hyperparameters are taken, and a final model trains over the entire dataset.
 
 \singlespacing
 \begin{knitrout}
@@ -938,7 +943,7 @@ The dependence plots show that for both the GARCH and ARMA orders, as the order 
 
 \doublespacing
 
-The simple model here performs relatively well. The extremes of the test data are almost all within the given bounds of the 95\% confidence interval. With a bit more tuning and perhaps an alternative control for the search over the parameter space, the reader would easily find a better model. While GARCH is excellent at catching the conditional heteroskedasticity of the past series, the TBATS model performs well in terms of catching long or multiseasonal type periods. Section~\ref{sub:stackedUnivar} goes over how to stack forecasting models to make use of the best characteristics of each.
+The simple model here performs relatively well. The extremes of the test data are almost all within the given bounds of the 95\% confidence interval. With a bit more tuning and perhaps an alternative control for the search over the parameter space, the reader would easily find a better model. While GARCH is excellent at catching the conditional heteroscedasticity of the past series, the TBATS model performs well its ability to catch long or multiseasonal type periods. Section~\ref{sub:stackedUnivar} goes over how to stack forecasting models to make use of the best characteristics of each.
 
 
 \section{Forecasting with Machine Learning Models}
@@ -1060,11 +1065,11 @@ where $\rho_i$ is the autoregressive parameter of order $p$ and $d$ is the lag o
 \label{fig:gbm_final}
 \end{figure}
 
-The forecasts drift quickly to an average value, which may be due to the modeling placing the highest value on the most recent data.  
+The forecasts drift quickly to an average value, which may be due to the model placing the highest value on the most recent data. When the latest data is much more important than other past periods, this creates a weak decay scheme which causes forecasts to drift quickly to an average value.
 
 \subsection{Forecasting with Classification Tasks}
 
-Forecasting for binary or multiclass outcomes~\cite{forecastBinary} is a common problem in the real world. However, research in this area of forecasting only started picking up speed in the last decade~\cite{ElliotBinary}. The forecasting extension of \pkg{mlr} gives econometricians the ability to take all the classification models in \pkg{mlr} and apply them to the forecasting context. For developing trading strategies, we normally have a discrete set of choices such as to buy, sell, or hold onto a stock. Using forecasting in mlr we can now train classification models that forecast these choices~\cite{foreclassif}. To example this, a simple buy, sell, or hold trading strategy will be built Using the \code{EuStockMarkets}'s DAX index. If the stock goes up by 5\% in a day a buy is executed, down 5\% a sell is executed, and otherwise no action will be taken. 
+Forecasting for binary or multiclass outcomes~\cite{forecastBinary} is a common problem in the real world. However, research in this area of forecasting only started picking up speed in the last decade~\cite{ElliotBinary}. The forecasting extension of \pkg{mlr} gives econometricians the ability to take all the classification models in \pkg{mlr} and apply them to the forecasting context. For developing trading strategies, there are usually a discrete set of choices such as to buy, sell, or hold onto a stock. The forecasting extension of \pkg{mlr} allows for classification models that forecast these options~\cite{foreclassif}. The code below implements a simple buy, sell, or hold trading strategy. If the stock goes up by 5\% in a day a buy is executed, down 5\% a sell is executed, and otherwise no action will be taken. 
 
 \singlespacing
 \begin{knitrout}
@@ -1128,13 +1133,14 @@ Forecasting for binary or multiclass outcomes~\cite{forecastBinary} is a common 
 \end{knitrout}
 \doublespacing
 
-With the models and methedologies available in \pkg{mlr}, forecasting binary outcomes is now as simple as any other model. These tools can be used for further research in areas such as directions of stock movement~\cite{markClassifStock} and forecasting extreme values ~\cite{Chen2015UsingEV}. 
+With the models and methodologies available in \pkg{mlr}, forecasting binary outcomes is now as simple as any other model. These tools can allow for further research in areas such as directions of stock movement~\cite{markClassifStock} and forecasting extreme values ~\cite{Chen2015UsingEV}. 
 
 \section{Lambert W Transforms}
 
-Many machine learning and time series models rely one the assumption that our data or errors fit a normal distribution. This assumption becomes precarious when modeling the asymmetric and fat-tailed data of the real world. Lambert $W\times F()$ transforms are a family of generalized skewed distributions~\cite{LambertGeneral} that have bijecetive and parametric functions that allow heavy tailed and asymettric data to appear more Gaussian~\cite{GaussLam}. 
+Many machine learning and time series models rely on the assumption that the data or errors fit a normal distribution. This assumption becomes precarious when modeling the asymmetric and fat-tailed data of the real world. Lambert $W\times F()$ transforms are a family of generalized skewed distributions~\cite{LambertGeneral} that have bijective and parametric functions that allow heavy tailed and asymmetric data to appear more Gaussian~\cite{GaussLam}. 
 
 Let $U$ be a continuous random variable with cdf $F_U(u|\beta)$ and pdf $f_U(u|\beta)$ given $\beta$ is a parameter vector. Define a continuous location-scale random variable $X\sim F_X(x|\beta)$. A locaton-scale skewed Lambert $W\times F_X$ random variable is defined as 
+
 \begin{equation}
 Z = U\exp \left(\frac{\delta}{2} (U^2)\right),\; \delta\ge 0
 \label{eq:hdist}
@@ -1167,9 +1173,9 @@ Given that $U = (X-\mu_X)/\sigma_X$ where $\mu_X$, $\sigma_X$, $\delta$, and $\a
 
 \doublespacing
 
-The function \code{Gaussianize()} is available in the package \pkg{LambertW} and has been made into a preprocessing function in \pkg{mlr}. Instead of calling \code{makeLearner()} to create a model, the function \code{makePreprocWrapperLambert()} can be used to create the model. Wrapping the model in this way allows the pre-processing function to be embedded with the model itself. This stops users from accidentally biasing their models due to improperly applying pre-processing processes. For instance, if a user demeaned their entire data set and then split the data into train and test subsets, the training data will be biased because demeaning the model over both the train and test data gives the training data information about the mean of the test data. What should happen instead is, the user first splits the data into training and test data, and then demeans each seperatly. Similary, cross-validation follows the above schema whereby each cross validation will be biased if the user demeaned all of the training data at one time. It is very easy for a user, who assumes they have made a good faith attempt to not bias their model, to receive overconfident results. Embedding the preprocessing within the model itself allows \pkg{mlr} to overcome this. 
+The function \code{Gaussianize()} is available in the package \pkg{LambertW} and has been made into a preprocessing function in \pkg{mlr}. Instead of calling \code{makeLearner()} to create a model, the function \code{makePreprocWrapperLambert()} can be used to create the model. This means the pre-processing scheme integrates into the model. Integrating the pre-processing scheme directly on top of the model stops users from accidentally biasing their models due to improperly applying pre-processing processes. For instance, if a user demeaned their entire data set and then split the data into train and test subsets, the training data will be biased because demeaning the model over both the train and test data gives the training data information about the mean of the test data. What should happen instead is, the user first splits the data into training and test data, and then demeans each separately. Similarly, cross-validation follows the above scheme whereby each cross-validation will be biased if the user demeaned all of the training data at one time. It is very easy for a user, who assumes they have made a good faith attempt not to bias their model, to receive overconfident results. Embedding the pre-processing itself allows \pkg{mlr} to overcome this. 
 
-The preprocessign scheme is broken down into two main components. One function to gather and estimate necessary parameters in the training data, then a function to apply the learned preprocess over the training and test data. In the context of Lambert $W\times F()$ transforms, the $h$, $hh$, or $s$ distribution that gaussianizes the data is estimated from the training data. Then the estimated parameter values from the training set are used during prediction to gaussianize the test observations. The code below follows this methedology, creating the model with Lambert preprocessing, training the model, and then performing prediction. The end result to the user appears the same, but a significant amount of bias is reduced in the background.
+The pre-processing scheme is broken down into two main components. One function to gather and estimate necessary parameters in the training data, then a function to apply the learned preprocess over the training and test data. In the context of Lambert $W\times F()$ transforms, the estimates for the parameters of the $h$, $hh$, or $s$ distribution that gaussianizes the data comes from the training data. Then the estimated parameter values from the training set are used during prediction to gaussianize the test observations. The code below follows this methodology, creating the model with Lambert preprocessing, training the model, and then performing prediction. The result to the user appears the same, but there is a significant reduction of bias in the background.
 
 \singlespacing
 \begin{knitrout}
@@ -1214,14 +1220,14 @@ The preprocessign scheme is broken down into two main components. One function t
 
 \section{Stacking Forecasting Learners}
 
-Stacking is a form of ensemble learning~\cite{ensembleOverview} in which a learning algorithm is trained on the predictions of several other learning algorithms. Let $y_{i,m}$ be the prediction at time $i$ of model $m$. Given an aggregation function $\phi$, a stacked forecast learner~\cite{combineForecast} is represented as
+Stacking is a form of ensemble learning~\cite{ensembleOverview} in which a learning algorithm trains on the predictions of several other learning algorithms. Let $y_{i,m}$ be the prediction at time $i$ of model $m$. Given an aggregation function $\phi$, a stacked forecast learner~\cite{combineForecast} is represented as
 
 \begin{equation}
 \tilde{y}_{i+1} = \phi(\tilde{y}_{i+1,1}, \tilde{y}_{i+1,2},\dots, \tilde{y}_{i+1,m}, \sum_{j=1}^m \epsilon_{i+1,j})
 \label{eq:ensemble}
 \end{equation}
 
-For a simple $\phi$ such as the ensemble average then equation~\ref{eq:ensemble} becomes
+For a simple $\phi()$ such as the ensemble average, equation~\ref{eq:ensemble} becomes
 
 \begin{equation}
 \tilde{y}_{i+1} = \frac{\tilde{y}_{i+1,1} + \tilde{y}_{i+1,2} +\dots + \tilde{y}_{i+1,m}}{m}
@@ -1233,7 +1239,7 @@ In section~\ref{sub:stackedUnivar} the simple model average is used to show how 
 \subsection{Stacking Univariate Learners}
 \label{sub:stackedUnivar}
 
-For this example the models TBATS, GARCH, and ARFIMA~\cite{arfima} are stacked together and averaged on the climate task data. A resample description is made, and the function \code{makeLearners()} is used to start multiple learners at the same time.
+For this example, the models TBATS, GARCH, and ARFIMA~\cite{arfima} are stacked together and averaged on the climate task data. A resample description is made, and the function \code{makeLearners()} is used to start many learners at the same time.
 
 \singlespacing
 \begin{knitrout}
@@ -1266,7 +1272,7 @@ The function \code{makeStackedLearner()} takes the initialized learners and sets
 \end{knitrout}
 \doublespacing
 
-Each of the stacked learners are tuned over the cross product of all model parameters. This leads to a change in design where, given that some models may have the same argument names, the full name of the model is placed before the argument. This leads to longer code, but tuning over the cross product of the models allows for a more honest perspective of how each model interacts in the stack.
+Each of the stacked learners are tuned over the cross product of all model parameters. This leads to a change in design where, given that some models may have the same argument names, the full name of the model is placed before the argument. Training over the cross-product of the model parameters leads to longer code, but it allows for a more honest perspective of how each model interacts in the stack.
 
 \singlespacing
 \begin{knitrout}
@@ -1315,7 +1321,7 @@ Each of the stacked learners are tuned over the cross product of all model param
 
 \doublespacing
 
-The rest of the modeling process flows in a way similar to the standard training and predicting schema. the function \code{setHyperPars2()} takes the best parameter models from the tuning process and assigns it to the final model to train over all of the data. Training and prediction are handled in the same manner as univariate forecasters.
+The rest of the modeling process flows in a way similar to the standard training and predicting schema. The function \code{setHyperPars2()} takes the best parameter models from the tuning process and assigns it to the final model to train over all of the data. Training and prediction operate in the same manner as univariate forecasters.
 
 \singlespacing
 \begin{knitrout}
@@ -1453,7 +1459,7 @@ Just as with univariate stacked forecasting models, a parameter set is created f
 
 \doublespacing
 
-Once the tuning is complete, the best model can be extracted with \code{setHyperPar2()} and the final model will be trained on all of the data. Since the multivariate model is used to produce forecasts for an single variable, univariate MASE is used instead of the multivariate form of MASE.
+Once the tuning is complete, \code{setHyperPar2()} extracts the final model parameters. Since the multivariate model is used to produce forecasts for a single variable, univariate MASE is used instead of the multivariate form of MASE.
 
 \singlespacing
 \begin{knitrout}
@@ -1509,11 +1515,13 @@ Once the tuning is complete, the best model can be extracted with \code{setHyper
 \label{fig:multfore_tune}
 \end{figure}
 
+This model only predicts a mean value for all forecasts, which may be due to poor performance of the stacked learner on top of the forecasts. The super learner trains on the forecasts of all the windowed cross-validations, though it does not understand that the forecast in period one is going to be better than the forecast at period $n$. Future research will create methods to correct this bias while training the super learner such as regressive weights for over the forecast period, giving more weight to the most recent forecast.
+
 \section{Conclusion}
 
-The results of this paper show that creating a unified interface for forecasting models in \proglang{R} allows for better models through an automated methedology of resampling, preprocessing, model selection, stacking tuning, and training. Building on the wide range of forecasting packages available in \proglang{R}, automating tasks such as windowing cross validation and model selection allow applied forecasters to spend less time dealing with the beauracracy of modeling and more time testing new models. New methods such as multivariate stacked learners, Lambert W transforms, and the ability to create arbitary AR($p,d$) machine learning models allows researchers to easily experiment with new ideas. While the example models here are not perfect, this was mostly due to time. It will be easy for researchers to beat the models created in this paper.
+The results of this paper show that creating a unified interface for forecasting models in \proglang{R} allows for better models through an automated methodology of resampling, preprocessing, model selection, stacking tuning, and training. Building on the broad range of forecasting packages available in \proglang{R}, automating tasks such as windowing cross-validation and model selection allow applied forecasters to spend less time dealing with the bureaucracy of modeling and more time testing new models. New methods such as multivariate stacked learners, Lambert W transforms, and the ability to create arbitrary AR($p,d$) machine learning models allows researchers to experiment with new ideas easily. While the example models here are not perfect, this was mostly due to time. It will be easy for researchers to beat the models created in this paper.
 
-Future research based on this package would involve tuning these models to see how useful they are in the real world. The classification forecast learners made available in the forecasting extension of \pkg{mlr} is a rising field, and with the ease of making models in \pkg{mlr} new research in this area can progress be easily replicatable. Updates to this package will include more multivariate and univariate forecast learners as well as new methods to stack models such as Bayesian averaging~\cite{bayesianAverage}.
+Future research based on this package would involve tuning these models to see how useful they are in the real world. The classification forecast learners made available in the forecasting extension of \pkg{mlr} is a growing field, and with the ease of making models in \pkg{mlr} new research in this area can progress be easily replicable. Updates to this package will include more multivariate and univariate forecast learners as well as new methods to stack models such as Bayesian averaging~\cite{bayesianAverage}.
 
 %\small
 \bibliography{thesisbib}{}
