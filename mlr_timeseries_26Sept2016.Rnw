@@ -229,9 +229,9 @@ One common problem with forecasting is that it is hard to use additional explana
 <<multivar_task1, cache = TRUE, eval = TRUE, message=FALSE, warning=FALSE>>=
 
 mfcregr.univar.task = makeMultiForecastRegrTask(id = "bigvar",
-                                                data = EuStockMarkets,
-                                                target = "FTSE",
-                                                frequency = 365L)
+                                         data = eu.train,
+                                         target = "FTSE",
+                                         frequency = 365L)
 mfcregr.univar.task
 @
 \doublespacing
@@ -302,7 +302,7 @@ MASE has favorable properties for calculating forecast errors relative to measur
 
 Where the denominator is the one step ahead naive forecast from the training data. When the numerator is equal to the denominator, the model performs as well as a simple naive forecast method. A MASE score greater than one indicates the model is performing worse than the naive forecasting method while scores less than one mean the model is performing better than the naive forecasting method.
 
-The scale invariance of MASE means that it is independent of the scale of the data and allows model comparison across data sets. The scale invariance of MASE has made it a favorite for comparing the accuracy of forecast methods~\cite{noteMase} across datasets. While scaling in measures such as the Mean Absolute Percentage Error can cause poor behavior as the target variable goes to zero, MASE does not become skewed when the target variable approaches zero. Having good properties near zero allows the use of MASE in situations in which zeros occur frequently or zero is not meaningful such as predicting temperature. 
+The scale invariance of MASE means that it is independent of the scale of the data and allows model comparison across data sets. The scale invariance of MASE has made it a favorite for comparing the accuracy of forecast methods~\cite{noteMase} across datasets. While scaling in measures such as the Mean Absolute Percentage Error can cause poor behavior as the target variable goes to zero, MASE does not become skewed when the target variable approaches zero. Having good properties near zero allows the use of MASE in situations in which zeros occur frequently or zero is not meaningful such as predicting temperature. The model does a successful job of catching the downward trend, but figure~\ref{fig:tbats_train} shows the downward bias of the model which does not allow it to account for the sharp upward swings.
 
 \singlespacing
 <<plotbatsTrain, cache = TRUE, echo = FALSE, results='hide'>>=
@@ -322,12 +322,10 @@ dev.off()
 
 \doublespacing
 
-The model does a successful job of catching the downward trend, but figure~\ref{fig:tbats_train} shows the downward bias of the model which does not allow it to account for the sharp upward swings.
-
 \begin{figure}[h!]
 \includegraphics[width=\linewidth]{plot_tbats_train.png}
 \centering
-\caption{The forecasts response from TBATS against the true testing weather data}
+\caption{The forecasts response from TBATS against the testing weather data}
 \label{fig:tbats_train}
 \end{figure}
 
@@ -450,13 +448,13 @@ parSet = makeParamSet(
                             tunable = TRUE),
            makeLogicalParam(id = "use.trend", default = FALSE,
                             tunable = TRUE),
-           makeLogicalParam(id = "use.damped.trend", default = FALSE,
-                            tunable = TRUE),
-           makeLogicalParam(id = "seasonal.periods", default = FALSE,
-                            tunable = TRUE),
+           makeLogicalParam(id = "use.damped.trend",
+                            default = FALSE, tunable = TRUE),
+           makeLogicalParam(id = "seasonal.periods",
+                            default = FALSE, tunable = TRUE),
            makeIntegerParam(id = "max.p", upper = 30, lower = 1,
                             trafo = function(x) x*2),
-           makeIntegerParam(id = "start.p", upper = 30, lower = 1,
+           makeIntegerParam(id = "start.p", upper = 30, lower= 1,
                             trafo = function(x) x*2),
            makeIntegerParam(id = "max.q", upper = 30, lower = 1,
                             trafo = function(x) x*2),
@@ -464,8 +462,10 @@ parSet = makeParamSet(
                             trafo = function(x) x*2),
            makeIntegerParam("max.P", lower = 0, upper = 5),
            makeIntegerParam("max.Q", lower = 0, upper = 5),
-           makeDiscreteParam("ic",values = c("aicc","aic","bic")),
-           makeDiscreteParam("test",values = c("kpss","adf","pp")),
+           makeDiscreteParam("ic",
+                             values = c("aicc","aic","bic")),
+           makeDiscreteParam("test",
+                             values = c("kpss","adf","pp")),
            makeDiscreteParam("seasonal.test",
                             values = c("ocsb", "ch")),
           makeLogicalParam("biasadj", default = FALSE)
@@ -501,7 +501,11 @@ tbatsTune$y
 
 @
 
-Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed graphically using partial dependence plots~\cite{partialdep}. Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{tbatsTune} and coerces them to be numeric.
+\doublespace
+
+Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed\footnote{Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{tbatsTune} and coerces them to be numeric} graphically using partial dependence plots~\cite{partialdep}.
+
+\singlespace
 
 <<loadTuneTbats2, cache = TRUE, echo = FALSE, results = 'hide'>>=
 # Make data for dependence plot 
@@ -555,7 +559,7 @@ ggsave("./tbats_dep_plot_max_p.png",p)
 
 \doublespacing
 
-For this model the best maximum number of moving average coefficients is two while the best number of seasonal autoregressive terms is five. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
+For this model the optimal number of moving average coefficients is two while the best number of seasonal autoregressive terms is five. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
 
 \singlespacing
 <<bestmodtrain, cache = TRUE>>=
@@ -582,12 +586,10 @@ For comparison, TBATS is run in \pkg{forecast} with it's base parameters
 \singlespacing
 <<forecastTbats, cache = TRUE, message=FALSE, warning=FALSE>>=
 library(forecast)
-forecast.train.tbats = tbats(ts(m4.train,frequency = 365))
+forecast.train.tbats = tbats(ts(m4.train,frequency = 183))
 forecast.tbats = forecast(forecast.train.tbats,h=35)
 # Calculate MASE
-sum(abs(coredata(m4.test)-forecast.tbats$mean)) / 
- ((nrow(m4.test) / (nrow(m4.test) + 1)) *
-     sum(abs(diff(coredata(m4.test)))))
+accuracy(forecast.tbats, x= m4.test)[2,6,drop=FALSE]
 @
 \doublespacing
 
@@ -611,9 +613,9 @@ dev.off()
 @
 
 \begin{figure}[H]
-\caption{The TBATS model forecasts tuned in \pkg{mlr} Vs. the base TBATS model in forecast}
   \includegraphics[width=\linewidth]{plot_tbats_vs_forecast.png}
   \centering
+  \caption{The TBATS model forecasts tuned in \pkg{mlr} Vs. the base TBATS model in forecast}
   \label{fig:mlrvsforecast}
 \end{figure}
 
@@ -623,11 +625,12 @@ To this author's knowledge, this is the first package in \proglang{R} that allow
 <<tuneGarch, eval = FALSE>>=
 # Make a tuning grid for GARCH
 par_set = makeParamSet(
-  makeDiscreteParam(id = "model", values = c("sGARCH", "csGARCH")),
-  makeIntegerVectorParam(id = "garchOrder", len = 2L, lower = c(1,1),
-                         upper = c(4,4)),
-  makeIntegerVectorParam(id = "armaOrder", len = 2L, lower = c(5,1),
-                         upper = c(8,3)),
+  makeDiscreteParam(id = "model",
+                    values = c("sGARCH", "csGARCH")),
+  makeIntegerVectorParam(id = "garchOrder", len = 2L,
+                         lower = c(1,1), upper = c(4,4)),
+  makeIntegerVectorParam(id = "armaOrder", len = 2L,
+                         lower = c(5,1), upper = c(8,3)),
   makeLogicalParam(id = "include.mean"),
   makeLogicalParam(id = "archm"),
   makeDiscreteParam(id = "distribution.model",
@@ -645,9 +648,9 @@ parallelStartSocket(6)
 configureMlr(on.learner.error = "warn")
 set.seed(1234)
 garchTune = tuneParams(makeLearner("fcregr.garch", n.ahead= 35),
-                       task = climate.task, resampling = resampDesc,
-                       par.set = par_set, control = ctrl,
-                       measures = mase)
+                    task = climate.task, resampling = resampDesc,
+                    par.set = par_set, control = ctrl,
+                    measures = mase)
 parallelStop()
 garchTune$y
 @
@@ -663,7 +666,7 @@ garchTune$y
 Because the partial dependence plots are still in development they do not work well with \code{makeNumericVectorParams()} such as \code{garchOrder} and \code{armaOrder}. Instead of looking at each $p,q$ individually, the sum of the coefficient values for the $p,q$ order of the GARCH component and the ARMA component are plotted.
 
 \singlespacing
-<<makeHyperPlot,cache=TRUE>>=
+<<makeHyperPlot,cache=TRUE, echo = FALSE>>=
 # Make hyper parameter data
 garch.hyperpar = generateHyperParsEffectData(garchTune,
                     trafo = TRUE, include.diagnostics = FALSE,
@@ -692,7 +695,7 @@ plotHyperParsEffect(garch.hyperpar, x= "armaOrder", y = "mase.test.mean",
                      partial.dep.learn = "regr.randomForest")
 @
 
-<<garchdepPlot3, echo=FALSE, cache = TRUE, results='hide'>>=
+<<garchdepPlot3, echo=FALSE, cache = TRUE, results='hide', message=FALSE>>=
 p = plotHyperParsEffect(garch.hyperpar, x= "garchOrder", y = "mase.test.mean",
                      plot.type = "line",
                      partial.dep.learn = "regr.randomForest")
@@ -752,8 +755,8 @@ legend(-.5,-5.2, c("Truth", "Prediction", "Lower ConfInt .05", "Upper ConfInt .9
 dev.off()
 @
 
-\begin{figure}[H]
-\includegraphics[width=.75\linewidth]{plot_garch_final.png}
+\begin{figure}[h!]
+\includegraphics[width=\linewidth]{plot_garch_final.png}
 \centering
 \caption{The GARCH model with confidence intervals}
 \label{fig:garch_final}
@@ -1102,7 +1105,7 @@ legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
 dev.off()
 @
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \includegraphics[width=\linewidth]{ensemble_pred.png}
 \centering
 \caption{The forecast of the M4 data using the Stacked ARFIMA, TBATS, and GARCH model}

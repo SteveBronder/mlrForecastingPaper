@@ -291,19 +291,19 @@ One common problem with forecasting is that it is hard to use additional explana
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlstd{mfcregr.univar.task} \hlkwb{=} \hlkwd{makeMultiForecastRegrTask}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"bigvar"}\hlstd{,}
-                                                \hlkwc{data} \hlstd{= EuStockMarkets,}
-                                                \hlkwc{target} \hlstd{=} \hlstr{"FTSE"}\hlstd{,}
-                                                \hlkwc{frequency} \hlstd{=} \hlnum{365L}\hlstd{)}
+                                         \hlkwc{data} \hlstd{= eu.train,}
+                                         \hlkwc{target} \hlstd{=} \hlstr{"FTSE"}\hlstd{,}
+                                         \hlkwc{frequency} \hlstd{=} \hlnum{365L}\hlstd{)}
 \hlstd{mfcregr.univar.task}
 \end{alltt}
 \begin{verbatim}
 ## Task: bigvar
 ## Type: mfcregr
 ## Target: FTSE
-## Observations: 1860
+## Observations: 1828
 ## Dates:
 ##  Start: 1991-07-01 02:18:27 
-##  End:   1998-08-24 20:18:27
+##  End:   1998-07-10 22:09:13
 ## Frequency: 365
 ## Features:
 ## numerics  factors  ordered 
@@ -435,19 +435,17 @@ MASE has favorable properties for calculating forecast errors relative to measur
 
 Where the denominator is the one step ahead naive forecast from the training data. When the numerator is equal to the denominator, the model performs as well as a simple naive forecast method. A MASE score greater than one indicates the model is performing worse than the naive forecasting method while scores less than one mean the model is performing better than the naive forecasting method.
 
-The scale invariance of MASE means that it is independent of the scale of the data and allows model comparison across data sets. The scale invariance of MASE has made it a favorite for comparing the accuracy of forecast methods~\cite{noteMase} across datasets. While scaling in measures such as the Mean Absolute Percentage Error can cause poor behavior as the target variable goes to zero, MASE does not become skewed when the target variable approaches zero. Having good properties near zero allows the use of MASE in situations in which zeros occur frequently or zero is not meaningful such as predicting temperature. 
+The scale invariance of MASE means that it is independent of the scale of the data and allows model comparison across data sets. The scale invariance of MASE has made it a favorite for comparing the accuracy of forecast methods~\cite{noteMase} across datasets. While scaling in measures such as the Mean Absolute Percentage Error can cause poor behavior as the target variable goes to zero, MASE does not become skewed when the target variable approaches zero. Having good properties near zero allows the use of MASE in situations in which zeros occur frequently or zero is not meaningful such as predicting temperature. The model does a successful job of catching the downward trend, but figure~\ref{fig:tbats_train} shows the downward bias of the model which does not allow it to account for the sharp upward swings.
 
 \singlespacing
 
 
 \doublespacing
 
-The model does a successful job of catching the downward trend, but figure~\ref{fig:tbats_train} shows the downward bias of the model which does not allow it to account for the sharp upward swings.
-
 \begin{figure}[h!]
 \includegraphics[width=\linewidth]{plot_tbats_train.png}
 \centering
-\caption{The forecasts response from TBATS against the true testing weather data}
+\caption{The forecasts response from TBATS against the testing weather data}
 \label{fig:tbats_train}
 \end{figure}
 
@@ -625,13 +623,13 @@ The methods in package \pkg{ParamHelpers}~\cite{paramhelper} allow \pkg{mlr} to 
                             \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
            \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"use.trend"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
                             \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-           \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"use.damped.trend"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
-                            \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
-           \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"seasonal.periods"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,}
-                            \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
+           \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"use.damped.trend"}\hlstd{,}
+                            \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,} \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
+           \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"seasonal.periods"}\hlstd{,}
+                            \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{,} \hlkwc{tunable} \hlstd{=} \hlnum{TRUE}\hlstd{),}
            \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"max.p"}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{30}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{1}\hlstd{,}
                             \hlkwc{trafo} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) x}\hlopt{*}\hlnum{2}\hlstd{),}
-           \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"start.p"}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{30}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{1}\hlstd{,}
+           \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"start.p"}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{30}\hlstd{,} \hlkwc{lower}\hlstd{=} \hlnum{1}\hlstd{,}
                             \hlkwc{trafo} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) x}\hlopt{*}\hlnum{2}\hlstd{),}
            \hlkwd{makeIntegerParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"max.q"}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{30}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{1}\hlstd{,}
                             \hlkwc{trafo} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) x}\hlopt{*}\hlnum{2}\hlstd{),}
@@ -639,8 +637,10 @@ The methods in package \pkg{ParamHelpers}~\cite{paramhelper} allow \pkg{mlr} to 
                             \hlkwc{trafo} \hlstd{=} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) x}\hlopt{*}\hlnum{2}\hlstd{),}
            \hlkwd{makeIntegerParam}\hlstd{(}\hlstr{"max.P"}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{5}\hlstd{),}
            \hlkwd{makeIntegerParam}\hlstd{(}\hlstr{"max.Q"}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{upper} \hlstd{=} \hlnum{5}\hlstd{),}
-           \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"ic"}\hlstd{,}\hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"aicc"}\hlstd{,}\hlstr{"aic"}\hlstd{,}\hlstr{"bic"}\hlstd{)),}
-           \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"test"}\hlstd{,}\hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"kpss"}\hlstd{,}\hlstr{"adf"}\hlstd{,}\hlstr{"pp"}\hlstd{)),}
+           \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"ic"}\hlstd{,}
+                             \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"aicc"}\hlstd{,}\hlstr{"aic"}\hlstd{,}\hlstr{"bic"}\hlstd{)),}
+           \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"test"}\hlstd{,}
+                             \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"kpss"}\hlstd{,}\hlstr{"adf"}\hlstd{,}\hlstr{"pp"}\hlstd{)),}
            \hlkwd{makeDiscreteParam}\hlstd{(}\hlstr{"seasonal.test"}\hlstd{,}
                             \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"ocsb"}\hlstd{,} \hlstr{"ch"}\hlstd{)),}
           \hlkwd{makeLogicalParam}\hlstd{(}\hlstr{"biasadj"}\hlstd{,} \hlkwc{default} \hlstd{=} \hlnum{FALSE}\hlstd{)}
@@ -684,7 +684,11 @@ Using \code{tuneParams()} the model is tuned for the task using the specified re
 \end{kframe}
 \end{knitrout}
 
-Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed graphically using partial dependence plots~\cite{partialdep}. Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{tbatsTune} and coerces them to be numeric.
+\doublespace
+
+Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed\footnote{Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{tbatsTune} and coerces them to be numeric} graphically using partial dependence plots~\cite{partialdep}.
+
+\singlespace
 
 
 
@@ -721,7 +725,7 @@ Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyz
 
 \doublespacing
 
-For this model the best maximum number of moving average coefficients is two while the best number of seasonal autoregressive terms is five. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
+For this model the optimal number of moving average coefficients is two while the best number of seasonal autoregressive terms is five. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
 
 \singlespacing
 \begin{knitrout}
@@ -760,15 +764,14 @@ For comparison, TBATS is run in \pkg{forecast} with it's base parameters
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlkwd{library}\hlstd{(forecast)}
-\hlstd{forecast.train.tbats} \hlkwb{=} \hlkwd{tbats}\hlstd{(}\hlkwd{ts}\hlstd{(m4.train,}\hlkwc{frequency} \hlstd{=} \hlnum{365}\hlstd{))}
+\hlstd{forecast.train.tbats} \hlkwb{=} \hlkwd{tbats}\hlstd{(}\hlkwd{ts}\hlstd{(m4.train,}\hlkwc{frequency} \hlstd{=} \hlnum{183}\hlstd{))}
 \hlstd{forecast.tbats} \hlkwb{=} \hlkwd{forecast}\hlstd{(forecast.train.tbats,}\hlkwc{h}\hlstd{=}\hlnum{35}\hlstd{)}
 \hlcom{# Calculate MASE}
-\hlkwd{sum}\hlstd{(}\hlkwd{abs}\hlstd{(}\hlkwd{coredata}\hlstd{(m4.test)}\hlopt{-}\hlstd{forecast.tbats}\hlopt{$}\hlstd{mean))} \hlopt{/}
- \hlstd{((}\hlkwd{nrow}\hlstd{(m4.test)} \hlopt{/} \hlstd{(}\hlkwd{nrow}\hlstd{(m4.test)} \hlopt{+} \hlnum{1}\hlstd{))} \hlopt{*}
-     \hlkwd{sum}\hlstd{(}\hlkwd{abs}\hlstd{(}\hlkwd{diff}\hlstd{(}\hlkwd{coredata}\hlstd{(m4.test)))))}
+\hlkwd{accuracy}\hlstd{(forecast.tbats,} \hlkwc{x}\hlstd{= m4.test)[}\hlnum{2}\hlstd{,}\hlnum{6}\hlstd{,}\hlkwc{drop}\hlstd{=}\hlnum{FALSE}\hlstd{]}
 \end{alltt}
 \begin{verbatim}
-## [1] 1.951852
+##               MASE
+## Test set 0.3533038
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -779,9 +782,9 @@ Now it is possible to see the clear benefit of the forecast extension to \pkg{ml
 
 
 \begin{figure}[H]
-\caption{The TBATS model forecasts tuned in \pkg{mlr} Vs. the base TBATS model in forecast}
   \includegraphics[width=\linewidth]{plot_tbats_vs_forecast.png}
   \centering
+  \caption{The TBATS model forecasts tuned in \pkg{mlr} Vs. the base TBATS model in forecast}
   \label{fig:mlrvsforecast}
 \end{figure}
 
@@ -793,11 +796,12 @@ To this author's knowledge, this is the first package in \proglang{R} that allow
 \begin{alltt}
 \hlcom{# Make a tuning grid for GARCH}
 \hlstd{par_set} \hlkwb{=} \hlkwd{makeParamSet}\hlstd{(}
-  \hlkwd{makeDiscreteParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"model"}\hlstd{,} \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"sGARCH"}\hlstd{,} \hlstr{"csGARCH"}\hlstd{)),}
-  \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"garchOrder"}\hlstd{,} \hlkwc{len} \hlstd{=} \hlnum{2L}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{),}
-                         \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{4}\hlstd{,}\hlnum{4}\hlstd{)),}
-  \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"armaOrder"}\hlstd{,} \hlkwc{len} \hlstd{=} \hlnum{2L}\hlstd{,} \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{5}\hlstd{,}\hlnum{1}\hlstd{),}
-                         \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{8}\hlstd{,}\hlnum{3}\hlstd{)),}
+  \hlkwd{makeDiscreteParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"model"}\hlstd{,}
+                    \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"sGARCH"}\hlstd{,} \hlstr{"csGARCH"}\hlstd{)),}
+  \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"garchOrder"}\hlstd{,} \hlkwc{len} \hlstd{=} \hlnum{2L}\hlstd{,}
+                         \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{4}\hlstd{,}\hlnum{4}\hlstd{)),}
+  \hlkwd{makeIntegerVectorParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"armaOrder"}\hlstd{,} \hlkwc{len} \hlstd{=} \hlnum{2L}\hlstd{,}
+                         \hlkwc{lower} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{5}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{upper} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{8}\hlstd{,}\hlnum{3}\hlstd{)),}
   \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"include.mean"}\hlstd{),}
   \hlkwd{makeLogicalParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"archm"}\hlstd{),}
   \hlkwd{makeDiscreteParam}\hlstd{(}\hlkwc{id} \hlstd{=} \hlstr{"distribution.model"}\hlstd{,}
@@ -815,9 +819,9 @@ To this author's knowledge, this is the first package in \proglang{R} that allow
 \hlkwd{configureMlr}\hlstd{(}\hlkwc{on.learner.error} \hlstd{=} \hlstr{"warn"}\hlstd{)}
 \hlkwd{set.seed}\hlstd{(}\hlnum{1234}\hlstd{)}
 \hlstd{garchTune} \hlkwb{=} \hlkwd{tuneParams}\hlstd{(}\hlkwd{makeLearner}\hlstd{(}\hlstr{"fcregr.garch"}\hlstd{,} \hlkwc{n.ahead}\hlstd{=} \hlnum{35}\hlstd{),}
-                       \hlkwc{task} \hlstd{= climate.task,} \hlkwc{resampling} \hlstd{= resampDesc,}
-                       \hlkwc{par.set} \hlstd{= par_set,} \hlkwc{control} \hlstd{= ctrl,}
-                       \hlkwc{measures} \hlstd{= mase)}
+                    \hlkwc{task} \hlstd{= climate.task,} \hlkwc{resampling} \hlstd{= resampDesc,}
+                    \hlkwc{par.set} \hlstd{= par_set,} \hlkwc{control} \hlstd{= ctrl,}
+                    \hlkwc{measures} \hlstd{= mase)}
 \hlkwd{parallelStop}\hlstd{()}
 \hlstd{garchTune}\hlopt{$}\hlstd{y}
 \end{alltt}
@@ -838,29 +842,7 @@ To this author's knowledge, this is the first package in \proglang{R} that allow
 Because the partial dependence plots are still in development they do not work well with \code{makeNumericVectorParams()} such as \code{garchOrder} and \code{armaOrder}. Instead of looking at each $p,q$ individually, the sum of the coefficient values for the $p,q$ order of the GARCH component and the ARMA component are plotted.
 
 \singlespacing
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{# Make hyper parameter data}
-\hlstd{garch.hyperpar} \hlkwb{=} \hlkwd{generateHyperParsEffectData}\hlstd{(garchTune,}
-                    \hlkwc{trafo} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{include.diagnostics} \hlstd{=} \hlnum{FALSE}\hlstd{,}
-                    \hlkwc{partial.dep} \hlstd{=} \hlnum{TRUE}\hlstd{)}
-\hlstd{garch.hyperpar}\hlopt{$}\hlstd{data} \hlkwb{=} \hlstd{garch.hyperpar}\hlopt{$}\hlstd{data[}
-                      \hlopt{-}\hlkwd{which}\hlstd{(garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{mase.test.mean} \hlopt{==}
-                            \hlkwd{max}\hlstd{(garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{mase.test.mean)),]}
-\hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{garchOrder1} \hlkwb{=} \hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{garchOrder1} \hlopt{+}
-                                  \hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{garchOrder2}
-\hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{garchOrder2} \hlkwb{=} \hlkwa{NULL}
-\hlkwd{colnames}\hlstd{(garch.hyperpar}\hlopt{$}\hlstd{data)[}\hlnum{2}\hlstd{]} \hlkwb{=} \hlstr{"garchOrder"}
-\hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{armaOrder1} \hlkwb{=} \hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{armaOrder1} \hlopt{+}
-                                 \hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{armaOrder2}
-\hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{armaOrder2} \hlkwb{=} \hlkwa{NULL}
-\hlkwd{colnames}\hlstd{(garch.hyperpar}\hlopt{$}\hlstd{data)[}\hlnum{3}\hlstd{]} \hlkwb{=} \hlstr{"armaOrder"}
-\hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{include.mean} \hlkwb{=} \hlkwd{as.numeric}\hlstd{(garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{include.mean)}
-\hlstd{garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{archm} \hlkwb{=} \hlkwd{as.numeric}\hlstd{(garch.hyperpar}\hlopt{$}\hlstd{data}\hlopt{$}\hlstd{archm)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -875,12 +857,7 @@ Because the partial dependence plots are still in development they do not work w
 \end{kframe}
 \end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Saving 7 x 7 in image\\\#\# Saving 7 x 7 in image}}\end{kframe}
-\end{knitrout}
 
 \begin{figure}[H]
 \centering
@@ -940,8 +917,8 @@ The dependence plots show that for both the GARCH and ARMA orders, as the order 
 
 
 
-\begin{figure}[H]
-\includegraphics[width=.75\linewidth]{plot_garch_final.png}
+\begin{figure}[h!]
+\includegraphics[width=\linewidth]{plot_garch_final.png}
 \centering
 \caption{The GARCH model with confidence intervals}
 \label{fig:garch_final}
@@ -1379,7 +1356,7 @@ The rest of the modeling process flows in a way similar to the standard training
 
 
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \includegraphics[width=\linewidth]{ensemble_pred.png}
 \centering
 \caption{The forecast of the M4 data using the Stacked ARFIMA, TBATS, and GARCH model}
