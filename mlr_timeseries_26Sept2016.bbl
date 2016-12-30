@@ -197,6 +197,13 @@ Alysha M.~De Livera, Rob~J. Hyndman, and Ralph~D. Snyder.
 \newblock {\em Journal of the American Statistical Association},
   106(496):1513--1527, 2011.
 
+\bibitem{irace}
+Manuel López-Ibáñez, Jérémie Dubois-Lacoste, Leslie~Pérez Cáceres, Mauro
+  Birattari, and Thomas Stützle.
+\newblock The irace package: Iterated racing for automatic algorithm
+  configuration.
+\newblock {\em Operations Research Perspectives}, 3:43 -- 58, 2016.
+
 \bibitem{Makridakis2000451}
 Spyros Makridakis and Michèle Hibon.
 \newblock The m3-competition: results, conclusions and implications.
