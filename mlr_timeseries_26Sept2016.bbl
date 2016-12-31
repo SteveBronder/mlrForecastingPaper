@@ -4,6 +4,12 @@
 {\em {CMA-ES: A Function Value Free Second Order Optimization Method}}, Paris,
   France, 2014.
 
+\bibitem{adaboost}
+Esteban Alfaro, Mat\'ias G\'amez, and Noelia Garc\'ia.
+\newblock {adabag}: An {R} package for classification with boosting and
+  bagging.
+\newblock {\em Journal of Statistical Software}, 54(2):1--35, 2013.
+
 \bibitem{MurphymeteoForecast}
 Robert L.~Winkler Allan H.~Murphy.
 \newblock Probability forecasting in meterology.
@@ -265,6 +271,11 @@ J.~D. Rodriguez, A.~Perez, and J.~A. Lozano.
 Jeffrey~A. Ryan and Joshua~M. Ulrich.
 \newblock {\em xts: eXtensible Time Series}, 2016.
 \newblock R package version 0.10-0.
+
+\bibitem{gbm}
+Greg~Ridgeway with contributions~from others.
+\newblock {\em gbm: Generalized Boosted Regression Models}, 2015.
+\newblock R package version 2.1.1.
 
 \bibitem{Wolpert92stackedgeneralization}
 David~H. Wolpert.
