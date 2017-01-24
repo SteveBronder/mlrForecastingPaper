@@ -2,13 +2,14 @@ Forecasting in the MLR Framework
 ========================================================
 author: Steve Bronder
 date: October 11th, 2016
-autosize: false
+autosize: true
 
-<style>
-.small-code pre code {
-  font-size: 1em;
-}
-</style>
+What is Forecasting?
+========================================================
+
+- Predictions of future based on past trends
+- What happens Vs. What happens tomorrow
+- Stocks, earthquakes, neuroscience
 
 Goal: Make Forecasting Simple
 ========================================================
@@ -18,143 +19,148 @@ Goal: Make Forecasting Simple
 
 Ex: Demeaning the whole data set before CV
 
-- Forecasting is very dangerous
-- Need a framework for 'safe forecasting'
-- Want to use ML in forecasting
+- Problem: Forecasting can be dangerous
+- Insight: Need a framework for 'safe forecasting'
+- Solution: Use ML Framework in forecasting
 
 The Modeling Process
 ========================================================
 
-<img src="modeling_process.jpeg" alt="Drawing" style="width: 1400px; height: 500px"/>
+<img src="flownames.jpeg" alt="Drawing" style="width: 90%; height: 90%"/>
 
 ***
 
-<img src="mlr_flow.jpeg" alt="Drawing" style="width: 2000px; height: 500px"/>
+- MLR automates this pipeline
+- Make forecasting safer by using the pipeline
 
 Example Data
 ======================================================
-class: small-code 
 
-```{r quandl, cache = TRUE, fig.align='center',fig.height= 12, fig.width= 15}
-library(M4comp)
+```{r quandl, cache = TRUE, fig.align='center'}
+library(Quandl)
 library(xts)
-library(lubridate)
-m4Fin1 <- M4[[8836]]
-m4Train1 <- xts(m4Fin1$past, as.POSIXct("2007-12-05") + days(0:I(length(m4Fin1$past)-1)))
-m4Test1 <- xts(m4Fin1$future, as.POSIXct("2009-09-06") + days(0:I(length(m4Fin1$future)-1)))
-colnames(m4Train1) <- "target_var"
-colnames(m4Test1) <- "target_var"
+aapl <- Quandl("YAHOO/AAPL", api_key="UG7wmFCm6zMyq1xhW9Re")
+aaplXts <- xts(aapl$Close, order.by = as.POSIXlt(aapl$Date))
+colnames(aaplXts) <- "Close"
+aaplXtsTrain <- aaplXts[1:9000,]
+aaplXtsTest  <- aaplXts[9001:9035,]
 
 ```
 
-Plot of Climate Data
+Plot of aapl Stock
 =====================================================
-class: small-code 
 
-```{r quandlPlot, cache = TRUE, fig.align='center',fig.height= 8, fig.width= 10, echo = FALSE}
-plot(m4Train1, main = "Daily Climate Data")
-
+```{r quandlPlot, cache = TRUE, eval = FALSE, echo = FALSE}
+plot(aaplXtsTrain, main = "Training: Closing Price of Apple by Day")
+plot(aaplXtsTest, main = "Testing: Closing Price of Apple by Day")
 ```
+
+<img src="training_aapl.png" alt="Drawing" style="width: 90%; height: 90%"/>
+
+***
+
+<img src="testing_aapl.png" alt="Drawing" style="width: 90%; height: 90%"/>
 
 Creating a Forecasting Task
 ========================================================
-class: small-code 
 
-```{r climateTask, cache = TRUE}
+- Task: Keeps data and meta-data for ML task
+
+```{r aaplTask, cache = TRUE}
 library(mlr)
-climate.task = makeForecastRegrTask(id = "M4 Climate Data",data = m4Train1,
-                                    target = "target_var",frequency = 365L)
-climate.task
+aaplTask <- makeForecastRegrTask(
+  id = "Forecast aapl Closing Price",
+  data = aaplXtsTrain,
+  target  = "Close",
+  frequency = 7L)
+```
+
+Creating a Forecasting Task: Info
+========================================================
+```{r aaplTaskView, cache = TRUE}
+aaplTask
+```
+
+
+Making a Forecasting Learner
+======================================================
+
+```{r arimaLearner, cache = TRUE}
+garch.mod =makeLearner("fcregr.garch", 
+                      model = "sGARCH",
+                      garchOrder = c(5,5),
+                      distribution.model = "sged",
+                      armaOrder = c(6,6),
+                      n.ahead = 35,
+                      predict.type = "quantile")
+
 ```
 
 Making a Forecasting Learner
 ======================================================
-class: small-code 
 
-```{r arimaLearner, cache = TRUE}
-tbatsMod =makeLearner("fcregr.tbats",
-                      use.box.cox = FALSE,
-                      use.trend = TRUE,
-                      seasonal.periods = TRUE,
-                      max.p = 3, max.q = 2,
-                      stationary = FALSE,
-                      use.arma.errors = TRUE, h = 35)
-tbatsMod
+```{r arimaLearnerView, cache = TRUE}
+garch.mod 
 ```
 
 Train a Forecast Learner
 ======================================================
-class: small-code 
 
-```{r trainArima, cache = TRUE}
-trainTbats= train(tbatsMod, climate.task )
-trainTbats
-
+```{r trainArima, cache = TRUE,eval = FALSE}
+garch.train <- train(garch.mod, aaplTask)
+garch.train
 ```
 
 Predict With a Forecast Learner
 ======================================================
-class: small-code 
-
 ```{r predictArima2, cache = TRUE}
-testp = predict(trainTbats, newdata = m4Test1)
-performance(testp, mase, task = climate.task)
-mase
+predAapl <- predict(garch.train, newdata = as.data.frame(aaplXtsTest))
+performance(predAapl, measures = mase, task = aaplTask)
 ```
 
 Prediction Plot
 =====================================================
-class: small-code 
 
 ```{r predplotArima, cache = TRUE, echo = FALSE, fig.align='center',fig.height= 8, fig.width= 10}
-matplot(testp$data, type = "l", main = "Prediction Vs. Real Values\n For Model with No Tuning")
+matplot(predAapl$data, type = "l", main = "Prediction Vs. Real Values of Next 35 Days")
 ```
 
+```{r updateModelArima, cache = TRUE, echo = FALSE, eval = FALSE}
+tbatsUpdate  = updateModel(train.tbats, aaplTask, newdata = aaplXtsTest)
+updatePred = predict(tbatsUpdate, task = aaplTask)
+updatePred
+```
 
 Tuning a Model
 =====================================================
-class: small-code 
 
 ```{r makeTuneParam, cache = TRUE}
-parSet = makeParamSet(
-  makeLogicalParam(id = "use.box.cox", default = FALSE, tunable = TRUE),
-  makeLogicalParam(id = "use.trend", default = FALSE, tunable = TRUE),
-  makeLogicalParam(id = "use.damped.trend", default = FALSE, tunable = TRUE),
-  makeLogicalParam(id = "seasonal.periods", default = FALSE, tunable = TRUE),
-  makeIntegerParam(id = "max.p", upper = 20, lower = 0),
-  makeIntegerParam(id = "start.p", upper = 10, lower = 1, 
-                   trafo = function(x) x*2),
-  makeIntegerParam(id = "max.q", upper = 20, lower = 0),
-  makeIntegerParam(id = "start.q", upper = 10,lower = 1,
-                   trafo = function(x) x*2),
-  makeIntegerParam("max.P", lower = 0, upper = 5),
-  makeIntegerParam("max.Q", lower = 0, upper = 5),
-  makeDiscreteParam("ic", values = c("aicc","aic","bic")),
-  makeDiscreteParam("test", values = c("kpss","adf","pp")),
-  makeDiscreteParam("seasonal.test", values = c("ocsb", "ch")),
-  makeLogicalParam("biasadj", default = FALSE)
-  )
-```
-
-
-Make a Tune Control Scheme
-=====================================================
-class: small-code 
-
-```{r makeTuneControl, cache = TRUE}
-#Specify tune by grid estimation
-ctrl = makeTuneControlIrace(maxExperiments = 500L)
-ctrl
+# Make a tuning grid for GARCH
+par_set = makeParamSet(
+  makeDiscreteParam(id = "model",
+                    values = c("sGARCH", "csGARCH", "fGARCH")),
+  makeDiscreteParam("submodel", values = c("GARCH","TGARCH","AVGARCH"),requires = quote(model == 'fGARCH') ),
+  makeIntegerVectorParam(id = "garchOrder", len = 2L,
+                         lower = 1, upper = 8),
+  makeIntegerVectorParam(id = "armaOrder", len = 2L,
+                         lower = 1, upper = 9),
+  makeLogicalParam(id = "include.mean"),
+  makeLogicalParam(id = "archm"),
+  makeDiscreteParam(id = "distribution.model",
+                    values = c("norm","std","jsu", "sged")),
+  makeDiscreteParam(id = "stationarity", c(0,1)),
+  makeDiscreteParam(id = "fixed.se", c(0,1))
+)
 ```
 
 Making a Resample Scheme
 ========================================
-class: small-code 
 
 ```{r resampleScheme, cache = TRUE}
 resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
-                               initial.window = .90,
-                               size = nrow(getTaskData(climate.task)), skip = .01)
+                              initial.window = .9,
+                              size = nrow(getTaskData(aaplTask)),
+                              skip = .01)
 resampDesc
 ```
 
@@ -164,188 +170,152 @@ Example of Windowing Resample
 <img src="caret_window.png" alt="Drawing" style="width: 1200px; height: 600px"/>
 </center>
 
+Making a Tuning Control
+===========================================
+
+```{r ctrlmake, cache = TRUE}
+ctrl <- makeTuneControlIrace(maxExperiments = 350)
+```
+
 Tuning Over Parameter Space
 ===========================================
-class: small-code 
 
 ```{r tuneSpace, eval = FALSE}
 library("parallelMap")
-parallelStartSocket(6)
-tbatsTune = tuneParams(makeLearner("fcregr.tbats",h = 35), 
-                       task = climate.task,
-                       resampling = resampDesc,
-                       par.set = parSet,
-                       control = ctrl,
-                       measures = mase)
+parallelStart("multicore",3)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+
+garch.mod = makeLearner("fcregr.garch", n.ahead = 35, solver = 'hybrid')
+garch.res = tuneParams(garch.mod, task = aaplTask,
+                 resampling = resampDesc, par.set = par_set,
+                 control = ctrl,
+                 measures = mase)
 parallelStop()
-tbatsTune
+
+garch.final = setHyperPars(makeLearner("fcregr.garch", n.ahead = 35, solver = 'nloptr', solver.control = list(maxeval = 200000, solver = 10), predict.type = "quantile"),par.vals = garch.res$x)
+
+garch.train = train(garch.final, aaplTask)
+garch.pred = predict(garch.train, newdata = aaplXtsTest)
+performance(garch.pred, measures = mase, task = aaplTask)
+matplot(garch.pred$data, type = "l")
+save(garch.res, file ="./garch_tune_mod.RData")
 ```
 
-```{r loadTune, echo = FALSE}
-load("./../tbatsTune.RData")
-tbatsTune
+
+Using an ML Model
+=========================================
+
+```{r mlLagTask, cache = TRUE, eval = FALSE}
+aaplRegTask <- makeRegrTask(
+  id = "Forecast aapl Closing Price",
+  data = as.data.frame(aaplXtsTrain,rownames = index(aaplXtsTrain)),
+  target  = "Close")
+
+aaplLagTask = createLagDiffFeatures(aaplRegTask, lag = 1L:665L, difference = 1L, na.pad = FALSE)
+
+
+## Trying Support Vector Machines
+xg_learner <- makeLearner("regr.xgboost")
+
+xg_param_set <- makeParamSet(
+  makeDiscreteParam(id = "booster", values = c("gbtree")),
+  makeNumericLearnerParam(id = "eta", lower = 0, upper = 1),
+  makeNumericLearnerParam(id = "gamma", lower = 0, upper = 100),
+  makeIntegerLearnerParam(id = "max_depth",  lower = 100L, upper = 300),
+  makeIntegerLearnerParam(id = "nrounds", lower = 100L, upper = 300)
+)
+# A pretty good model had something like
+# [Tune-x] 1: booster=gbtree; eta=0.248; gamma=61.4; max_depth=425; subsample=0.456;
+# colsample_bytree=0.971; colsample_bylevel=0.612; lambda=18.5; lambda_bias=9.49;
+# alpha=5.62; nrounds=493
+
+ctrl <- makeTuneControlIrace(maxExperiments = 200)
+
+library("parallelMap")
+parallelStart("multicore",3)
+configureMlr(on.learner.error = "warn")
+tune_mod <- tuneParams(learner = xg_learner, task = aaplLagTask,
+                       measures = mase, resampling = resampDesc,
+                       par.set = xg_param_set, control = ctrl )
+parallelStop()
+
+gbm_final = setHyperPars(xg_learner, par.vals = tune_mod$x)
+gbm_train <- train(gbm_final, aaplLagTask)
+gbm_fore = forecast(gbm_train, h = 35, newdata = aaplXtsTest)
+performance(gbm_fore, mase, task = aaplLagTask)
+save(tune_mod, file = "./gbm_tune_mod.RData")
 ```
 
+Make Resampling Scheme
+===========================================
 
-Training Best Model
-=========================================
-class: small-code 
-
-```{r runBest, cache = TRUE}
-lrn = setHyperPars(makeLearner("fcregr.tbats"), par.vals = tbatsTune$x)
-m = train(lrn, climate.task)
-m
+```{r resampleSchemegbm, cache = TRUE}
+resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
+                               initialWindow = 7000L,
+                               size = nrow(getTaskData(aaplLagTask)), skip = 35L)
 ```
 
-Prediction With Best Model
-=========================================
-class: small-code 
-
-```{r predBest, cache = TRUE}
-climate.pred = predict(m, newdata = m4Test1)
-performance(climate.pred, measures = mase, task = climate.task)
-```
-
-Prediction Plot With Best Model
-=========================================
-class: small-code 
-
-```{r predplottbats, cache = TRUE, echo = FALSE, fig.align='center',fig.height= 8, fig.width= 10}
-
-matplot(climate.pred$data, type = "l", main = "Prediction Vs. Real Data \n With Tuned Model")
-
-```
-
-Using an ML Model: Ensemble Forecasts
-=========================================
-class: small-code 
-
-1. Train multiple forecasting models
-2. Perform windowed cross validation, saving each forecast
-3. Train an ML model on the forecasts
-
-
-
-Using an ML Model: Ensemble Forecasts Covariance Parameter Space
-=========================================
-
-class: small-code 
-```{r mlLagTask, cache = TRUE}
+Make Tuning Set and Search Scheme
+===========================================
+```{r gbmtuning}
+library(mlr)
 ps = makeParamSet(
-  makeLogicalParam(id = "fcregr.tbats.use.box.cox", default = FALSE, tunable = TRUE),
-  makeLogicalParam(id = "fcregr.tbats.use.trend", default = FALSE, tunable = TRUE),
-  makeLogicalParam(id = "fcregr.tbats.use.damped.trend", default = FALSE, tunable = TRUE),
-  makeLogicalParam(id = "fcregr.tbats.seasonal.periods", default = FALSE, tunable = TRUE),
-  makeIntegerParam(id = "fcregr.tbats.max.p", upper = 10, lower = 0),
-  makeIntegerParam(id = "fcregr.tbats.start.p", upper = 5, lower = 1, 
-                   trafo = function(x) x*2),
-  makeIntegerParam(id = "fcregr.tbats.max.q", upper = 10, lower = 0),
-  makeIntegerParam(id = "fcregr.tbats.start.q", upper = 5,lower = 1,
-                   trafo = function(x) x*2),
-  makeIntegerParam("fcregr.tbats.max.P", lower = 0, upper = 2),
-  makeIntegerParam("fcregr.tbats.max.Q", lower = 0, upper = 2),
-  makeDiscreteParam("fcregr.tbats.ic", values = c("aic","bic")),
-  makeDiscreteParam("fcregr.tbats.test", values = c("kpss","adf")),
-  makeDiscreteParam("fcregr.tbats.seasonal.test", values = c("ocsb", "ch")),
-  makeLogicalParam("fcregr.tbats.biasadj", default = FALSE),
-  makeDiscreteParam("fcregr.garch.model", values = c("sGARCH","csGARCH")),
-  makeIntegerVectorParam(id = "fcregr.garch.garchOrder",
-                         len = 2L,
-                         lower = 0L,
-                         upper = 2L,
-                         tunable = TRUE),
-  makeLogicalParam(id = "fcregr.garch.include.mean",
-                   default = FALSE,
-                   tunable = TRUE),
-  makeDiscreteParam("fcregr.garch.distribution.model", values = c("snorm","sged")),
-  makeDiscreteLearnerParam("fcregr.garch.solver", values = c("nloptr"))
+  makeDiscreteParam("distribution", values = c("gaussian","laplace", "tdist")),
+  makeIntegerParam("n.trees", lower = 1, upper = 10, trafo = function(x) x * 1000),
+  makeIntegerParam("interaction.depth", lower = 1, upper = 5, trafo = function(x) x * 5),
+  makeNumericParam("shrinkage", lower = 1E-5, upper = 1E-2)
 )
+ctrl = makeTuneControlIrace(maxExperiments = 200L)
 ```
+Tuning GBM Model
+===========================================
 
-Using an ML Model: Ensemble Forecasts Super Learner Parameter Set
-=========================================
-
-```{r superset, cache = TRUE}
-super.ps = makeParamSet(
-  makeIntegerLearnerParam("committees", lower = 1, upper = 100),
-  makeIntegerLearnerParam("rules", lower = 40, upper = 80),
-  makeIntegerLearnerParam("neighbors", lower = 0, upper = 2)
-)
-ctrl = makeTuneControlIrace(maxExperiments = 300L, n.instances = 50L, minNbSurvival = 2L)
-super.mod = makeTuneWrapper(makeLearner("regr.cubist"), resampling = resamp.super,
-                            par.set = super.ps, control = ctrl )
-```
-
-Using an ML Model: Ensemble Forecasts Sampling Scheme
-=========================================
-
-class: small-code 
-```{r ensembleResample, cache = TRUE}
-resamp.sub = makeResampleDesc("GrowingCV",
-                          horizon = 35L,
-                          initial.window = .75,
-                          size = nrow(getTaskData(climate.task)),
-                          #skip = .01
-                          )
-                          
-resamp.super = makeResampleDesc("CV", iters = 20)
-```
-
-Using an ML Model: Ensemble Forecasts
-=========================================
-class: small-code 
-```{r ensembleStackLearner, cache = TRUE}
-base = c("fcregr.tbats", "fcregr.garch")
-lrns = lapply(base, makeLearner)
-lrns = lapply(lrns, setPredictType, "response")
-lrns[[1]]$par.vals$h = 35
-lrns[[2]]$par.vals$n.ahead = 35
-stack.forecast = makeStackedLearner(base.learners = lrns,
-                       predict.type = "response",
-                       method = "average")
-```
-
-Using an ML Model: Ensemble Forecasts Tune
-=========================================
-class: small-code 
-```{r ensembleStackLearner, cache = TRUE}
+```{r tuneSpacegbm, cache = TRUE}
 library("parallelMap")
-parallelStartSocket(7)
-fore.tune = tuneParams(stack.forecast, climate.task, resampling = resamp.sub,
-                   par.set = ps, control = ctrl,
-                   measures = mase)
+parallelStartSocket(3)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+res = tuneParams("regr.gbm", task = aaplLagTask, resampling = resampDesc,
+                 par.set = ps, control = ctrl, measures = mse)
 parallelStop()
+
+```
+
+Predict with ML Model
+======================================================
+```{r mlPred, cache = TRUE}
+testp <- predict(gbmMod, newdata = aaplLagTest)
+performance(testp, mase, aaplLagTask)
+```
+
+Plot Prediction
+===========================================
+```{r mlPredictGraph, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = FALSE}
+testXts <- xts(testp$data, as.POSIXlt(rownames(testp$data)))
+testZoo <- as.zoo(testXts)
+tsRainbow <- rainbow(ncol(testZoo))
+plot(x = testZoo, ylab = "Closing Price", main = "Prediction Vs. Real",
+col = tsRainbow, screens = 1)
 ```
 
 
-```{r ensembleTrain, cache = TRUE}
-super.ps = makeParamSet(
-  makeIntegerParam("ntree", lower = 500, upper = 1000),
-  makeIntegerParam("mtry", lower = 1, upper = 2),
-  makeIntegerParam("nodesize",lower = 1, upper = 200),
-  makeLogicalParam("replace")
-)
-ctrl = makeTuneControlIrace(maxExperiments = 1000L)
-super.mod = makeTuneWrapper(makeLearner("regr.randomForest"), resampling = resamp.super,
-                            par.set = super.ps, control = ctrl, measure = mase )
+Make Forecast
+===========================================
 
-# Now we will tune a super learner over the base learners
-stack.forecast = makeStackedLearner(base.learners = lrns,
-                       predict.type = "response",
-                       method = "growing.cv",
-                       resampling = resamp.sub,
-                       super.learner = super.mod)
+```{r mlforecast, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = TRUE}
+library(lubridate)
+aaplLagFore = createLagDiffFeatures(aaplXts, lag = 0L:65L, na.pad = FALSE, return.nonlag = FALSE)
+aaplLagFore = aaplLagFore[I(nrow(aaplLagFore) - 35L):nrow(aaplLagFore),]
+colnames(aaplLagFore)[1:66] = colnames(aaplLagTrain)[2:67]
+forep = predict(gbmMod, newdata = aaplLagFore)
+```
 
-stack.forecast.tune  = setHyperPars2(stack.forecast,fore.tune$x)
-stack.forecast.tune
-#start parallel
-library("parallelMap")
-parallelStartSocket(7)
-stack.forecast.mod = train(stack.forecast.tune,climate.task)
-parallelStop()
-stack.forecast.pred = predict(stack.forecast.mod, newdata = m4Test1)
-stack.forecast.pred
-performance(stack.forecast.pred, task = climate.task, measure = mase)
-matplot(stack.forecast.pred$data,type = "l")
-matplot(stack.forecast.pred$data, type = "l")
+Plot Forecast
+===========================================
+
+```{r mlforecastPlot, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = FALSE}
+testXts = xts(forep$data, as.POSIXlt(rownames(forep$data)) + days(53))
+testZoo = as.zoo(testXts)
+plot(x = testZoo, ylab = "Closing Price", main = "Forecast of aapl Closing Stock Price")
 ```
