@@ -1,0 +1,1322 @@
+\documentclass[12pt]{article}%[final]
+\setcounter{secnumdepth}{3}
+% if you need to pass options to natbib, use, e.g.:
+% \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading nips_2016
+%
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{nips_2016}
+
+%\usepackage{nips_2016}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%\usepackage[final]{nips_2016}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\hypersetup{
+     colorlinks   = true,
+     citecolor    = black,
+     linkcolor    = black
+}
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{float}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{color,soul}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage[margin=1.5in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{verbatim}
+\usepackage{setspace}
+\usepackage{subcaption}
+\doublespacing
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+% Code defs from jss
+\newcommand\code{\@codex}
+\def\@codex#1{{\normalfont\ttfamily\hyphenchar\font=-1 #1}}
+%%\let\code=\texttt
+\let\proglang=\textsf
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+
+
+%\theoremstyle{definition}
+%\newtheorem{definition}{Definition}[section]
+
+
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+
+\title{Time Series Methods in the R package \pkg{mlr}}
+
+% The \author macro works with any number of authors. There are two
+% commands used to separate the names and addresses of multiple
+% authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to
+% break the lines. Using \AND forces a line break at that point. So,
+% if LaTeX puts 3 of 4 authors names on the first line, and the last
+% on the second line, try using \AND instead of \And before the third
+% author name.
+\singlespacing
+\author{
+  Steve Bronder \\
+  %Quantitative Methods of the Social Sciences\\
+  %Columbia University\\
+  %New York City, NY 10027 \\
+  \texttt{sab2287@columbia.edu} \\
+  %% examples of more authors test etst
+   %Department of Computer Science \\
+   %Columbia University\\
+   %New York City, NY 10027 \\
+  %% \AND
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+}
+\doublespacing
+
+\begin{document}
+% \nipsfinalcopy is no longer used
+
+\maketitle
+
+\begin{abstract}
+The \pkg{mlr} package is a unified interface for machine learning tasks such as classification, regression, cluster analysis, and survival analysis. \pkg{mlr} handles the data pipeline of preprocessing, resampling, model selection, model tuning, ensembling, and prediction. This paper details new methods for developing time series models in \pkg{mlr}. This extension includes standard and novel tools such as Lambert $W\times F_X$ transform data generating processes, autoregressive data generating schemes for forecasting with machine learning models, fixed and growing window cross-validation, and forecasting models in the context of univariate and multivariate time series. Examples are given to demonstrate the benefits of a unified framework for machine learning and time series.
+\end{abstract}
+
+
+\section{Introduction}
+There has been a rapid development in time series methods over the last 25 years~\cite{Hyndman25} whereby time series models have not only become more common, but more complex. The \proglang{R} language~\cite{Rbase} has several task views that list the extensive amount of packages available for forecasting, time series methods, and empirical finance. While the amount of packages is large, the open source nature of \proglang{R} has left users without a standard syntactic framework whereby individual packages will have a sub-culture of style, syntax, and output. This causes users unnecessary burden, forcing them to memorize and interpret each authors unique style. The \pkg{mlr}~\cite{mlr} package, short for Machine Learning in R, is a meta-package which works to give a strong syntactic framework for the modeling pipeline. By automating and standardizing the tools and methodologies in machine learning, \pkg{mlr} reduces error from the user during the modeling process. 
+
+This extension to \pkg{mlr} is the first \proglang{R} package, to this authors knowledge, which gives a fully standardized framework for rigorously testing and training forecasting models\footnote{It is important to recognize that packages like \pkg{forecast} and \pkg{BigVAR} have some pieces of the training framework such as windowing cross-validation and tuning of some of the hyperparameters}. While there are some time series methods available in \pkg{caret}~\cite{caret}, development of forecasting models in \pkg{caret} is difficult due to computational constraints and design choices within the package. The highly modular structure of \pkg{mlr} makes it the best option for implementing time series methods and models. This paper will show how using \pkg{mlr}'s strong syntactic structure allows for time series packages such as \pkg{forecast}~\cite{HyndForecast}, \pkg{rugarch}~\cite{rugarch}, and \pkg{BigVAR}~\cite{BigVAR} to use machine learning methodologies such as automated parameter tuning, data preprocessing, model blending, cross-validation, performance evaluation, and parallel processing techniques for increasing model predictive power.
+
+Section~\ref{sec:m4data} describes the time series data used in this paper to showcase how forecasting is performed in \pkg{mlr}. Section~\ref{sec:task} covers how to create and use univariate and multivariate forecasting tasks. Creating, training, updating, and predicting with basic univariate and multivariate forecasting learners are exampled in section~\ref{seq:build} while tuning and resampling strategies for forecasting are in section~\ref{sec:resamp}. Section~\ref{sec:preproc} covers how using $AR(p,d)$ data generating processes allow for machine learning models to be used in the context of forecasting. Lambert $W\times F_X$ data preprocessing is covered in section~\ref{sec:lambert}. Section~\ref{sec:stackfore} demonstrates how univariate and multivariate forecasting learners can be stacked and ensembled with machine learning models.
+
+\section{Forecasting Data}
+\label{sec:m4data}
+
+\subsection{Univariate Forecasting Data}
+The standard objective in forecasting is, at time period $t$, make predictions of the target variable $y$ for $t+h$ periods into the future. The difference between standard regression tasks and forecasting is that future values of $y$ are mainly predicted by it’s past. This means that forecasting tasks are most suitable when aspects of past patterns will continue on into the future. 
+
+Professional forecasters attempt to predict the future of a series based on its past values. Forecasting has applications in a wide range of tasks including forecasting stock prices~\cite{GRANGER19923}, weather patterns~\cite{MurphymeteoForecast}, international conflicts~\cite{Chadefaux01012014}, and earthquakes~\cite{earthquakeYegu}. This paper uses data from the Makridakis competition To evaluate \pkg{mlr}'s forecasting framework as it is well known and provides several types of time series.
+
+The Makridakis competition~\cite{Makridakis2000451} is a set of forecasting challenges organized by the International Institute of Forecasters and led by Spyros Makridakis to evaluate and compare the accuracy of forecasting methods. The most recent of the competitions, the M4 competition, contains 10,000 time series on a yearly, quarterly, monthly, and daily frequency in areas such as finance, macroeconomics, climate, microeconomics, and industry. A particular climate series is used to example \pkg{mlr}'s forecasting features. The data is daily with the training subset starting on September 6th, 2007 and ending on September 5th, 2009 while the testing subset is from September 6th, 2009 to October 10th, 2009 for a total of 640 training periods and 35 test periods to forecast.
+
+\singlespacing
+<<get_dat_weather, cache = FALSE>>=
+
+# Read in M4 Data
+library(M4comp)
+library(xts)
+library(lubridate)
+m4.climate <- M4[[8836]]
+m4.train <- xts(m4.climate$past, as.POSIXct("2007-12-05") +
+                  days(0:I(length(m4.climate$past)-1)))
+m4.test <- xts(m4.climate$future, as.POSIXct("2009-09-06") +
+                 days(0:I(length(m4.climate$future)-1)))
+colnames(m4.train) <- "target_var"
+colnames(m4.test) <- "target_var"
+@
+
+<<plot_dat_weather, cache = FALSE, echo = FALSE, results='hide'>>=
+
+dev.copy(png,'plot_m4_train.png')
+plot_m4_train = plot(m4.train, main = "Daily Climate Data",ylab = "Temperature in Celcius")
+dev.off()
+@
+
+\begin{figure}[h!]
+\includegraphics[width=.8\linewidth]{plot_m4_train.png}
+\centering
+\caption{The training data from the M4 forecasting competition}
+\label{fig:m4_train}
+\end{figure}
+\doublespacing
+
+This series has a distinct seasonality feature, which will give the forecasting tools in \pkg{mlr} a challenge. Figure~\ref{fig:m4_train} is what most would imagine when they think of a time series. There is a clear seasonal time trend with individual points moving about the annual seasons. The data can be found in the package \pkg{M4comp}~\cite{m4comp} under \code{M4[8836]}.
+
+\subsection{Multivariate Forecasting Data}
+This paper uses the EUStockMarkets data set from the \pkg{datasets}~\cite{datasets} package to showcase the multivariate forecasting tools. It contains a subset of daily DAX, SMI, CAC, and FTSE European stock indices from July 1st, 1991 to August 24th, 1998 totaling 1828 training observations and 32 test observations.
+
+\singlespace
+<<get_dat_stocks, cache = TRUE>>=
+# Read in Stock Market Data
+data("EuStockMarkets")
+EuStockMarkets.time = lubridate::date_decimal(
+                as.numeric(time(EuStockMarkets)))
+EuStockMarkets  = xts::xts(as.data.frame(EuStockMarkets),
+                           order.by = EuStockMarkets.time)
+eu.train = EuStockMarkets[1:1828,]
+eu.test = EuStockMarkets[1829:1860,]
+@
+
+<<plot_dat_stocks, cache = TRUE, echo = FALSE, fig.show=FALSE, results='hide'>>=
+col_names = colnames(eu.train)
+# Set a color scheme:
+tsRainbow <- rainbow(ncol(EuStockMarkets))
+# Plot the overlayed series
+(dev.copy(png,'plot_eu_train.png'))
+plot(x = as.zoo(EuStockMarkets), ylab = "Price", main = "Daily Price of European Stock Indices",
+col = tsRainbow, screens = 1)
+# Set a legend in the upper left hand corner to match color to return series
+legend(x = "topleft", legend = col_names,lty = 1, bty = "n",
+       col = tsRainbow, text.width = 8,  cex=1.5, pt.cex = 1)
+dev.off()
+@
+
+\doublespacing
+
+Figure~\ref{fig:eu_train} shows the plot of each series. Note that each stock index tends to follow a similar, but diverging, trend. This will be important to note when performing windowed cross-validation as it will be a real test to see how well the models adapt to what appears to be nonstationary data.
+
+\begin{figure}[h!]
+\includegraphics[width=\linewidth]{plot_eu_train.png}
+\centering
+\caption{The training data from the EuStockMarkets dataset}
+\label{fig:eu_train}
+\end{figure}
+
+\section{Univariate and Multivariate Forecasting Tasks}
+\label{sec:task}
+
+\subsection{Univariate Tasks}
+\label{sec:univarTask}
+\pkg{mlr} uses the S3 object system to clearly define a predictive modeling task. Tasks contain the data and other relevant meta-information such as the task id and for supervised learning problems the target variable. Forecasting tasks are handled in \pkg{mlr} by the function \code{makeForecastRegrTask()}. The forecasting task inherets most of it's arguments from \code{makeRegrTask}, but has two additional arguments.
+
+\begin{itemize}
+\item[data:] Instead of a data frame, an xts object from \pkg{xts}~\cite{xts} containing the time series.
+\item[frequency:] An integer representing the periodicity of the time series. For example, daily data with a weekly periodicity has a frequency of 7, daily data with a yearly periodicity has a frequency of 365, and weekly data with a yearly frequency has a periodicity of 52.
+\end{itemize}
+
+\singlespacing
+<<climate_task, eval = TRUE, cache=TRUE, message=FALSE, warning=FALSE>>=
+library(mlr)
+
+climate.task = makeForecastRegrTask(id = "M4 Climate Data",
+                                 data = m4.train,
+                                 target = "target_var",
+                                 frequency = 7L)
+climate.task
+
+@
+\doublespacing
+Like a regression task, this records the type of the learning problem and basic information about the data set such as the start and end dates, frequency, and whether there are missing values. Note that there are zero features in the task because there is only a target variable, which the model itself will use to build features.
+
+\subsection{Multivariate Tasks}
+\label{sec:multivarTask}
+
+One common problem with forecasting is that it is hard to use additional explanatory variables or forecast multiple targets that are dependent on one another. If a model with exogenous variables is at time $t$ and is designed to predict ten periods in the future, it needs to know the values of the exogenous variables at time $t+10$, which is often not possible. A new set of models~\cite{BigVAR} which treats exogenous variables endogenously allows forecasters to not only forecast the target, but additional explanatory variables. Forecasting exogenous variables works by treating all the variables as targets, making them endogenous to the model. A multivariate forecasting task is created to hold the data and meta-information for the model. The function \code{makeMultiForecastRegrTask()} has the same arguments as \code{makeForecastRegrTask()} with one exception. The \code{target} argument can contain either a single target variable, multiple target variables, or \code{All} which treats all variables endogenously.
+
+\singlespacing
+<<multivar_task1, cache = TRUE, eval = TRUE, message=FALSE, warning=FALSE>>=
+
+mfcregr.univar.task = makeMultiForecastRegrTask(id = "bigvar",
+                                         data = eu.train,
+                                         target = "FTSE",
+                                         frequency = 365L)
+mfcregr.univar.task
+@
+\doublespacing
+
+Like \code{makeForecastRegrTask()}, \code{mfcregr.univar.task} has the standard output, but notice now that there are three features. Alternatively, \code{mfcregr.all.task} contains multiple target values with no features. The difference between each of these multivariate tasks is that \code{mfcregr.univar.task} will act similar to \code{makeForecastRegrTask()}, giving a univariate forecast output and evaluating the forecasts with univariate measures. When the target is \code{All} or multiple variables the trained model will forecast and output all series and use a multivariate form of the univariate measures. Though the results appear different, both of these tasks will still forecast all of the underlying series, which allows the model take in exogenous variables and treat them endogenously for n-step ahead forecasts that use additional explanatory variables.
+
+\singlespacing
+<<multivar_task2, cache = TRUE, eval = TRUE, message=FALSE, warning=FALSE>>=
+mfcregr.all.task = makeMultiForecastRegrTask(id = "bigvar",
+                                      data = eu.train,
+                                      target = "all",
+                                      frequency = 365L)
+mfcregr.all.task
+@
+\doublespacing
+
+\section{Building and a forecast learner}
+\label{seq:build}
+\subsection{Univariate Forecasting}
+\label{seq:buildAndTuneUni}
+
+The \code{makeLearner()} function provides a structured model building framework to the several forecasting models currently implemented in \pkg{mlr}. This section will build Exponential smoothing state space model (ETS)~\cite{etsMod} to show how to create forecasting models in \pkg{mlr}.
+
+ETS is one of the most popular forecasting models and is available in \pkg{mlr} along with models such as BATS, ARIMA, TBATS, several GARCH variants, and autoregressive neural networks. Section~\ref{sec:preprocAR} uses preprocessing features to develop arbitrary supervised machine learning models in the context of forecasting. An ETS model is created by calling the function \code{makeLearner()}, supplying the class of learner, order, the number of steps to forecast, and any additional arguments to be passed to \code{ets()} from \pkg{forecast}. 
+
+%\footnote{Possible arguments to the model can be found by using \code{getLearnerParamSet("fcregr.tbats")}.}
+\singlespacing
+<<makeEts, cache = TRUE>>=
+ets.mod =makeLearner("fcregr.ets",
+                     damped = TRUE,
+                     h = 35, predict.type = "response")
+
+@
+\doublespacing
+
+The \code{predict.type} for forecasting models can either be a point estimate (\code{response}) or point estimates with quantiles of confidence intervals (\code{quantile}). The function \code{train()} is called, supplying both the learner and task to build the final model over the full data set.
+
+\singlespace
+<<makeetsTrain, cache = TRUE>>=
+train.ets = train(learner = ets.mod, task = climate.task )
+@
+\doublespace
+
+The forecasts are generated by calling \code{predict()}. Optionally, supplying the test data as an additional argument will allow \pkg{mlr} to return an object containing meta information for the forecasts along with the prediction and test data in columns \code{truth} and \code{response}, respectively.
+
+\singlespacing
+<<makeEtsTrain2, cache = TRUE>>=
+predict.ets = predict(train.ets, newdata = m4.test)
+predict.ets
+@
+\doublespacing
+
+The model is evaluated by calling \code{performance()} with the Mean Absolute Scaled Error (MASE)~\cite{Hyndman2006} measure.
+
+\singlespacing
+<<measureetsTrain, cache = TRUE>>=
+performance(predict.ets, measure = mase,
+            task = climate.task)
+
+@
+\doublespacing
+MASE has favorable properties for calculating forecast errors relative to measures such as root mean squared error or median relative absolute error. Arguably one of the most important features, it is very interpretable. Let $y_t$ and $\tilde{y}_t$ be the target variable and prediction at time $t$ with $\epsilon_t = y_t - \tilde{y}_t$ being the forecast error. Then MASE is calculated as
+
+\begin{equation}
+\text{MASE} = \frac{\sum_{t=1}^T |\epsilon_t|}{\frac{T}{T-1} \sum_{t=2}^T |y_{t, \text{insample}} - y_{t-1, \text{insample}}|}
+\end{equation}
+
+Where the denominator is the one step ahead naive forecast from the training data. When the numerator is equal to the denominator, the model performs as well as a simple naive forecast method. A MASE score greater than one indicates the model is performing worse than the naive forecasting method while scores less than one mean the model is performing better than the naive forecasting method.
+
+The scale invariance of MASE means that it is independent of the scale of the data and allows model comparison across data sets. The scale invariance of MASE has made it a favorite for comparing the accuracy of forecast methods~\cite{noteMase} across datasets. While scaling in measures such as the Mean Absolute Percentage Error can cause poor behavior as the target variable goes to zero, MASE does not become skewed when the target variable approaches zero. Having good properties near zero allows the use of MASE in situations in which zeros occur frequently or zero is not meaningful such as predicting temperature. The model does a successful job of catching the downward trend, but figure~\ref{fig:ets_train} shows the downward bias of the model which does not allow it to account for the sharp upward swings.
+
+\singlespacing
+<<ploetsTrain, cache = TRUE, echo = FALSE, results='hide'>>=
+pred.ets.dat = zoo(predict.ets$data, order.by = index(m4.test))
+col_names = colnames(pred.ets.dat)
+# Set a color scheme:
+tsRainbow <- rainbow(ncol(pred.ets.dat))
+# Plot the overlayed series
+dev.copy(png,'plot_ets_train.png')
+plot(x = pred.ets.dat, ylab = "Temperature", main = "Forecast of Temperature",
+col = tsRainbow, screens = 1)
+# Set a legend in the upper left hand corner to match color to return series
+legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
+       col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+dev.off()
+@
+
+\doublespacing
+
+\begin{figure}[h!]
+\includegraphics[width=\linewidth]{plot_ets_train.png}
+\centering
+\caption{The forecasts response from ets against the testing weather data}
+\label{fig:ets_train}
+\end{figure}
+
+\subsection{Updating Forecast Models}
+
+ Forecasting models are designed to predict the next $n$ values that will appear in the series. Without a way to update the model with new data, the model will have to be completely rebuilt for each new set of forecasts. The \code{updateModel} function allows forecasters to avoid the expensive cost of retraining the entire forecasting model. The function updates the model with new points which then allows for updated forecasts. 
+
+\singlespacing
+<<etsupdate, cache = TRUE>>=
+update.ets = updateModel(train.ets, climate.task,
+                           newdata = m4.test)
+predict(update.ets, task = climate.task)
+@
+\doublespacing
+
+All univariate forecasting models have access to the \code{updateModel()} function. Future versions of \code{mlr} will also include online machine learning models that can be updated as new data comes in.
+
+\subsection{Multivariate Forecasting}
+\label{seq:buildAndTuneMulti}
+
+Multivariate forecasting in \pkg{mlr} uses the package \pkg{BigVAR}~\cite{bigvarpaper}. \pkg{BigVAR} allows for estimation of high dimensional time series through methods such as structured Lasso penalties to find the optimal autoregressive structures through cross-sections and time.
+
+\singlespacing
+<<bigVarmod, cache=TRUE, message=FALSE, error=FALSE>>=
+bigvar.mod = makeLearner("mfcregr.BigVAR",p = 25,
+                         struct = "SparseLag",
+                         gran = c(50, 60),h = 35, n.ahead = 35)
+@
+
+This section uses the multivariate forecast task which has all variables as targets, while section~\ref{sub:multiStack} performs the single target multivariate forecast with a stacked predictor. Multiforecast regressions operate the same as other supervised models, supplying a task and learner to \code{train()}.
+
+<<bigVartrain, cache=TRUE, message=FALSE, error=FALSE, eval=FALSE>>=
+train.bigvar = train(learner = bigvar.mod,
+                     task = mfcregr.all.task )
+train.bigvar
+@
+
+<<bigVartrainreal, cache=TRUE, message=FALSE, error=FALSE, echo = FALSE>>=
+load("./bigvarmod.RData")
+train.bigvar
+
+@
+\doublespacing
+
+Predictions for \code{multiForecast} methods have a similar output to \code{multiclass} methods, returning multiple truth and response variables. For multivariate forecasts, a multivariate version of MASE takes the mean of each MASE score for the individual variables as the performance measure.
+
+\begin{equation}
+\text{MultiMASE} = \frac{\sum_{i=1}^m \text{MASE}_i}{m}
+\end{equation}
+
+given that $m$ is the number of variables that are forecast.
+
+\singlespacing
+<<bigVarpred, cache=TRUE, message=FALSE, error=FALSE>>=
+predict.bigvar = predict(train.bigvar, newdata = eu.test)
+predict.bigvar
+performance(predict.bigvar, multivar.mase,
+            task = mfcregr.all.task)
+@
+
+<<bigVarplot, cache=TRUE, message=FALSE, error=FALSE, echo = FALSE, results='hide'>>=
+pred.bigvar.dat = zoo(predict.bigvar$data, order.by = index(eu.test))
+col_names = colnames(pred.bigvar.dat)
+# Set a color scheme:
+tsRainbow <- rainbow(ncol(pred.bigvar.dat))
+# Plot the overlayed series
+dev.copy(png,'plot_bigvar_train.png')
+par(xpd = TRUE)
+plot(x = pred.bigvar.dat, ylab = "Price", main = "Forecast of Prices for Euro Stock Indices",
+col = tsRainbow, screens = 1)
+# Set a legend in the upper left hand corner to match color to return series
+legend("topleft", legend = col_names[1:4],lty = 1, bty = "n",
+       col = tsRainbow[1:4], text.width = 500000, cex = .8,
+       ncol = 4)
+legend("bottomleft", legend = col_names[5:8],lty = 1, bty = "n",
+       col = tsRainbow[5:8], text.width = 600000, cex=.8,
+       ncol = 4)
+dev.off()
+
+@
+\begin{figure}[H]
+\includegraphics[width=\linewidth]{plot_bigvar_train.png}
+\centering
+\caption{The forecasts response from BigVAR against the true test stock index data}
+\label{fig:bigvar_train}
+\end{figure}
+\doublespacing
+
+\section{Resampling with Time}
+\label{sec:resamp}
+
+
+While ETS is one of the most popular time series models, the order selection process of the ARIMA errors and whether to include a damped or multiplicative trend or select the model type can be a subjective process that makes finding the best model difficult for users. One of the first proposals for automated forecasting methods comes from~\cite{hannanOrder} for automatic order selection of ARIMA models. Innovations are obtained by fitting high order autoregressive models to the data and then computing the likelihood of potential models through a series of standard regression. Proprietary algorithms from software such as \proglang{Forecast Pro}~\cite{forecastpro} and \proglang{Autobox}~\cite{reillyautobox} are well known and have performed to high standards in competitions such as the M3 forecasting competition~\cite{Makridakis2000451}. One of the most prominent R packages for automated forecasting is \pkg{forecast}~\cite{HyndForecast} which contains several methods for automated forecasting including exponential smoothing based methods and step-wise algorithms for finding optimal ARIMA models.
+
+Forecasting in \pkg{mlr} takes a machine learning approach, creating a parameter set for a given model and using an optimization method to search over the parameter space. The forecasting extension of \pkg{mlr} includes growing and fixed window resampling schemes to train over the possible models. Resampling schemes such as cross-validation and bootstrapping are common in machine learning for dealing with the bias-variance tradeoff~\cite{Friedman1997}~\cite{rodriguezkfold}. When there is a time component to the data, windowing schemes are useful in allowing a valid resampling scheme while still accounting for the time properties of the series. Figure~\ref{fig:caret} gives an example of fixed and growing window cross validation. Let $h$ be a forecast horizon where the index of the starting and end points of the training data are $\text{start}_i$ and $\text{end}_i$ where $i$ is the index for each window. The first model will train on data between $\text{start}_i$ and $\text{end}_i$ while testing on data indexed between $\text{end}_i + h$. After each iteration the window slides forward $h$ steps such that $\text{end}_{i+1} = \text{end}_{i} + h$. In the case of the fixed window, the starting index will also shift such that $\text{start}_{i+1} = \text{start}_{i} + h$ while $\text{start}_i$ will remain constant in the growing window case. This type of growing and fixed window resampling~\cite{hyndman2014forecasting} is now available in the \code{resampling()} function of \pkg{mlr}. 
+
+\begin{figure}[h!]
+  \includegraphics[width=\linewidth]{windowing_pic_caret}
+  \centering
+  \caption{Resampling with a window scheme as exampled by \pkg{caret}~\cite{windowingcaret}. The top graphs are fixed window cross validation while the bottom graphs are growing window cross validation. }
+  \label{fig:caret}
+\end{figure}
+
+To create a windowing resampling process, the function \code{makeResampleDesc()} uses the resampling type, the horizon, initial window, the length of the series, and an optional argument to skip over some windows for the sake of time.
+
+\singlespacing
+<<makeResampleDesc, cache = TRUE>>=
+resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
+                          initial.window = .7,
+                          size = nrow(getTaskData(climate.task)),
+                          skip = .025)
+resampDesc
+@
+\doublespacing
+
+The methods in package \pkg{ParamHelpers}~\cite{paramhelper} allow \pkg{mlr} to have a simple and rigorous interface for creating parameter spaces. There are several types of tools to help search the parameter space including grid search, random search~\cite{Bergstra}, iterated F-racing~\cite{irace}, Simulated Annealing, and CMA-ES~\cite{cmaes}  to search the parameter space for the most optimal model.
+
+
+\singlespacing                                      
+<<makeparSet, eval = FALSE>>=
+parSet = makeParamSet(
+  makeDiscreteParam("model", values = c("ANN", "MNN", "ZNN",
+                                        "AAN", "MAN", "ZAN",
+                                        "AMN", "MMN", "ZMN",
+                                        "AZN", "MZN", "ZZN",
+                                        "ANA", "MNA", "ZNA",
+                                        "AAA", "MAA", "ZAA",
+                                        "AMA", "MMA", "ZMA",
+                                        "AZA")),
+  makeLogicalParam("damped"),
+  makeLogicalParam("additive.only"),
+  makeLogicalParam("biasadj"),
+  makeDiscreteParam("opt.crit", values = c("mase", "amse",
+                                           "sigma", "mae",
+                                           "lik")),
+  makeDiscreteParam("ic", values = c("aicc", "aic", "bic")),
+  makeLogicalParam("allow.multiplicative.trend")
+)
+
+#Specify tune by grid estimation
+ctrl = makeTuneControlIrace(maxExperiments = 500L)
+@
+\doublespacing
+
+Using \code{tuneParams()} the model is tuned for the task using the specified resampling scheme, parameter set, tune control, and measure. The \code{trafo} argument allows the tuning process to take values on a separate scale than the one described. In the tuning scheme above, trafo will search over $1, 4, 9, ..., 81$, and $100$ values of \code{max.p}, selecting the model with the optimal \code{max.p}. This tuning task uses MASE~\cite{Hyndman2006} as a measure of performance \footnote{Models with a seasonal difference $> 0$ may be favorably biased as \pkg{mlr}'s forecasting extension uses the non-seasonal MASE score}. The model is also tuned in parallel using the package \pkg{parallelMap}~\cite{parallel} for it's built in compatibility with \pkg{mlr}.
+
+\singlespacing
+<<tuneparam2, eval = FALSE>>=
+#Tune the ETS Model
+library("parallelMap")
+parallelStart("multicore", 8)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+etsTune = tuneParams(makeLearner("fcregr.ets", h = 35),
+                       task = climate.task,
+                       resampling = resampDesc, par.set = parSet,
+                       control = ctrl, measures = mase)
+parallelStop()
+# Output the test mean of best model
+etsTune$y
+
+@
+
+<<tuneparam, eval = FALSE, echo = FALSE>>=
+save(etsTune, file = "./etsTuneFeb10th.RData")
+@
+
+<<loadTuneETS,echo = FALSE, cache = TRUE>>=
+load("./etsTuneFeb10th.RData")
+etsTune$y
+
+@
+
+\doublespace
+
+Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyzed\footnote{Because of constraints which do not allow logical types in the partial dependence plots, the below code takes all of the logical parameters from \code{etsTune} and coerces them to be numeric} graphically using partial dependence plots~\cite{partialdep}.
+
+\singlespace
+
+<<loadTuneets2, cache = TRUE, echo = FALSE, results = 'hide'>>=
+# Make data for dependence plot 
+ets.hyp = generateHyperParsEffectData(etsTune, partial.dep = TRUE,
+                                        trafo = TRUE)
+# Cleaning
+ets.hyp$data <- ets.hyp$data[complete.cases(ets.hyp$data),]
+ets.hyp$data[,2] <- as.integer(ets.hyp$data[,2])
+ets.hyp$data[,3] <- as.integer(ets.hyp$data[,3])
+ets.hyp$data[,4] <- as.integer(ets.hyp$data[,4])
+ets.hyp$data[,7] <- as.integer(ets.hyp$data[,7])
+
+@
+
+<<loadTuneets3, eval = FALSE, warning=FALSE>>=
+# Making graphics
+plotHyperParsEffect(ets.hyp, x= "model", y = "mase.test.mean",
+                     plot.type = "line", 
+                     partial.dep.learn = "regr.randomForest")
+plotHyperParsEffect(ets.hyp, x= "damped", y = "mase.test.mean",
+                     plot.type = "scatter",
+                     partial.dep.learn = "regr.randomForest")
+
+@
+
+<<loadTuneetsReal, cache = TRUE, echo = FALSE, message=FALSE, error=FALSE, warning=FALSE>>=
+library(ggthemes)
+q = plotHyperParsEffect(ets.hyp, x= "model", y = "mase.test.mean",
+                     plot.type = "line", 
+                     partial.dep.learn = "regr.randomForest")
+
+q = q + theme_tufte()
+ggsave("./ets_dep_plot_max_q.png",q)
+p = plotHyperParsEffect(ets.hyp, x= "damped", y = "mase.test.mean",
+                     plot.type = "scatter",
+                     partial.dep.learn = "regr.randomForest")
+
+p = p + theme_tufte()
+ggsave("./ets_dep_plot_max_p.png",p)
+@
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{ets_dep_plot_max_q.png}
+  \label{fig:etsDep1}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{ets_dep_plot_max_p.png}
+  \label{fig:etsDep2}
+\end{minipage}
+\caption{The figure on the left shows the dependence of the MASE score averaged over all windows for each value of the maximum number of moving average terms $q$. The figure on the right does the same, but for the seasonal autoregressive term $P$}
+\end{figure}
+
+\doublespacing
+
+For this model the optimal number of moving average coefficients is two while the best number of seasonal autoregressive terms is four. The best model's parameters are extracted using \code{setHyperPars()} and passed to \code{train()} to go over the full data set.
+
+\singlespacing
+<<bestmodtrain, cache = TRUE>>=
+# Train best model over full data
+ets.lrn = setHyperPars(makeLearner("fcregr.ets",
+                                     h = 35),
+                         par.vals = etsTune$x)
+ets.final = train(ets.lrn, climate.task)
+@
+\doublespacing
+
+A prediction object is created by passing the model and optional testing data to \code{predict()} while the performance of the model can be evaluated by calling \code{performance()}.
+
+\singlespacing
+<<predbestArima, cache = TRUE>>=
+climate.pred = predict(ets.final, newdata = m4.test)
+performance(climate.pred, measures = mase, task = climate.task)
+
+@
+\doublespacing
+
+For comparison, ETS is run in \pkg{forecast} with it's base parameters
+
+\singlespacing
+<<forecastETS, cache = TRUE, message=FALSE, warning=FALSE>>=
+
+forecast.train.ets = forecast::ets(ts(m4.train,frequency = 7))
+forecast.ets = forecast::forecast(forecast.train.ets,h=35)
+# Calculate MASE
+forecast::accuracy(forecast.ets, x= ts(m4.test, end = c(93,2),
+                                  frequency = 7))[2,6,drop=FALSE]
+@
+\doublespacing
+
+Now it is possible to see the clear benefit of the forecast extension to \pkg{mlr}. While \pkg{forecast} does some automatic tuning, this model would still require extensive manual testing in an attempt to find the best model. The automation of the modeling process allows for a faster and better solution with minimal work.
+
+<<plotetsTune, cache = TRUE, echo = FALSE, results='hide'>>=
+
+pred.ets.dat = zoo(cbind(climate.pred$data, as.data.frame(forecast.ets$mean)), order.by = index(m4.test))
+colnames(pred.ets.dat)[3] <- "forecast_ets" 
+col_names = colnames(pred.ets.dat)
+dev.copy(png,'plot_ets_vs_forecast.png')
+# Set a color scheme:
+tsRainbow <- rainbow(ncol(pred.ets.dat))
+# Plot the overlayed series
+plot(x = pred.ets.dat, ylab = "Temperature", main = "Tuned Forecast of Temperature",
+col = tsRainbow, screens = 1)
+# Set a legend in the upper left hand corner to match color to return series
+legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
+       col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+dev.off()
+@
+
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{plot_ets_vs_forecast.png}
+  \centering
+  \caption{The ETS model forecasts tuned in \pkg{mlr} Vs. the base ETS model in forecast}
+  \label{fig:mlrvsforecast}
+\end{figure}
+
+To this author's knowledge, this is the first package in \proglang{R} that allows for automated tuning and training of GARCH models~\cite{garchengels}. It is possible to pass and train multiple types of GARCH models while also tuning the model's respective parameters. In this example \code{predict.type = "quantile"} is used to estimate confidence intervals for the forecast.
+
+\singlespacing
+<<tuneGarch, eval = FALSE>>=
+# Make a tuning grid for GARCH
+par_set = makeParamSet(
+  makeDiscreteParam(id = "model",
+                    values = c("sGARCH", "csGARCH")),
+  makeIntegerVectorParam(id = "garchOrder", len = 2L,
+                         lower = c(1,1), upper = c(4,4)),
+  makeIntegerVectorParam(id = "armaOrder", len = 2L,
+                         lower = c(5,1), upper = c(8,3)),
+  makeLogicalParam(id = "include.mean"),
+  makeLogicalParam(id = "archm"),
+  makeDiscreteParam(id = "distribution.model",
+                    values = c("norm","std","jsu")),
+  makeDiscreteParam(id = "stationarity", c(0,1)),
+  makeDiscreteParam(id = "fixed.se", c(0,1)),
+  makeDiscreteParam(id = "solver", values = "nloptr")
+)
+
+#Specify tune by F-racing
+ctrl = makeTuneControlIrace(maxExperiments = 400L)
+
+#Tuning in parallel
+parallelStart("multicore",8)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+garchTune = tuneParams(makeLearner("fcregr.garch", n.ahead= 35),
+                    task = climate.task, resampling = resampDesc,
+                    par.set = par_set, control = ctrl,
+                    measures = mase)
+parallelStop()
+garchTune$y
+@
+\doublespacing
+
+<<saveGarchTune, cache = FALSE, eval = FALSE, echo = FALSE>>=
+save(garchTune, file = "./garchTune.RData")
+@
+
+<<loadGarchTune, cache = TRUE, echo = FALSE>>=
+load("./garchTune.RData")
+garchTune$y
+
+@
+
+
+Because the partial dependence plots are still in development they do not work well with \code{makeNumericVectorParams()} such as \code{garchOrder} and \code{armaOrder}. Instead of looking at each $p,q$ individually, the sum of the coefficient values for the $p,q$ order of the GARCH component and the ARMA component are plotted.
+
+\singlespacing
+<<makeHyperPlot,cache=TRUE, echo = FALSE>>=
+# Make hyper parameter data
+garch.hyperpar = generateHyperParsEffectData(garchTune,
+                    trafo = TRUE, include.diagnostics = FALSE,
+                    partial.dep = TRUE)
+garch.hyperpar$data = garch.hyperpar$data[
+                      -which(garch.hyperpar$data$mase.test.mean ==
+                            max(garch.hyperpar$data$mase.test.mean)),]
+garch.hyperpar$data$garchOrder1 = garch.hyperpar$data$garchOrder1 +
+                                  garch.hyperpar$data$garchOrder2
+garch.hyperpar$data$garchOrder2 = NULL
+colnames(garch.hyperpar$data)[2] = "garchOrder"
+garch.hyperpar$data$armaOrder1 = garch.hyperpar$data$armaOrder1 +
+                                 garch.hyperpar$data$armaOrder2
+garch.hyperpar$data$armaOrder2 = NULL
+colnames(garch.hyperpar$data)[3] = "armaOrder"
+garch.hyperpar$data$include.mean = as.numeric(garch.hyperpar$data$include.mean)
+garch.hyperpar$data$archm = as.numeric(garch.hyperpar$data$archm)
+@
+
+<<garchdepPlot2, eval = FALSE>>=
+plotHyperParsEffect(garch.hyperpar, x= "garchOrder",
+                    y = "mase.test.mean", plot.type = "line",
+                     partial.dep.learn = "regr.randomForest")
+plotHyperParsEffect(garch.hyperpar, x= "armaOrder",
+                    y = "mase.test.mean", plot.type = "line",
+                     partial.dep.learn = "regr.randomForest")
+@
+
+<<garchdepPlot3, echo=FALSE, cache = TRUE, results='hide', message=FALSE>>=
+p = plotHyperParsEffect(garch.hyperpar, x= "garchOrder", y = "mase.test.mean",
+                     plot.type = "line",
+                     partial.dep.learn = "regr.randomForest")
+p = p + theme_tufte()
+ggsave("garch_order.png",p)
+q = plotHyperParsEffect(garch.hyperpar, x= "armaOrder", y = "mase.test.mean",
+                     plot.type = "line",
+                     partial.dep.learn = "regr.randomForest")
+q = q + theme_tufte()
+ggsave("arma_order.png",q)
+@
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{garch_order.png}
+  \label{fig:test1}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{arma_order.png}
+  \label{fig:test2}
+\end{minipage}
+\caption{The figure on the left shows the dependence of the MASE score averaged over all windows for each value of the sum of $p,q$ terms in the GARCH order. The figure on the right does the same, but for the ARMA order}
+\label{fig:depGarch}
+\end{figure}
+\doublespacing
+
+The dependence plots in figure~\ref{fig:depGarch} show that for both the GARCH and ARMA orders, as the order increases, the MASE score decreases. A better model would arise if the order of both the GARCH and ARMA components increased up to twenty or more. The forecasting extension of \pkg{mlr} treats forecasting models with quantiles the same as any other learner post-tuning. The best hyperparameters are taken, and a final model trains over the entire dataset.
+
+\singlespacing
+<<trainGarchTuned1, cache = TRUE>>=
+# Get the hyperpars and train the best GARCH model
+tuned.lrn = setHyperPars(makeLearner("fcregr.garch",
+                                     predict.type = "quantile",
+                                     n.ahead = 35),
+                         par.vals = garchTune$x)
+garch.train = train(tuned.lrn, climate.task)
+@
+
+
+<<trainGarchTuned3, cache = TRUE>>=
+climate.pred = predict(garch.train, newdata = m4.test)
+climate.pred
+@
+
+<<trainGarchTuned4, cache = TRUE, echo = FALSE, results='hide'>>=
+nn <- ncol(climate.pred$data)
+dev.copy(png,'plot_garch_final.png')
+par(xpd = TRUE)
+matplot(climate.pred$data,type="l", xlab = "Forecast Horizon", ylab = "Temperature",
+        main = "Forecast of Daily Climate Data\n With Confidence Intervals")
+legend(-.5,-5.2, c("Truth", "Prediction", "Lower ConfInt .05", "Upper ConfInt .95"),
+       col=seq_len(nn),cex=0.8,fill=seq_len(nn), ncol = 4, bty = "n")
+dev.off()
+@
+
+\begin{figure}[h!]
+\includegraphics[width=\linewidth]{plot_garch_final.png}
+\centering
+\caption{The GARCH model with confidence intervals}
+\label{fig:garch_final}
+\end{figure}
+
+<<tunegarch5, cache =TRUE>>=
+performance(climate.pred, measures = mase, task = climate.task)
+
+@
+
+\doublespacing
+
+The simple model here performs relatively well. Figure~\ref{fig:garch_final} shows that the extremes of the test data are almost all within the given bounds of the 95\% confidence interval. With a bit more tuning and perhaps an alternative control for the search over the parameter space, the reader would easily find a better model. While GARCH is excellent at catching the conditional heteroscedasticity of the past series, the ETS model performs well in its ability to catch additive and multiplicative factors of the time series. Section~\ref{sub:stackedUnivar} goes over how to stack forecasting models to make use of the best characteristics of each.
+
+
+\section{Forecasting with Machine Learning Models}
+\label{sec:preproc}
+\subsection{Forecasting with Regression Tasks}
+\label{sec:preprocAR}
+\doublespacing
+The forecasting extension of \pkg{mlr} includes a preprocessing function that allows forecasting with supervised machine learning models. The function \code{createLagDiffFeatures()} allows for $AR(p,d)$ structures to be embedded in machine learning models.
+\singlespacing
+<<lagdiffproc, cache= TRUE>>=
+climate.regr.task = makeRegrTask(id = "lagged gbm",
+                                 data = as.data.frame(m4.train),
+                                 target = "target_var")
+climate.task.lag = createLagDiffFeatures(climate.regr.task,
+                                         lag = 1L:165L,
+                                         difference = 0L,
+                                         na.pad=FALSE)
+climate.task.lag
+@
+\doublespacing
+
+Notice that \code{createLagDiffFeatures()} returns a new task with the lagged variables as the new features. Once the lagged task is created the model is trained or tuned like any other. The example below uses a gradient boosting machine~\cite{gbm} learner with an $AR(p,q)$ data generating process to forecast the M4 temperature data for 35 periods.
+
+\singlespacing
+<<laggbm, cache= TRUE, eval = FALSE>>=
+# make Gradient Boosting Machine
+lag.gbm = makeLearner("regr.gbm",
+                      par.vals = list(n.trees = 20000,
+                                      shrinkage = .000001,
+                                      interaction.depth = 16,
+                                      bag.fraction = .7))
+gbm.train = train(lag.gbm, climate.task.lag)
+
+@
+
+<<saverealgbm, cache = FALSE, echo = FALSE, eval = FALSE>>=
+save(gbm.train, file = "./gbm_train.RData")
+@
+
+
+<<realgbm, cache = TRUE, echo = FALSE>>=
+load("./gbm_train.RData")
+@
+\doublespacing
+
+The \code{forecast()} function allows machine learning models to do arbitrary n-step ahead forecasts. Let the one step ahead forecast be defined by
+
+\begin{equation}
+\hat{y}_{t+1} = \sum_{i=1}^p \left(\rho_i \Delta_d y_{i} + \epsilon_{i}\right)
+\end{equation}
+where $\rho_i$ is the autoregressive parameter of order $p$ and $d$ is the lag of the difference operator $\Delta$. Then the $n$-step ahead forecast is defined as
+
+\begin{equation}
+\hat{y}_{t+n} = \sum_{i=t+1}^{n} \left(\rho_i \Delta_d \hat{y}_{i} + \epsilon_{i}\right)
+\end{equation}
+
+
+\singlespacing
+<<forecastgbm2, eval = FALSE>>=
+# Forecast with GBM
+gbm.forecast = forecast(gbm.train, h = 35L,
+                        newdata = as.data.frame(m4.test))
+@
+
+
+<<forecastgbm3a, eval = FALSE, echo = FALSE>>=
+save(gbm.forecast, file = "./gbm_forecast.RData")
+@
+
+
+<<forecastgbm3, cache = TRUE, echo = FALSE>>=
+load("./gbm_forecast.RData")
+@
+
+<<forecastgbm4, cache = TRUE>>=
+gbm.forecast
+performance(pred = gbm.forecast,
+            measures = mase,
+            task = climate.regr.task)
+
+@
+
+\doublespacing
+
+<<forecastgbmplot, cache = TRUE, echo = FALSE, results='hide'>>=
+pred.gbm.dat = zoo(gbm.forecast$data, order.by = index(m4.test))
+col_names = colnames(pred.gbm.dat)
+# Set a color scheme:
+tsRainbow <- rainbow(ncol(pred.gbm.dat))
+# Plot the overlayed series
+dev.copy(png,'plot_gbm_fore.png')
+plot(x = pred.gbm.dat, ylab = "Temperature", main = "GBM Forecast of Temperature",
+col = tsRainbow, screens = 1)
+# Set a legend in the upper left hand corner to match color to return series
+legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
+       col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+dev.off()
+@
+
+\begin{figure}[h!]
+\includegraphics[width=.8\linewidth]{plot_gbm_fore.png}
+\centering
+\caption{The forecast of the M4 data using a Gradient Boosting Machine}
+\label{fig:gbm_final}
+\end{figure}
+
+The forecasts in figure~\ref{fig:gbm_final} show the forecasts from the $AR(p,d)$ gradient boosting machine model. The autoregressive data generating process works for all regression machine learners which will allow researchers an easy haven for testing out machine learning models in the context of forecasting
+
+%model placing the highest value on the most recent data. When the latest data is much more important than other past periods, this creates a weak decay scheme which causes forecasts to drift quickly to an average value.
+
+\subsection{Forecasting with Classification Tasks}
+
+Forecasting for binary or multiclass outcomes~\cite{forecastBinary} is a common problem in the real world. However, research in this area of forecasting only started picking up speed in the last decade~\cite{ElliotBinary}. The forecasting extension of \pkg{mlr} gives econometricians the ability to take all the classification models in \pkg{mlr} and apply them to the forecasting context. For developing trading strategies, there are usually a discrete set of choices such as to buy, sell, or hold onto a stock. The forecasting extension of \pkg{mlr} allows for classification models that forecast these options~\cite{foreclassif}. The code below implements a simple buy, sell, or hold trading strategy. If the stock goes up by 3\% over a 12 day period then a buy is executed, down 2\% a sell is executed, and otherwise no action will be taken. The probability of the best action being a buy, sell, or hold for the next 10 days of trades are then forecast using the adaboost algorithm~\cite{adaboost}. Data is divided into 1838 periods for training and 10 periods for evaluating the forecasting.
+
+\singlespacing
+<<classlag, cache = TRUE>>=
+# Make Trading Strategy
+DAX = EuStockMarkets$DAX/lag(EuStockMarkets$DAX,
+                             12,na.pad = FALSE) - 1
+trade.strat = ifelse(DAX > .03, "Buy",
+                     ifelse(DAX < -.02, "Sell", "Hold"))
+euro.classif.data = data.frame(trade.strat = trade.strat ,
+                               row.names = index(trade.strat))
+euro.classif.train = euro.classif.data[1:1838,,drop = FALSE]
+euro.classif.test  = euro.classif.data[1839:1848,,drop = FALSE]
+@
+
+<<classifPlot, cache = TRUE, results='hide',echo=FALSE>>=
+# Plot the overlayed series
+dev.copy(png,'plot_classif_fore.png')
+plot(x = DAX, ylab = "Percent Change in Price", main = "Percent Change in Price over 7 days for DAX")
+abline(h = .03, col = "red")
+abline(h = -.02, col = "blue")
+dev.off()
+@
+
+\begin{figure}[h!]
+\includegraphics[width=\linewidth]{plot_classif_fore.png}
+\centering
+\caption{The percent change in price over a 7 day period for DAX. The top red line represents when a buy will be executed while the bottom blue line represents when a sell will be executed.}
+\label{fig:classif_plot}
+\end{figure}
+
+<<classifTasker1, cache = TRUE>>=
+classif.task = makeClassifTask(data = euro.classif.train,
+                               target = "DAX")
+
+# Make Lagged Task and Learner
+classif.task.lag = createLagDiffFeatures(classif.task,
+                                         lag = 1L:565L,
+                                         na.pad = FALSE)
+classif.learn = makeLearner("classif.boosting", 
+                            mfinal = 250, minsplit = 13,
+                            predict.type = "prob")
+@
+
+<<classlagtrain, eval = FALSE>>=
+classif.train = train(classif.learn, classif.task.lag)
+# Tune threshold
+classif.pred = predict(classif.train, task = classif.task.lag)
+classif.pred.thresh = tuneThreshold(pred = classif.pred,
+                                    measure = multiclass.au1p)
+classif.train$learner$predict.threshold = classif.pred.thresh$th
+# Forecast
+classif.fc = forecast(classif.train, h=10,
+                      newdata = euro.classif.test)
+@
+
+<<classifSave, eval = FALSE, echo = FALSE>>=
+save(classif.train, file = "classif_train.RData")
+save(classif.fc, file = "classif_fc.RData")
+@
+
+<<classlagtrainreal, echo = FALSE, cache = TRUE>>=
+load("./classif_train.RData")
+load("./classif_fc.RData")
+@
+
+<<classifEval, cache=TRUE>>=
+
+classif.fc
+performance(classif.fc)
+@
+\doublespacing
+
+It is obvious that an MMCE of zero should be looked at with incredulousness. It can be seen in figure~\ref{fig:classif_plot} that the last periods before the test data are all below the rule to execute a sell and so the model follows the trend. Further testing is necessary with multiple types of data and models to assess the usefullness of forecasting classification within \pkg{mlr}. With the models and methodologies available in \pkg{mlr}, forecasting binary or multiclass outcomes is now as simple as utilizing any other machine learning model. These tools can allow for further research in areas such as forecasting directions of stock movement~\cite{markClassifStock} and extreme values~\cite{Chen2015UsingEV}. 
+
+\section{Lambert W Transforms}
+\label{sec:lambert}
+Many machine learning and time series models rely on the assumption that the data or errors fit a normal distribution. This assumption becomes precarious when modeling the asymmetric and fat-tailed data of the real world. Lambert $W\times F_X$ transforms are a family of generalized skewed distributions~\cite{LambertGeneral} that have bijective and parametric functions that allow heavy tailed and asymmetric data to appear more Gaussian~\cite{GaussLam}. 
+
+Let $U$ be a continuous random variable with cdf $F_U(u|\beta)$ and pdf $f_U(u|\beta)$ given $\beta$ is a parameter vector. Define a continuous location-scale random variable $X\sim F_X(x|\beta)$. A location-scale skewed Lambert $W\times F_X$ random variable is defined as 
+
+\begin{equation}
+Z = U\exp \left(\frac{\delta}{2} (U^2)\right),\; \delta\ge 0
+\label{eq:hdist}
+\end{equation}
+
+And the heavy-tailed Lambert $W\times F_X$ random variable can be defined as
+
+\begin{equation}
+Z = U\exp\left(\frac{\delta}{2}(U^2)^\alpha\right),\; \delta\ge 0\; \alpha > 0
+\label{eq:hhdist2}
+\end{equation}
+
+Given that $U = (X-\mu_X)/\sigma_X$ where $\mu_X$, $\sigma_X$, $\delta$, and $\alpha$ are the mean and standard deviation of X and the parameters to control skewness and asymmetry , respectively. When $\delta = 0$, equation~\ref{eq:hdist} reduces to a standard normal distribution. Equation~\ref{eq:hhdist2} is the general form of Tukey's $h$ distribution~\cite{ghdist} and the basis for Morgenthaler and Tukey's~\cite{hhdist} skewed, heavy tailed family of $hh$ random variables.
+
+\begin{equation}
+  Z = \begin{cases}
+               U\exp\left(\frac{\delta_l}{2}(U^2)^\alpha_l\right),\; \delta_l \ge 0\; \alpha_l > 0\\
+               U\exp\left(\frac{\delta_r}{2}(U^2)^\alpha_r\right),\; \delta_r \ge 0 \alpha_r > 0
+            \end{cases}
+\end{equation}
+
+\singlespacing
+<<lambertWplots, cache= TRUE, message=FALSE, echo = FALSE, results='hide', eval = FALSE>>=
+# Univariate example
+library(LambertW)
+set.seed(20)
+y1 <- rcauchy(n = 500)
+out <- Gaussianize(y1, return.tau.mat = TRUE, type = "h" )
+x1 <- get_input(y1, c(out$tau.mat[, 1]))  # same as out$input
+par(mfrow = c(2,1))
+plot(y1, ylab = "", main = "Cauchy Samples")
+plot(x1, ylab = "", main =  "Cauchy Samples With Lambert 'h' Transform")
+dev.copy(png, "./cauchy_h_train.png")
+dev.off()
+@
+
+\begin{figure}[H]
+\includegraphics[width=\linewidth]{cauchy_h_train.png}
+\centering
+\caption{The top plot are samples from the cauchy distribution where the bottom plot represents the cauchy transformed variables with the $hh$ distribution to make the samples approximately normal.}
+\label{fig:cauchy_lambert}
+\end{figure}
+
+\doublespacing
+
+The function \code{Gaussianize()} is available in the package \pkg{LambertW} and has been made into a preprocessing function in \pkg{mlr}. Instead of calling \code{makeLearner()} to create a model, the function \code{makePreprocWrapperLambert()} can be used to create the model. This means the pre-processing scheme integrates into the model. Integrating the pre-processing scheme directly on top of the model stops users from accidentally biasing their models due to improperly applying pre-processing. For instance, if a user demeaned their entire data set and then split the data into train and test subsets, the training data will be biased because demeaning the model over both the train and test data gives the training data information about the mean of the test data. What should happen instead is, the user first splits the data into training and test data, and then demeans each separately. Similarly, cross-validation follows the above scheme whereby each cross-validation will be biased if the user demeaned all of the training data at one time. It is very easy for a user, who assumes they have made a good faith attempt not to bias their model, to receive overconfident results. Embedding the pre-processing itself allows \pkg{mlr} to overcome this. 
+
+The pre-processing scheme is broken down into two main components. One function to gather and estimate necessary parameters in the training data, then a function to apply the learned preprocess over the training and test data. In the context of Lambert $W\times F_X$ transforms, the estimates for the parameters of the $h$, $hh$, or $s$ distribution that gaussianizes the data comes from the training data. Then the estimated parameter values from the training set are used during prediction to gaussianize the test observations. The code below follows this methodology, creating the model with Lambert preprocessing, training the model, and then performing prediction. The result to the user appears the same, but there is a significant reduction of bias in the background.
+
+\singlespacing
+<<lambertWtransform, cache = TRUE>>=
+# Make a Learner with Lambert WxF() learner 
+lamb.lrn = makePreprocWrapperLambert("classif.lda", type = "s")
+lamb.lrn
+lamb.trn = train(lamb.lrn,iris.task, subset = 1:120)
+lamb.pred = predict(lamb.trn, iris.task, subset = 121:150)
+
+# Do the non-LW version
+trn = train(makeLearner("classif.lda"),iris.task, subset = 1:120)
+pred = predict(trn, iris.task, subset = 121:150)
+performance(lamb.pred)
+performance(pred)
+@
+\doublespacing
+
+\section{Stacking Forecasting Learners}
+\label{sec:stackfore}
+Stacking is a form of ensemble learning~\cite{ensembleOverview} in which a learning algorithm trains on the predictions of several other learning algorithms. Let $\tilde{y}_{i,m}$ be the prediction at time $i$ of model $m$. Given an aggregation function $\phi$, a stacked forecast learner~\cite{combineForecast} is represented as
+
+\begin{equation}
+\tilde{y}_{i+1} = \phi(\tilde{y}_{i+1,1}, \tilde{y}_{i+1,2},\dots, \tilde{y}_{i+1,m}, \sum_{j=1}^m \epsilon_{i+1,j})
+\label{eq:ensemble}
+\end{equation}
+
+For a simple $\phi()$ such as the ensemble average, equation~\ref{eq:ensemble} becomes
+
+\begin{equation}
+\tilde{y}_{i+1} = \frac{\tilde{y}_{i+1,1} + \tilde{y}_{i+1,2} +\dots + \tilde{y}_{i+1,m}}{m}
+\label{eq:ensembleAverage}
+\end{equation}
+
+In section~\ref{sub:stackedUnivar} the simple model average is used to show how stacked forecast models are built in \pkg{mlr}. Section~\ref{sub:multiStack} does a more advanced method of ensemble averaging involving the forecast of endogenous variables.
+
+\subsection{Stacking Univariate Learners}
+\label{sub:stackedUnivar}
+
+For this example, the models TBATS, GARCH, and ARFIMA~\cite{arfima} are stacked together and averaged on the climate task data. A resample description is made, and the function \code{makeLearners()} is used to start many learners at the same time.
+
+\singlespacing
+<<ensembleModel1, cache = TRUE, eval = TRUE>>=
+
+resamp.sub = makeResampleDesc("GrowingCV",
+                          horizon = 35L,
+                          initial.window = .80,
+                          size = nrow(getTaskData(climate.task)),
+                          skip = .012
+                          )
+lrns = makeLearners(c("fcregr.tbats","fcregr.garch",
+                      "fcregr.arfima"))
+@
+\doublespacing
+
+The function \code{makeStackedLearner()} takes the initialized learners and sets the meta information for stacking. This method uses simple model averaging such as equation~\ref{eq:ensembleAverage}, however a super learner~\cite{Wolpert92stackedgeneralization} can be used here, where $\phi()$ becomes another machine learning model.
+
+\singlespacing
+<<ensembleModel2, cache = TRUE, eval = TRUE>>=
+stack.forecast = makeStackedLearner(base.learners = lrns,
+                       predict.type = "response",
+                       method = "average")
+@
+\doublespacing
+
+Each of the stacked learners are tuned over the cross product of all model parameters. This leads to a change in design where, given that some models may have the same argument names, the full name of the model is placed before the argument. Training over the cross-product of the model parameters leads to longer code, but it allows for a more honest perspective of how each model interacts in the stack.
+
+\singlespacing
+<<ensembleModel3, cache = TRUE, eval = FALSE>>=
+
+# Simple param set for tuning sub learners
+ps = makeParamSet(
+  makeDiscreteParam("fcregr.tbats.h", values = 35),
+  makeDiscreteParam("fcregr.garch.n.ahead", values = 35),
+  makeDiscreteParam("fcregr.arfima.h", values = 35),
+  makeDiscreteParam("fcregr.arfima.estim", values = "ls"),
+  makeDiscreteParam(id = "fcregr.garch.model",
+                    values = c("csGARCH")),
+  makeIntegerVectorParam(id = "fcregr.garch.garchOrder",
+                         len = 2L, lower = c(1),
+                         upper = c(6)),
+  makeIntegerVectorParam(id = "fcregr.garch.armaOrder",
+                         len = 2L, lower = c(1),
+                         upper = c(4)),
+  makeDiscreteParam(id = "fcregr.garch.distribution.model",
+                    values = c("norm","std","jsu")),
+  makeDiscreteParam("fcregr.tbats.test",
+                    values = c("kpss","adf","pp")),
+  makeIntegerParam("fcregr.tbats.max.P", lower = 0, upper = 3),
+  makeIntegerParam("fcregr.tbats.max.Q", lower = 0, upper = 2)
+)
+ctrl = makeTuneControlIrace(maxExperiments = 400L)
+## tuning
+library(parallelMap)
+parallelStart("multicore",8)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+fore.tune = tuneParams(stack.forecast, climate.task,
+                       resampling = resamp.sub,
+                       par.set = ps, control = ctrl,
+                       measures = mase, show.info = FALSE)
+parallelStop()
+@
+
+<<ensembleModelReal, cache = TRUE, echo = FALSE, eval = FALSE>>=
+save(fore.tune,file="fore_tune.RData")
+@
+
+
+<<ensembleModelReal2, cache = TRUE, echo = FALSE>>=
+load("fore_tune.RData")
+@
+\doublespacing
+
+The rest of the modeling process flows in a way similar to the standard training and predicting schema. The function \code{setHyperPars2()} takes the best parameter models from the tuning process and assigns it to the final model to train over all of the data. Training and prediction operate in the same manner as univariate forecasters.
+
+\singlespacing
+<<ensembleModel4, cache = TRUE, eval = TRUE>>=
+
+# get hyper params
+stack.forecast.tune  = setHyperPars2(stack.forecast,fore.tune$x)
+# Train the final best models and predict
+stack.forecast.mod = train(stack.forecast.tune,climate.task)
+stack.forecast.pred = predict(stack.forecast.mod,
+                              newdata = m4.test)
+stack.forecast.pred
+performance(stack.forecast.pred,mase,climate.task)  
+@
+
+<<ensembleForecast5, cache = TRUE, echo = FALSE, results = 'hide'>>=
+col_names = colnames(stack.forecast.pred$data)
+# Set a color scheme:
+tsRainbow <- rainbow(ncol(stack.forecast.pred$data))
+dev.copy(png,"ensemble_pred.png")
+# Plot the overlayed series
+plot(x = as.zoo(stack.forecast.pred$data), ylab = "Price", main = "Forecast for Staked Univerate Learners",
+col = tsRainbow, screens = 1)
+# Set a legend in the upper left hand corner to match color to return series
+legend(x = "bottomleft", legend = col_names,lty = 1, bty = "n",
+       col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+dev.off()
+@
+
+\begin{figure}[h!]
+\includegraphics[width=\linewidth]{ensemble_pred.png}
+\centering
+\caption{The forecast of the M4 data using the Stacked ARFIMA, TBATS, and GARCH model}
+\label{fig:ensemble_final}
+\end{figure}
+
+\doublespacing
+
+\subsection{Multivariate Stacked Learner}
+\label{sub:multiStack}
+
+When there is a single target variable with multiple predictors, stacked learning can be used with multivariate forecasters to forecast the predictors and have a machine learning model train over the forecasts of all variables. For this, equation~\ref{eq:ensemble} can be modified to include forecasts of other predictors $x_{i,k}$ where $k$ is the index for each predictor variable
+
+\begin{equation}
+\tilde{y}_{i+1} = \phi(\tilde{y}_{i+1,1},\dots, \tilde{y}_{i+1,m}, \tilde{x}_{i+1,1},\dots, \tilde{x}_{i+1,k}, \sum_{j=1}^m \epsilon_{i+1,j}, \sum_{j=1}^k \epsilon_{i+1,j})
+\label{eq:ensembleMulti}
+\end{equation}
+
+In the example below, a boosted glm~\cite{glmboost} is used as a super learner over a sparse lag multivariate VAR model to forecast FTSE prices. A resampling strategy is creating for both the underlying stacked learner and the super learner.
+
+\singlespacing
+<<multiforecast1, cache = TRUE>>=
+multfore.task = makeMultiForecastRegrTask(id = "bigvar",
+                                          data = eu.train,
+                                          target = "FTSE")
+
+resamp.sub = makeResampleDesc("GrowingCV",
+                          horizon = 32L,
+                          initial.window = .90,
+                          size = nrow(getTaskData(multfore.task)),
+                          skip = .03)
+
+resamp.super = makeResampleDesc("CV", iters = 3)
+@
+\doublespacing
+
+In \code{makeStackedLearner()}, the super learner argument contains the boosted glm model.
+
+\singlespacing
+<<multiforecast2, eval = FALSE>>=
+base = c("mfcregr.BigVAR")
+lrns = lapply(base, makeLearner)
+lrns = lapply(lrns, setPredictType, "response")
+lrns[[1]]$par.vals$verbose = FALSE
+lrns[[1]]$par.vals$recursive = FALSE
+lrns[[1]]$par.vals$struct = "SparseLag"
+
+
+stack.forecast = makeStackedLearner(base.learners = lrns,
+                    predict.type = "response",
+                    super.learner = makeLearner("regr.glmboost",
+                                            family = "Laplace"),
+                    method = "growing.cv",
+                    resampling = resamp.sub)
+@
+\doublespacing
+
+Just as with univariate stacked forecasting models, a parameter set is created for the multivariate VAR model and tuning is done with \code{tuneParams()}.
+
+\singlespacing
+<<multiforecast3, eval = FALSE>>=
+ps = makeParamSet(
+  makeDiscreteParam("mfcregr.BigVAR.p", values = 9),
+  makeNumericVectorParam("mfcregr.BigVAR.gran", len = 2L,
+                         lower = 30, upper = 40),
+  makeDiscreteParam("mfcregr.BigVAR.h", values = 32),
+  makeDiscreteParam("mfcregr.BigVAR.n.ahead", values = 32)
+)
+  ## tuning
+library(parallelMap)
+parallelStart("multicore",8)
+configureMlr(on.learner.error = "warn")
+set.seed(1234)
+multfore.tune = tuneParams(stack.forecast, multfore.task,
+                    resampling = resamp.sub, par.set = ps,
+                    control = makeTuneControlGrid(resolution = 5L),
+                    measures = mase, show.info = FALSE)
+parallelStop()
+@
+
+<<multiforecastaa, eval = FALSE, echo = FALSE>>=
+save(multfore.tune,file = "./multfore_tune.RData")
+@
+
+<<multiforecast4, cache=TRUE, echo = FALSE>>=
+load("multfore_tune.RData")
+@
+\doublespacing
+
+Once the tuning is complete, \code{setHyperPar2()} extracts the final model parameters. Since the multivariate model is used to produce forecasts for a single variable, univariate MASE is used instead of the multivariate form of MASE.
+
+\singlespacing
+<<multiforecast5, eval = FALSE>>=
+stack.forecast.f  = setHyperPars2(stack.forecast,
+                                  multfore.tune$x)
+multfore.train = train(stack.forecast.f,multfore.task)
+@
+
+<<multiforecast7, cache=TRUE, echo = FALSE>>=
+load("multfore_train.RData")
+@
+
+<<multiforecast8, cache=TRUE, echo = FALSE>>=
+load("multfore_train.RData")
+@
+
+<<multiforecast9, cache=TRUE>>=
+
+multfore.pred = predict(multfore.train,
+                  newdata = as.data.frame(eu.test))
+multfore.pred
+performance(multfore.pred, mase, task = multfore.task)
+@
+\doublespacing
+<<multiForecast10, cache = TRUE, echo = FALSE, results='hide'>>=
+col_names = colnames(multfore.pred$data)
+# Set a color scheme:
+tsRainbow <- rainbow(ncol(multfore.pred$data))
+# Plot the overlayed series
+dev.copy(png,"multfore_tune.png")
+plot(x = as.zoo(multfore.pred$data), ylab = "Price",
+     main = "Daily Forecast of European Stock Indices",
+col = tsRainbow, screens = 1)
+# Set a legend in the upper left hand corner to match color to return series
+legend(x = "topleft", legend = col_names,lty = 1, bty = "n",
+       col = tsRainbow, text.width = 8,  cex=1, pt.cex = 1)
+dev.off()
+@
+
+
+\begin{figure}[h!]
+\includegraphics[width=\linewidth]{multfore_tune.png}
+\centering
+\caption{The forecast of the DAX Stock Index against the true values}
+\label{fig:multfore_tune}
+\end{figure}
+
+This model only predicts a mean value for all forecasts, which may be due to poor performance of the stacked learner on top of the forecasts. The super learner trains on the forecasts of all the windowed cross-validations, though it does not understand that the forecast in period one is going to be better than the forecast at period $n$. Future research will create methods to correct this bias while training the super learner such as regressive weights over the forecast period, giving more weight to the most recent forecast.
+
+\section{Conclusion}
+
+The results of this paper show that creating a unified interface for forecasting models in \proglang{R} allows for better models through an automated methodology of resampling, preprocessing, model selection, stacking tuning, and training. Building on the broad range of forecasting packages available in \proglang{R}, automating tasks such as windowing cross-validation and model selection allow applied forecasters to spend less time dealing with the bureaucracy of modeling and more time testing new models. New methods such as multivariate stacked learners, Lambert W transforms, and the ability to create arbitrary AR($p,d$) machine learning models allows researchers to experiment with new ideas easily. While the example models here are not perfect, this was mostly due to time. It will be easy for researchers to beat the models created in this paper.
+
+Future research based on this package would involve tuning these models to see how useful they are in the real world. The classification forecast learners made available in the forecasting extension of \pkg{mlr} is a growing field, and with the ease of making models in \pkg{mlr}, new research in this area can progress while being easily replicable. Updates to this package will include more multivariate and univariate forecast learners as well as new methods to stack models such as Bayesian averaging~\cite{bayesianAverage}.
+
+%\small
+\bibliography{thesisbib}{}
+\bibliographystyle{plain}
+
+\end{document}

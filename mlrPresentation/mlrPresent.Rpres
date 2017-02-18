@@ -67,12 +67,14 @@ Creating a Forecasting Task
 - Task: Keeps data and meta-data for ML task
 
 ```{r aaplTask, cache = TRUE}
+
 library(mlr)
 aaplTask <- makeForecastRegrTask(
   id = "Forecast aapl Closing Price",
   data = aaplXtsTrain,
   target  = "Close",
   frequency = 7L)
+
 ```
 
 Creating a Forecasting Task: Info
@@ -106,7 +108,7 @@ garch.mod
 Train a Forecast Learner
 ======================================================
 
-```{r trainArima, cache = TRUE,eval = FALSE}
+```{r trainArima, cache = TRUE,eval = TRUE}
 garch.train <- train(garch.mod, aaplTask)
 garch.train
 ```
@@ -181,24 +183,53 @@ Tuning Over Parameter Space
 ===========================================
 
 ```{r tuneSpace, eval = FALSE}
+garch.mod = makeLearner("fcregr.garch", n.ahead = 35, solver = 'hybrid')
 library("parallelMap")
 parallelStart("multicore",3)
 configureMlr(on.learner.error = "warn")
 set.seed(1234)
-
-garch.mod = makeLearner("fcregr.garch", n.ahead = 35, solver = 'hybrid')
 garch.res = tuneParams(garch.mod, task = aaplTask,
                  resampling = resampDesc, par.set = par_set,
                  control = ctrl,
                  measures = mase)
 parallelStop()
+garch.res
+```
 
-garch.final = setHyperPars(makeLearner("fcregr.garch", n.ahead = 35, solver = 'nloptr', solver.control = list(maxeval = 200000, solver = 10), predict.type = "quantile"),par.vals = garch.res$x)
+```{r garchTuneReal, eval = TRUE, echo = FALSE}
+
+load("./garch_tune_mod.RData")
+garch.res
+```
+
+Tuning Over Parameter Space: Final Model
+===========================================
+
+```{r garchTrain, eval = TRUE}
+library(mlr)
+garch.final = setHyperPars(makeLearner("fcregr.garch", n.ahead = 35, solver = 'nloptr',
+                                       solver.control = list(maxeval = 200000, solver = 10),
+                                       predict.type = "quantile"),par.vals = garch.res$x)
 
 garch.train = train(garch.final, aaplTask)
 garch.pred = predict(garch.train, newdata = aaplXtsTest)
 performance(garch.pred, measures = mase, task = aaplTask)
-matplot(garch.pred$data, type = "l")
+```
+
+Tuning Over Parameter Space: Plot Forecast
+===========================================
+
+```{r garchPred, eval = TRUE, echo = FALSE, fig.align= "center"}
+library(xts)
+plot(as.zoo(garch.pred$data), screens = 1, xlab = "Time", ylab = "Price", main = "Forecast Vs. Real",
+     col = 1:3)
+legend(x = "topleft", legend = colnames(garch.pred$data),lty = 1, bty = "n",
+       col = 1:3, text.width = 8,  cex=1.2, pt.cex = 1)
+
+```
+
+
+```{r garchPredPlot, eval = FALSE, echo = FALSE}
 save(garch.res, file ="./garch_tune_mod.RData")
 ```
 
@@ -206,116 +237,111 @@ save(garch.res, file ="./garch_tune_mod.RData")
 Using an ML Model
 =========================================
 
-```{r mlLagTask, cache = TRUE, eval = FALSE}
+```{r mlLagTask, cache = TRUE, eval = TRUE}
 aaplRegTask <- makeRegrTask(
   id = "Forecast aapl Closing Price",
   data = as.data.frame(aaplXtsTrain,rownames = index(aaplXtsTrain)),
   target  = "Close")
 
-aaplLagTask = createLagDiffFeatures(aaplRegTask, lag = 1L:665L, difference = 1L, na.pad = FALSE)
+aaplLagTask = createLagDiffFeatures(aaplRegTask, lag = 1L:600L, difference = 0L, na.pad = FALSE)
+```
+
+Using an ML Model
+=========================================
+
+```{r mlLagTaskResample, cache = TRUE, eval = TRUE}
+resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
+                              initial.window = .9,
+                              size = nrow(getTaskData(aaplLagTask)),
+                              skip = .01)
+resampDesc
+
+```
+
+Using an ML Model
+=========================================
 
 
+```{r xgboostParams, cache = TRUE, eval = FALSE, echo = TRUE}
 ## Trying Support Vector Machines
-xg_learner <- makeLearner("regr.xgboost")
-
+xg_learner <- makeLearner("regr.xgboost", booster = "gbtree", nthread = 4)
+getLearnerParamSet("regr.xgboost")
 xg_param_set <- makeParamSet(
-  makeDiscreteParam(id = "booster", values = c("gbtree")),
-  makeNumericLearnerParam(id = "eta", lower = 0, upper = 1),
-  makeNumericLearnerParam(id = "gamma", lower = 0, upper = 100),
-  makeIntegerLearnerParam(id = "max_depth",  lower = 100L, upper = 300),
-  makeIntegerLearnerParam(id = "nrounds", lower = 100L, upper = 300)
+  makeNumericParam(id = "eta", lower = 0.1, upper = 1),
+  makeNumericParam(id = "gamma", lower = 0, upper = 100),
+  makeNumericParam(id = "lambda", lower = 0, upper = 100),
+  makeNumericParam(id = "lambda_bias", lower = 0, upper = 100),
+  makeNumericParam(id = "alpha", lower = 0, upper = 100),
+    makeNumericParam(id = "base_score", lower = 80, upper = 120),
+  makeNumericParam(id = "colsample_bytree", lower = 0.01, upper = 1),
+  makeNumericParam(id = "colsample_bylevel", lower = 0.01, upper = 1),
+    makeNumericParam(id = "subsample", lower = 0.01, upper = 1),
+  makeIntegerParam(id = "max_depth",  lower = 5, upper = 1000),
+  makeIntegerParam(id = "nrounds", lower = 5, upper = 1000),
+  makeIntegerParam(id = "num_parallel_tree", lower = 1, upper = 10)
 )
-# A pretty good model had something like
-# [Tune-x] 1: booster=gbtree; eta=0.248; gamma=61.4; max_depth=425; subsample=0.456;
-# colsample_bytree=0.971; colsample_bylevel=0.612; lambda=18.5; lambda_bias=9.49;
-# alpha=5.62; nrounds=493
+```
 
-ctrl <- makeTuneControlIrace(maxExperiments = 200)
+Using an ML Model
+=========================================
+
+```{r xgboostTasktune, cache = TRUE, eval = FALSE, echo = TRUE}
+ctrl <- makeTuneControlIrace(maxExperiments = 400)
 
 library("parallelMap")
-parallelStart("multicore",3)
+parallelStart("socket",2, level = "mlr.resample")
 configureMlr(on.learner.error = "warn")
 tune_mod <- tuneParams(learner = xg_learner, task = aaplLagTask,
                        measures = mase, resampling = resampDesc,
                        par.set = xg_param_set, control = ctrl )
 parallelStop()
+tune_mod
+```
 
+```{r xgboostTaskTuneReal, cache = TRUE, eval = TRUE, echo = FALSE}
+load("./gbm_tune_mod.RData")
+tune_mod
+```
+
+Using an ML Model
+=========================================
+
+
+```{r xgboostTasktrain, cache = TRUE, eval = FALSE, echo = TRUE}
+xg_learner <- makeLearner("regr.xgboost", booster = "gbtree", nthread = 7)
 gbm_final = setHyperPars(xg_learner, par.vals = tune_mod$x)
 gbm_train <- train(gbm_final, aaplLagTask)
+```
+
+
+```{r xgboostTaskTrainReal, cache = TRUE, eval = TRUE, echo = FALSE}
+load("./gbm_train_mod.RData")
+```
+
+
+Using an ML Model
+=========================================
+
+```{r xgboostTaskfc, cache = TRUE, eval = TRUE, echo = TRUE}
 gbm_fore = forecast(gbm_train, h = 35, newdata = aaplXtsTest)
 performance(gbm_fore, mase, task = aaplLagTask)
+```
+
+
+Using an ML Model
+=========================================
+
+
+```{r xgboostTaskfcPlot, cache = TRUE, eval = TRUE, echo = FALSE, fig.show= TRUE, fig.align="center"}
+gbm_fore_dat = xts(gbm_fore$data, order.by = index(aaplXtsTest))
+plot(as.zoo(gbm_fore_dat), screens = 1, xlab = "Time", ylab = "Price", main = "Forecast Vs. Real",
+     col = 1:2)
+legend(x = "topleft", legend = colnames(gbm_fore_dat),lty = 1, bty = "n",
+       col = 1:2, text.width = 8,  cex=1.5, pt.cex = 1)
+```
+
+```{r xgboostTasktrainReal, cache = TRUE, eval = FALSE, echo = FALSE}
 save(tune_mod, file = "./gbm_tune_mod.RData")
+save(gbm_train, file = "./gbm_train_mod.RData")
 ```
 
-Make Resampling Scheme
-===========================================
-
-```{r resampleSchemegbm, cache = TRUE}
-resampDesc = makeResampleDesc("GrowingCV", horizon = 35L,
-                               initialWindow = 7000L,
-                               size = nrow(getTaskData(aaplLagTask)), skip = 35L)
-```
-
-Make Tuning Set and Search Scheme
-===========================================
-```{r gbmtuning}
-library(mlr)
-ps = makeParamSet(
-  makeDiscreteParam("distribution", values = c("gaussian","laplace", "tdist")),
-  makeIntegerParam("n.trees", lower = 1, upper = 10, trafo = function(x) x * 1000),
-  makeIntegerParam("interaction.depth", lower = 1, upper = 5, trafo = function(x) x * 5),
-  makeNumericParam("shrinkage", lower = 1E-5, upper = 1E-2)
-)
-ctrl = makeTuneControlIrace(maxExperiments = 200L)
-```
-Tuning GBM Model
-===========================================
-
-```{r tuneSpacegbm, cache = TRUE}
-library("parallelMap")
-parallelStartSocket(3)
-configureMlr(on.learner.error = "warn")
-set.seed(1234)
-res = tuneParams("regr.gbm", task = aaplLagTask, resampling = resampDesc,
-                 par.set = ps, control = ctrl, measures = mse)
-parallelStop()
-
-```
-
-Predict with ML Model
-======================================================
-```{r mlPred, cache = TRUE}
-testp <- predict(gbmMod, newdata = aaplLagTest)
-performance(testp, mase, aaplLagTask)
-```
-
-Plot Prediction
-===========================================
-```{r mlPredictGraph, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = FALSE}
-testXts <- xts(testp$data, as.POSIXlt(rownames(testp$data)))
-testZoo <- as.zoo(testXts)
-tsRainbow <- rainbow(ncol(testZoo))
-plot(x = testZoo, ylab = "Closing Price", main = "Prediction Vs. Real",
-col = tsRainbow, screens = 1)
-```
-
-
-Make Forecast
-===========================================
-
-```{r mlforecast, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = TRUE}
-library(lubridate)
-aaplLagFore = createLagDiffFeatures(aaplXts, lag = 0L:65L, na.pad = FALSE, return.nonlag = FALSE)
-aaplLagFore = aaplLagFore[I(nrow(aaplLagFore) - 35L):nrow(aaplLagFore),]
-colnames(aaplLagFore)[1:66] = colnames(aaplLagTrain)[2:67]
-forep = predict(gbmMod, newdata = aaplLagFore)
-```
-
-Plot Forecast
-===========================================
-
-```{r mlforecastPlot, cache = TRUE, fig.align='center', fig.height= 8, fig.width= 10, echo = FALSE}
-testXts = xts(forep$data, as.POSIXlt(rownames(forep$data)) + days(53))
-testZoo = as.zoo(testXts)
-plot(x = testZoo, ylab = "Closing Price", main = "Forecast of aapl Closing Stock Price")
-```
