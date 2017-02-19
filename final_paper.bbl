@@ -1,0 +1,290 @@
+\begin{thebibliography}{10}
+
+\bibitem{cmaes}
+{\em {CMA-ES: A Function Value Free Second Order Optimization Method}}, Paris,
+  France, 2014.
+
+\bibitem{adaboost}
+Esteban Alfaro, Mat\'ias G\'amez, and Noelia Garc\'ia.
+\newblock {adabag}: An {R} package for classification with boosting and
+  bagging.
+\newblock {\em Journal of Statistical Software}, 54(2):1--35, 2013.
+
+\bibitem{MurphymeteoForecast}
+Robert L.~Winkler Allan H.~Murphy.
+\newblock Probability forecasting in meterology.
+\newblock {\em Journal of the American Statistical Association},
+  79(387):489--500, 1984.
+
+\bibitem{m4comp}
+Souhaib BenTaieb.
+\newblock {\em M4comp: Data from the M4 Time Series Forecasting Competition},
+  2016.
+\newblock R package version 0.0.1.
+
+\bibitem{Bergstra}
+James Bergstra and Yoshua Bengio.
+\newblock Random search for hyper-parameter optimization.
+\newblock {\em J. Mach. Learn. Res.}, 13(1):281--305, February 2012.
+
+\bibitem{parallel}
+Bernd Bischl and Michel Lang.
+\newblock {\em parallelMap: Unified Interface to Parallelization Back-Ends},
+  2015.
+\newblock R package version 1.3.
+
+\bibitem{paramhelper}
+Bernd Bischl, Michel Lang, Jakob Bossek, Daniel Horn, Jakob Richter, and Pascal
+  Kerschke.
+\newblock {\em ParamHelpers: Helpers for Parameters in Black-Box Optimization,
+  Tuning and Machine Learning}, 2016.
+\newblock R package version 1.9.
+
+\bibitem{mlr}
+Bernd Bischl, Michel Lang, Jakob Richter, Jakob Bossek, Leonard Judt, Tobias
+  Kuehn, Erich Studerus, and Lars Kotthoff.
+\newblock {\em mlr: Machine Learning in R}, 2015.
+\newblock R package version 2.7.
+
+\bibitem{glmboost}
+Peter Buehlmann and Torsten Hothorn.
+\newblock Boosting algorithms: Regularization, prediction and model fitting
+  (with discussion).
+\newblock {\em Statistical Science}, 22(4):477--505, 2007.
+
+\bibitem{Chadefaux01012014}
+Thomas Chadefaux.
+\newblock Early warning signals for war in the news.
+\newblock {\em Journal of Peace Research}, 51(1):5--18, 2014.
+
+\bibitem{Chen2015UsingEV}
+Jiangpeng Chen, Xun Lei, Li~Zhang, and Bin Peng.
+\newblock Using extreme value theory approaches to forecast the probability of
+  outbreak of highly pathogenic influenza in zhejiang, china.
+\newblock In {\em PloS one}, 2015.
+
+\bibitem{combineForecast}
+Robert~T. Clemen.
+\newblock Combining forecasts: A review and annotated bibliography.
+\newblock {\em International Journal of Forecasting}, 5(4):559 -- 583, 1989.
+
+\bibitem{ensembleOverview}
+Thomas~G. Dietterich.
+\newblock Ensemble methods in machine learning.
+\newblock In {\em Proceedings of the First International Workshop on Multiple
+  Classifier Systems}, MCS '00, pages 1--15, London, UK, UK, 2000.
+  Springer-Verlag.
+
+\bibitem{hannanOrder}
+J.~Rissanen E.~J.~Hannan.
+\newblock Recursive estimation of mixed autoregressive-moving average order.
+\newblock {\em Biometrika}, 69(1):81--94, 1982.
+
+\bibitem{ElliotBinary}
+Graham Elliott and Robert~P. Lieli.
+\newblock Predicting binary outcomes.
+\newblock {\em Journal of Econometrics}, 174(1):15 -- 26, 2013.
+
+\bibitem{garchengels}
+Robert~F. Engle.
+\newblock Autoregressive conditional heteroscedasticity with estimates of the
+  variance of united kingdom inflation.
+\newblock {\em Econometrica}, 50(4):987--1007, 1982.
+
+\bibitem{noteMase}
+Philip~Hans Franses.
+\newblock {A note on the Mean Absolute Scaled Error}.
+\newblock {\em International Journal of Forecasting}, 32(1):20--22, 2016.
+
+\bibitem{Friedman1997}
+Jerome~H. Friedman.
+\newblock On bias, variance, 0/1---loss, and the curse-of-dimensionality.
+\newblock {\em Data Mining and Knowledge Discovery}, 1(1):55--77, 1997.
+
+\bibitem{caret}
+Max Kuhn.~Contributions from Jed~Wing, Steve Weston, Andre Williams, Chris
+  Keefer, Allan Engelhardt, Tony Cooper, Zachary Mayer, Brenton Kenkel, the
+  R~Core~Team, Michael Benesty, Reynald Lescarbeau, Andrew Ziem, Luca Scrucca,
+  Yuan Tang, and Can Candan.
+\newblock {\em caret: Classification and Regression Training}, 2015.
+\newblock R package version 6.0-62.
+
+\bibitem{rugarch}
+Alexios Ghalanos.
+\newblock {\em rugarch: Univariate GARCH models.}, 2015.
+\newblock R package version 1.3-6.
+
+\bibitem{LambertGeneral}
+Georg~M. Goerg.
+\newblock Lambert w random variables - a new family of generalized skewed
+  distributions with applications to risk estimation.
+\newblock {\em Annals of Applied Statistics}, 5(3):2197--2230, 2011.
+
+\bibitem{GaussLam}
+Georg~M. Goerg.
+\newblock The lambert way to gaussianize heavy-tailed data with the inverse of
+  tukey's h transformation as a special case.
+\newblock {\em The Scientific World Journal: Special Issue on Probability and
+  Statistics with Applications in Finance and Economics}, 2015(2015):16, 2015.
+
+\bibitem{partialdep}
+Alex Goldstein, Adam Kapelner, Justin Bleich, and Emil Pitkin.
+\newblock Peeking inside the black box: Visualizing statistical learning with
+  plots of individual conditional expectation.
+\newblock {\em Journal of Computational and Graphical Statistics},
+  24(1):44--65, 2015.
+
+\bibitem{Hyndman25}
+Jan G.~De Gooijer and Rob~J. Hyndman.
+\newblock 25 years of time series forecasting.
+\newblock {\em International Journal of Forecasting}, 22(3):443 -- 473, 2006.
+\newblock Twenty five years of forecasting.
+
+\bibitem{arfima}
+C.~W.~J. Granger and Roselyne Joyeux.
+\newblock An introduction to long-memory time series models and fractional
+  differencing.
+\newblock {\em Journal of Time Series Analysis}, 1(1):15--29, 1980.
+
+\bibitem{GRANGER19923}
+Clive~W.J. Granger.
+\newblock Forecasting stock market prices: Lessons for forecasters.
+\newblock {\em International Journal of Forecasting}, 8(1):3 -- 13, 1992.
+
+\bibitem{ghdist}
+David~C. Hoaglin.
+\newblock {\em Summarizing Shape Numerically: The g-and-h Distributions}, pages
+  461--513.
+\newblock John Wiley \& Sons, Inc., 2006.
+
+\bibitem{hyndman2014forecasting}
+R.J. Hyndman and G.~Athanasopoulos.
+\newblock {\em Forecasting: principles and practice:}.
+\newblock OTexts, 2014.
+
+\bibitem{HyndForecast}
+Rob~J Hyndman and Yeasmin Khandakar.
+\newblock Automatic time series forecasting: the forecast package for {R}.
+\newblock {\em Journal of Statistical Software}, 26(3):1--22, 2008.
+
+\bibitem{Hyndman2006}
+Rob~J. Hyndman and Anne~B. Koehler.
+\newblock {Another Look at Measures of Forecast Accuracy}.
+\newblock Monash Econometrics and Business Statistics Working Papers 13/05,
+  Monash University, Department of Econometrics and Business Statistics, May
+  2005.
+
+\bibitem{windowingcaret}
+Max Kuhn.
+\newblock {caret} data splitting methods, 1999.
+
+\bibitem{forecastBinary}
+Kajal Lahiri and Liu Yang.
+\newblock {\em {Forecasting Binary Outcomes}}, volume~2 of {\em Handbook of
+  Economic Forecasting}, chapter~0, pages 1025--1106.
+\newblock Elsevier, May/June 2013.
+
+\bibitem{foreclassif}
+Mark~T. Leung, Hazem Daouk, and An-Sing Chen.
+\newblock Forecasting stock indices: a comparison of classification and level
+  estimation models.
+\newblock {\em International Journal of Forecasting}, 16(2):173 -- 190, 2000.
+
+\bibitem{markClassifStock}
+{Mark T.} Leung, Hazem Daouk, and {An Sing} Chen.
+\newblock Forecasting stock indices: A comparison of classification and level
+  estimation models.
+\newblock {\em International Journal of Forecasting}, 16(2):173--190, 4 2000.
+
+\bibitem{tbats}
+Alysha M.~De Livera, Rob~J. Hyndman, and Ralph~D. Snyder.
+\newblock Forecasting time series with complex seasonal patterns using
+  exponential smoothing.
+\newblock {\em Journal of the American Statistical Association},
+  106(496):1513--1527, 2011.
+
+\bibitem{irace}
+Manuel López-Ibáñez, Jérémie Dubois-Lacoste, Leslie~Pérez Cáceres, Mauro
+  Birattari, and Thomas Stützle.
+\newblock The irace package: Iterated racing for automatic algorithm
+  configuration.
+\newblock {\em Operations Research Perspectives}, 3:43 -- 58, 2016.
+
+\bibitem{Makridakis2000451}
+Spyros Makridakis and Michèle Hibon.
+\newblock The m3-competition: results, conclusions and implications.
+\newblock {\em International Journal of Forecasting}, 16(4):451 -- 476, 2000.
+\newblock The M3- Competition.
+
+\bibitem{hhdist}
+Stephan Morgenthaler and John~W. Tukey.
+\newblock Fitting quantiles: Doubling, hr, hq, and hhh distributions.
+\newblock {\em Journal of Computational and Graphical Statistics},
+  9(1):180--195, 2000.
+
+\bibitem{bigvarpaper}
+W.~{Nicholson}, D.~{Matteson}, and J.~{Bien}.
+\newblock {VARX-L: Structured Regularization for Large Vector Autoregressions
+  with Exogenous Variables}.
+\newblock {\em ArXiv e-prints}, August 2015.
+
+\bibitem{BigVAR}
+Will Nicholson, David Matteson, and Jacob Bien.
+\newblock {\em BigVAR: Dimension Reduction Methods for Multivariate Time
+  Series}, 2016.
+\newblock R package version 1.0.1.
+
+\bibitem{Rbase}
+{R Core Team}.
+\newblock {\em R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria, 2015.
+
+\bibitem{datasets}
+{R Core Team}.
+\newblock {\em R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria, 2016.
+\newblock The data were kindly provided by Erste Bank AG, Vienna, Austria.
+
+\bibitem{bayesianAverage}
+Adrian~E. Raftery, Tilmann Gneiting, Fadoua Balabdaoui, and Michael Polakowski.
+\newblock Using bayesian model averaging to calibrate forecast ensembles.
+\newblock {\em Monthly Weather Review}, 133(5):1155--1174, 2005.
+
+\bibitem{reillyautobox}
+David Reilly.
+\newblock The autobox system.
+\newblock {\em International Journal of Forecasting}, 16(4):531--533, 2000.
+
+\bibitem{forecastpro}
+Goodrich RL.
+\newblock The forecast pro methodology.
+\newblock {\em International Journal of Forecasting}, 16(4):533--535, 2000.
+
+\bibitem{rodriguezkfold}
+J.~D. Rodriguez, A.~Perez, and J.~A. Lozano.
+\newblock Sensitivity analysis of k-fold cross validation in prediction error
+  estimation.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  32(3):569--575, March 2010.
+
+\bibitem{xts}
+Jeffrey~A. Ryan and Joshua~M. Ulrich.
+\newblock {\em xts: eXtensible Time Series}, 2016.
+\newblock R package version 0.10-0.
+
+\bibitem{gbm}
+Greg~Ridgeway with contributions~from others.
+\newblock {\em gbm: Generalized Boosted Regression Models}, 2015.
+\newblock R package version 2.1.1.
+
+\bibitem{Wolpert92stackedgeneralization}
+David~H. Wolpert.
+\newblock Stacked generalization.
+\newblock {\em Neural Networks}, 5:241--259, 1992.
+
+\bibitem{earthquakeYegu}
+Tuncel~M. Yegulalp.
+\newblock Forecasting for largest earthquakes.
+\newblock {\em Management Science}, 21(4):418--421, 1974.
+
+\end{thebibliography}

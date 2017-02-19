@@ -125,7 +125,7 @@ Section~\ref{sec:m4data} describes the time series data used in this paper to sh
 \label{sec:m4data}
 
 \subsection{Univariate Forecasting Data}
-The standard objective in forecasting is, at time period $t$, make predictions of the target variable $y$ for $t+h$ periods into the future. The difference between standard regression tasks and forecasting is that future values of $y$ are mainly predicted by it’s past. This means that forecasting tasks are most suitable when aspects of past patterns will continue on into the future. 
+The standard objective in forecasting is, at time period $t$, make predictions of the target variable $y$ for $t+h$ periods into the future. The difference between standard regression tasks and forecasting is that future values of $y$ are mainly predicted by its past. This means that forecasting tasks are most suitable when aspects of past patterns will continue on into the future. 
 
 Professional forecasters attempt to predict the future of a series based on its past values. Forecasting has applications in a wide range of tasks including forecasting stock prices~\cite{GRANGER19923}, weather patterns~\cite{MurphymeteoForecast}, international conflicts~\cite{Chadefaux01012014}, and earthquakes~\cite{earthquakeYegu}. This paper uses data from the Makridakis competition To evaluate \pkg{mlr}'s forecasting framework as it is well known and provides several types of time series.
 
@@ -223,7 +223,7 @@ library(mlr)
 climate.task = makeForecastRegrTask(id = "M4 Climate Data",
                                  data = m4.train,
                                  target = "target_var",
-                                 frequency = 183L)
+                                 frequency = 7L)
 climate.task
 
 @
@@ -258,7 +258,7 @@ mfcregr.all.task
 @
 \doublespacing
 
-\section{Building and a forecast learner}
+\section{Building a forecast learner}
 \label{seq:build}
 \subsection{Univariate Forecasting}
 \label{seq:buildAndTuneUni}
