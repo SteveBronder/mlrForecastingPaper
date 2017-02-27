@@ -271,6 +271,11 @@ Jeffrey~A. Ryan and Joshua~M. Ulrich.
 \newblock {\em xts: eXtensible Time Series}, 2016.
 \newblock R package version 0.10-0.
 
+\bibitem{prophet}
+Sean Taylor and Ben Letham.
+\newblock {\em prophet: Automatic Forecasting Procedure}, 2017.
+\newblock R package version 0.1.
+
 \bibitem{gbm}
 Greg~Ridgeway with contributions~from others.
 \newblock {\em gbm: Generalized Boosted Regression Models}, 2015.

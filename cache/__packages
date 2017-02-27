@@ -15,3 +15,5 @@ timeDate
 forecast
 devtools
 ggthemes
+Rcpp
+prophet

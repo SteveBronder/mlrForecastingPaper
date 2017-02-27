@@ -115,7 +115,7 @@ The \pkg{mlr} package is a unified interface for machine learning tasks such as 
 
 
 \section{Introduction}
-There has been a rapid development in time series methods over the last 25 years~\cite{Hyndman25} whereby time series models have not only become more common, but more complex. The \proglang{R} language~\cite{Rbase} has several task views that list the extensive amount of packages available for forecasting, time series methods, and empirical finance. While the amount of packages is large, the open source nature of \proglang{R} has left users without a standard syntactic framework whereby individual packages will have a sub-culture of style, syntax, and output. This causes users unnecessary burden, forcing them to memorize and interpret each authors unique style. The \pkg{mlr}~\cite{mlr} package, short for Machine Learning in R, is a meta-package which works to give a strong syntactic framework for the modeling pipeline. By automating and standardizing the tools and methodologies in machine learning, \pkg{mlr} reduces error from the user during the modeling process. 
+There has been a rapid development in time series methods over the last 25 years~\cite{Hyndman25} whereby time series models have not only become more common, but more complex. The \proglang{R} language~\cite{Rbase} has several task views that list the extensive amount of packages available for forecasting, time series methods, and empirical finance. While the amount of packages is large, the open source nature of \proglang{R} has left users without a standard syntactic framework whereby individual packages will have a sub-culture of style, syntax, and output. This causes users unnecessary burden, forcing them to memorize and interpret each authors unique style. The \pkg{mlr}~\cite{mlr} package, short for Machine Learning in R, is a meta-package which works to give a strong syntactic framework for the modeling pipeline. By automating and standardizing the tools and methodologies in machine learning, \pkg{mlr} reduces error from the user during the modeling process.
 
 This extension to \pkg{mlr} is the first \proglang{R} package, to this authors knowledge, which gives a fully standardized framework for rigorously testing and training forecasting models\footnote{It is important to recognize that packages like \pkg{forecast} and \pkg{BigVAR} have some pieces of the training framework such as windowing cross-validation and tuning of some of the hyperparameters}. While there are some time series methods available in \pkg{caret}~\cite{caret}, development of forecasting models in \pkg{caret} is difficult due to computational constraints and design choices within the package. The highly modular structure of \pkg{mlr} makes it the best option for implementing time series methods and models. This paper will show how using \pkg{mlr}'s strong syntactic structure allows for time series packages such as \pkg{forecast}~\cite{HyndForecast}, \pkg{rugarch}~\cite{rugarch}, and \pkg{BigVAR}~\cite{BigVAR} to use machine learning methodologies such as automated parameter tuning, data preprocessing, model blending, cross-validation, performance evaluation, and parallel processing techniques for increasing model predictive power.
 
@@ -125,7 +125,7 @@ Section~\ref{sec:m4data} describes the time series data used in this paper to sh
 \label{sec:m4data}
 
 \subsection{Univariate Forecasting Data}
-The standard objective in forecasting is, at time period $t$, make predictions of the target variable $y$ for $t+h$ periods into the future. The difference between standard regression tasks and forecasting is that future values of $y$ are mainly predicted by its past. This means that forecasting tasks are most suitable when aspects of past patterns will continue on into the future. 
+The standard objective in forecasting is, at time period $t$, make predictions of the target variable $y$ for $t+h$ periods into the future. The difference between standard regression tasks and forecasting is that future values of $y$ are mainly predicted by its past. This means that forecasting tasks are most suitable when aspects of past patterns will continue on into the future.
 
 Professional forecasters attempt to predict the future of a series based on its past values. Forecasting has applications in a wide range of tasks including forecasting stock prices~\cite{GRANGER19923}, weather patterns~\cite{MurphymeteoForecast}, international conflicts~\cite{Chadefaux01012014}, and earthquakes~\cite{earthquakeYegu}. This paper uses data from the Makridakis competition To evaluate \pkg{mlr}'s forecasting framework as it is well known and provides several types of time series.
 
@@ -219,7 +219,6 @@ Figure~\ref{fig:eu_train} shows the plot of each series. Note that each stock in
 \singlespacing
 <<climate_task, eval = TRUE, cache=TRUE, message=FALSE, warning=FALSE>>=
 library(mlr)
-
 climate.task = makeForecastRegrTask(id = "M4 Climate Data",
                                  data = m4.train,
                                  target = "target_var",
@@ -241,7 +240,7 @@ One common problem with forecasting is that it is hard to use additional explana
 mfcregr.univar.task = makeMultiForecastRegrTask(id = "bigvar",
                                          data = eu.train,
                                          target = "FTSE",
-                                         frequency = 365L)
+                                         frequency = 5L)
 mfcregr.univar.task
 @
 \doublespacing
@@ -253,7 +252,7 @@ Like \code{makeForecastRegrTask()}, \code{mfcregr.univar.task} has the standard 
 mfcregr.all.task = makeMultiForecastRegrTask(id = "bigvar",
                                       data = eu.train,
                                       target = "all",
-                                      frequency = 365L)
+                                      frequency = 5L)
 mfcregr.all.task
 @
 \doublespacing
@@ -265,7 +264,7 @@ mfcregr.all.task
 
 The \code{makeLearner()} function provides a structured model building framework to the several forecasting models currently implemented in \pkg{mlr}. This section will build the Trigonometric, exponential smoothing state space model with Box-Cox transformation, ARMA errors, Trend and Seasonal Components (TBATS)~\cite{tbats} to show how to create forecasting models in \pkg{mlr}.
 
-TBATS is one of the most popular forecasting models and is available in \pkg{mlr} along with models such as BATS, ARIMA, ETS, several GARCH variants, and autoregressive neural networks. Section~\ref{sec:preprocAR} uses preprocessing features to develop arbitrary supervised machine learning models in the context of forecasting. A TBATS model is created by calling the function \code{makeLearner()}, supplying the class of learner, order, the number of steps to forecast, and any additional arguments to be passed to \code{tbats()} from \pkg{forecast}. 
+TBATS is one of the most popular forecasting models and is available in \pkg{mlr} along with models such as BATS, ARIMA, ETS, several GARCH variants, and autoregressive neural networks. Section~\ref{sec:preprocAR} uses preprocessing features to develop arbitrary supervised machine learning models in the context of forecasting. A TBATS model is created by calling the function \code{makeLearner()}, supplying the class of learner, order, the number of steps to forecast, and any additional arguments to be passed to \code{tbats()} from \pkg{forecast}.
 
 %\footnote{Possible arguments to the model can be found by using \code{getLearnerParamSet("fcregr.tbats")}.}
 \singlespacing
@@ -303,6 +302,7 @@ The model is evaluated by calling \code{performance()} with the Mean Absolute Sc
 <<measuretbatsTrain, cache = TRUE>>=
 performance(predict.tbats, measure = mase,
             task = climate.task)
+
 @
 \doublespacing
 MASE has favorable properties for calculating forecast errors relative to measures such as root mean squared error or median relative absolute error. Arguably one of the most important features, it is very interpretable. Let $y_t$ and $\tilde{y}_t$ be the target variable and prediction at time $t$ with $\epsilon_t = y_t - \tilde{y}_t$ being the forecast error. Then MASE is calculated as
@@ -342,7 +342,7 @@ dev.off()
 
 \subsection{Updating Forecast Models}
 
- Forecasting models are designed to predict the next $n$ values that will appear in the series. Without a way to update the model with new data, the model will have to be completely rebuilt for each new set of forecasts. The \code{updateModel} function allows forecasters to avoid the expensive cost of retraining the entire forecasting model. The function updates the model with new points which then allows for updated forecasts. 
+ Forecasting models are designed to predict the next $n$ values that will appear in the series. Without a way to update the model with new data, the model will have to be completely rebuilt for each new set of forecasts. The \code{updateModel} function allows forecasters to avoid the expensive cost of retraining the entire forecasting model. The function updates the model with new points which then allows for updated forecasts.
 
 \singlespacing
 <<tbatsupdate, cache = TRUE>>=
@@ -395,6 +395,7 @@ predict.bigvar = predict(train.bigvar, newdata = eu.test)
 predict.bigvar
 performance(predict.bigvar, multivar.mase,
             task = mfcregr.all.task)
+
 @
 
 <<bigVarplot, cache=TRUE, message=FALSE, error=FALSE, echo = FALSE, results='hide'>>=
@@ -431,7 +432,7 @@ dev.off()
 
 While TBATS is one of the most popular time series models, the order selection process of the ARIMA errors and whether to include trend, damped trend, or seasonal periods can be a subjective process that makes finding the best model difficult for users. One of the first proposals for automated forecasting methods comes from~\cite{hannanOrder} for automatic order selection of ARIMA models. Innovations are obtained by fitting high order autoregressive models to the data and then computing the likelihood of potential models through a series of standard regression. Proprietary algorithms from software such as \proglang{Forecast Pro}~\cite{forecastpro} and \proglang{Autobox}~\cite{reillyautobox} are well known and have performed to high standards in competitions such as the M3 forecasting competition~\cite{Makridakis2000451}. One of the most prominent R packages for automated forecasting is \pkg{forecast}~\cite{HyndForecast} which contains several methods for automated forecasting including exponential smoothing based methods and step-wise algorithms for finding optimal ARIMA models.
 
-Forecasting in \pkg{mlr} takes a machine learning approach, creating a parameter set for a given model and using an optimization method to search over the parameter space. The forecasting extension of \pkg{mlr} includes growing and fixed window resampling schemes to train over the possible models. Resampling schemes such as cross-validation and bootstrapping are common in machine learning for dealing with the bias-variance tradeoff~\cite{Friedman1997}~\cite{rodriguezkfold}. When there is a time component to the data, windowing schemes are useful in allowing a valid resampling scheme while still accounting for the time properties of the series. Figure~\ref{fig:caret} gives an example of fixed and growing window cross validation. Let $h$ be a forecast horizon where the index of the starting and end points of the training data are $\text{start}_i$ and $\text{end}_i$ where $i$ is the index for each window. The first model will train on data between $\text{start}_i$ and $\text{end}_i$ while testing on data indexed between $\text{end}_i + h$. After each iteration the window slides forward $h$ steps such that $\text{end}_{i+1} = \text{end}_{i} + h$. In the case of the fixed window, the starting index will also shift such that $\text{start}_{i+1} = \text{start}_{i} + h$ while $\text{start}_i$ will remain constant in the growing window case. This type of growing and fixed window resampling~\cite{hyndman2014forecasting} is now available in the \code{resampling()} function of \pkg{mlr}. 
+Forecasting in \pkg{mlr} takes a machine learning approach, creating a parameter set for a given model and using an optimization method to search over the parameter space. The forecasting extension of \pkg{mlr} includes growing and fixed window resampling schemes to train over the possible models. Resampling schemes such as cross-validation and bootstrapping are common in machine learning for dealing with the bias-variance tradeoff~\cite{Friedman1997}~\cite{rodriguezkfold}. When there is a time component to the data, windowing schemes are useful in allowing a valid resampling scheme while still accounting for the time properties of the series. Figure~\ref{fig:caret} gives an example of fixed and growing window cross validation. Let $h$ be a forecast horizon where the index of the starting and end points of the training data are $\text{start}_i$ and $\text{end}_i$ where $i$ is the index for each window. The first model will train on data between $\text{start}_i$ and $\text{end}_i$ while testing on data indexed between $\text{end}_i + h$. After each iteration the window slides forward $h$ steps such that $\text{end}_{i+1} = \text{end}_{i} + h$. In the case of the fixed window, the starting index will also shift such that $\text{start}_{i+1} = \text{start}_{i} + h$ while $\text{start}_i$ will remain constant in the growing window case. This type of growing and fixed window resampling~\cite{hyndman2014forecasting} is now available in the \code{resampling()} function of \pkg{mlr}.
 
 \begin{figure}[h!]
   \includegraphics[width=\linewidth]{windowing_pic_caret}
@@ -455,7 +456,7 @@ resampDesc
 The methods in package \pkg{ParamHelpers}~\cite{paramhelper} allow \pkg{mlr} to have a simple and rigorous interface for creating parameter spaces. There are several types of tools to help search the parameter space including grid search, random search~\cite{Bergstra}, iterated F-racing~\cite{irace}, Simulated Annealing, and CMA-ES~\cite{cmaes}  to search the parameter space for the most optimal model.
 
 
-\singlespacing                                      
+\singlespacing
 <<makeparSet, eval = FALSE>>=
 parSet = makeParamSet(
            makeLogicalParam(id = "use.box.cox",default = FALSE,
@@ -522,7 +523,7 @@ Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyz
 \singlespace
 
 <<loadTuneTbats2, cache = TRUE, echo = FALSE, results = 'hide'>>=
-# Make data for dependence plot 
+# Make data for dependence plot
 tbats.hyp = generateHyperParsEffectData(tbatsTune, partial.dep = TRUE,
                                         trafo = TRUE)
 # Cleaning
@@ -534,7 +535,7 @@ tbats.hyp$data[,14] = as.numeric(tbats.hyp$data[,14])
 <<loadTuneTbats3, eval = FALSE>>=
 # Making graphics
 plotHyperParsEffect(tbats.hyp, x= "max.q", y = "mase.test.mean",
-                     plot.type = "line", 
+                     plot.type = "line",
                      partial.dep.learn = "regr.randomForest")
 plotHyperParsEffect(tbats.hyp, x= "max.P", y = "mase.test.mean",
                      plot.type = "line",
@@ -545,7 +546,7 @@ plotHyperParsEffect(tbats.hyp, x= "max.P", y = "mase.test.mean",
 <<loadTuneTbatsReal, cache = TRUE, echo = FALSE, message=FALSE, error=FALSE>>=
 library(ggthemes)
 q = plotHyperParsEffect(tbats.hyp, x= "max.q", y = "mase.test.mean",
-                     plot.type = "line", 
+                     plot.type = "line",
                      partial.dep.learn = "regr.randomForest")
 q = q + theme_tufte()
 ggsave("./tbats_dep_plot_max_q.png",q)
@@ -593,6 +594,7 @@ A prediction object is created by passing the model and optional testing data to
 climate.pred = predict(tbats.final, newdata = m4.test)
 performance(climate.pred, measures = mase, task = climate.task)
 
+
 @
 \doublespacing
 
@@ -612,7 +614,7 @@ Now it is possible to see the clear benefit of the forecast extension to \pkg{ml
 
 <<plottbatsTune, cache = TRUE, echo = FALSE, results='hide'>>=
 pred.tbat.dat = zoo(cbind(climate.pred$data, as.data.frame(forecast.tbats$mean)), order.by = index(m4.test))
-colnames(pred.tbat.dat)[3] <- "forecast_tbats" 
+colnames(pred.tbat.dat)[3] <- "forecast_tbats"
 col_names = colnames(pred.tbat.dat)
 dev.copy(png,'plot_tbats_vs_forecast.png')
 # Set a color scheme:
@@ -780,6 +782,7 @@ dev.off()
 
 <<tunegarch5, cache =TRUE>>=
 performance(climate.pred, measures = mase, task = climate.task)
+
 @
 
 \doublespacing
@@ -855,6 +858,7 @@ performance(pred = gbm.forecast,
             measures = mase,
             task = climate.regr.task)
 
+
 @
 
 \doublespacing
@@ -926,7 +930,7 @@ classif.task = makeClassifTask(data = euro.classif.train,
 classif.task.lag = createLagDiffFeatures(classif.task,
                                          lag = 1L:565L,
                                          na.pad = FALSE)
-classif.learn = makeLearner("classif.boosting", 
+classif.learn = makeLearner("classif.boosting",
                             mfinal = 250, minsplit = 13,
                             predict.type = "prob")
 @
@@ -958,16 +962,17 @@ load("./classif_fc.RData")
 
 classif.fc
 performance(classif.fc)
+
 @
 \doublespacing
 
-It is obvious that an MMCE of zero should be looked at with incredulousness. It can be seen in figure~\ref{fig:classif_plot} that the last periods before the test data are all below the rule to execute a sell and so the model follows the trend. Further testing is necessary with multiple types of data and models to assess the usefullness of forecasting classification within \pkg{mlr}. With the models and methodologies available in \pkg{mlr}, forecasting binary or multiclass outcomes is now as simple as utilizing any other machine learning model. These tools can allow for further research in areas such as forecasting directions of stock movement~\cite{markClassifStock} and extreme values~\cite{Chen2015UsingEV}. 
+It is obvious that an MMCE of zero should be looked at with incredulousness. It can be seen in figure~\ref{fig:classif_plot} that the last periods before the test data are all below the rule to execute a sell and so the model follows the trend. Further testing is necessary with multiple types of data and models to assess the usefullness of forecasting classification within \pkg{mlr}. With the models and methodologies available in \pkg{mlr}, forecasting binary or multiclass outcomes is now as simple as utilizing any other machine learning model. These tools can allow for further research in areas such as forecasting directions of stock movement~\cite{markClassifStock} and extreme values~\cite{Chen2015UsingEV}.
 
 \section{Lambert W Transforms}
 \label{sec:lambert}
-Many machine learning and time series models rely on the assumption that the data or errors fit a normal distribution. This assumption becomes precarious when modeling the asymmetric and fat-tailed data of the real world. Lambert $W\times F_X$ transforms are a family of generalized skewed distributions~\cite{LambertGeneral} that have bijective and parametric functions that allow heavy tailed and asymmetric data to appear more Gaussian~\cite{GaussLam}. 
+Many machine learning and time series models rely on the assumption that the data or errors fit a normal distribution. This assumption becomes precarious when modeling the asymmetric and fat-tailed data of the real world. Lambert $W\times F_X$ transforms are a family of generalized skewed distributions~\cite{LambertGeneral} that have bijective and parametric functions that allow heavy tailed and asymmetric data to appear more Gaussian~\cite{GaussLam}.
 
-Let $U$ be a continuous random variable with cdf $F_U(u|\beta)$ and pdf $f_U(u|\beta)$ given $\beta$ is a parameter vector. Define a continuous location-scale random variable $X\sim F_X(x|\beta)$. A location-scale skewed Lambert $W\times F_X$ random variable is defined as 
+Let $U$ be a continuous random variable with cdf $F_U(u|\beta)$ and pdf $f_U(u|\beta)$ given $\beta$ is a parameter vector. Define a continuous location-scale random variable $X\sim F_X(x|\beta)$. A location-scale skewed Lambert $W\times F_X$ random variable is defined as
 
 \begin{equation}
 Z = U\exp \left(\frac{\delta}{2} (U^2)\right),\; \delta\ge 0
@@ -1014,13 +1019,13 @@ dev.off()
 
 \doublespacing
 
-The function \code{Gaussianize()} is available in the package \pkg{LambertW} and has been made into a preprocessing function in \pkg{mlr}. Instead of calling \code{makeLearner()} to create a model, the function \code{makePreprocWrapperLambert()} can be used to create the model. This means the pre-processing scheme integrates into the model. Integrating the pre-processing scheme directly on top of the model stops users from accidentally biasing their models due to improperly applying pre-processing. For instance, if a user demeaned their entire data set and then split the data into train and test subsets, the training data will be biased because demeaning the model over both the train and test data gives the training data information about the mean of the test data. What should happen instead is, the user first splits the data into training and test data, and then demeans each separately. Similarly, cross-validation follows the above scheme whereby each cross-validation will be biased if the user demeaned all of the training data at one time. It is very easy for a user, who assumes they have made a good faith attempt not to bias their model, to receive overconfident results. Embedding the pre-processing itself allows \pkg{mlr} to overcome this. 
+The function \code{Gaussianize()} is available in the package \pkg{LambertW} and has been made into a preprocessing function in \pkg{mlr}. Instead of calling \code{makeLearner()} to create a model, the function \code{makePreprocWrapperLambert()} can be used to create the model. This means the pre-processing scheme integrates into the model. Integrating the pre-processing scheme directly on top of the model stops users from accidentally biasing their models due to improperly applying pre-processing. For instance, if a user demeaned their entire data set and then split the data into train and test subsets, the training data will be biased because demeaning the model over both the train and test data gives the training data information about the mean of the test data. What should happen instead is, the user first splits the data into training and test data, and then demeans each separately. Similarly, cross-validation follows the above scheme whereby each cross-validation will be biased if the user demeaned all of the training data at one time. It is very easy for a user, who assumes they have made a good faith attempt not to bias their model, to receive overconfident results. Embedding the pre-processing itself allows \pkg{mlr} to overcome this.
 
 The pre-processing scheme is broken down into two main components. One function to gather and estimate necessary parameters in the training data, then a function to apply the learned preprocess over the training and test data. In the context of Lambert $W\times F_X$ transforms, the estimates for the parameters of the $h$, $hh$, or $s$ distribution that gaussianizes the data comes from the training data. Then the estimated parameter values from the training set are used during prediction to gaussianize the test observations. The code below follows this methodology, creating the model with Lambert preprocessing, training the model, and then performing prediction. The result to the user appears the same, but there is a significant reduction of bias in the background.
 
 \singlespacing
 <<lambertWtransform, cache = TRUE>>=
-# Make a Learner with Lambert WxF() learner 
+# Make a Learner with Lambert WxF() learner
 lamb.lrn = makePreprocWrapperLambert("classif.lda", type = "s")
 lamb.lrn
 lamb.trn = train(lamb.lrn,iris.task, subset = 1:120)
@@ -1031,6 +1036,7 @@ trn = train(makeLearner("classif.lda"),iris.task, subset = 1:120)
 pred = predict(trn, iris.task, subset = 121:150)
 performance(lamb.pred)
 performance(pred)
+
 @
 \doublespacing
 
@@ -1143,7 +1149,8 @@ stack.forecast.mod = train(stack.forecast.tune,climate.task)
 stack.forecast.pred = predict(stack.forecast.mod,
                               newdata = m4.test)
 stack.forecast.pred
-performance(stack.forecast.pred,mase,climate.task)  
+performance(stack.forecast.pred,mase,climate.task)
+
 @
 
 <<ensembleForecast5, cache = TRUE, echo = FALSE, results = 'hide'>>=
@@ -1267,6 +1274,7 @@ multfore.pred = predict(multfore.train,
                   newdata = as.data.frame(eu.test))
 multfore.pred
 performance(multfore.pred, mase, task = multfore.task)
+
 @
 \doublespacing
 <<multiForecast8, cache = TRUE, echo = FALSE, results='hide'>>=
