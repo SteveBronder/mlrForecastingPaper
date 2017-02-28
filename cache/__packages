@@ -17,3 +17,6 @@ devtools
 ggthemes
 Rcpp
 prophet
+testthat
+checkmate
+Quandl

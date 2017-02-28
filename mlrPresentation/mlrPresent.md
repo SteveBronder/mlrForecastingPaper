@@ -50,13 +50,13 @@ aaplXtsTest  <- aaplXts[9001:9035,]
 Plot of aapl Stock
 =====================================================
 
+![plot of chunk quandlPlotTrain](mlrPresent-figure/quandlPlotTrain-1.png)
 
-
-<img src="training_aapl.png" alt="Drawing" style="width: 90%; height: 90%"/>
 
 ***
 
-<img src="testing_aapl.png" alt="Drawing" style="width: 90%; height: 90%"/>
+
+![plot of chunk quandlPlotTest](mlrPresent-figure/quandlPlotTest-1.png)
 
 Creating a Forecasting Task
 ========================================================
@@ -70,7 +70,7 @@ aaplTask <- makeForecastRegrTask(
   id = "Forecast aapl Closing Price",
   data = aaplXtsTrain,
   target  = "Close",
-  frequency = 7L)
+  frequency = 5L)
 ```
 
 Creating a Forecasting Task: Info
@@ -154,8 +154,8 @@ performance(predAapl, measures = mase, task = aaplTask)
 ```
 
 ```
-     mase 
-0.5902145 
+   mase 
+0.72276 
 ```
 
 Prediction Plot
@@ -264,7 +264,7 @@ performance(garch.pred, measures = mase, task = aaplTask)
 
 ```
      mase 
-0.5540621 
+0.6784888 
 ```
 
 Tuning Over Parameter Space: Plot Forecast

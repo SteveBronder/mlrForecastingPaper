@@ -114,7 +114,7 @@
 \def\BState{\State\hskip-\ALG@thistlm}
 \makeatother
 
-\title{Time Series Methods in the R package \pkg{mlr}}
+\title{Integrating Forecasting and Machine Learning in the \pkg{mlr} Framework}
 
 % The \author macro works with any number of authors. There are two
 % commands used to separate the names and addresses of multiple
@@ -190,21 +190,7 @@ The Makridakis competition~\cite{Makridakis2000451} is a set of forecasting chal
 \hlcom{# Read in M4 Data}
 \hlkwd{library}\hlstd{(M4comp)}
 \hlkwd{library}\hlstd{(xts)}
-\end{alltt}
-
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: zoo}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# \\\#\# Attaching package: 'zoo'}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# The following objects are masked from 'package:base':\\\#\# \\\#\#\ \ \ \  as.Date, as.Date.numeric}}\begin{alltt}
 \hlkwd{library}\hlstd{(lubridate)}
-\end{alltt}
-
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# \\\#\# Attaching package: 'lubridate'}}
-
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# The following object is masked from 'package:base':\\\#\# \\\#\#\ \ \ \  date}}\begin{alltt}
 \hlstd{m4.climate} \hlkwb{<-} \hlstd{M4[[}\hlnum{8836}\hlstd{]]}
 \hlstd{m4.train} \hlkwb{<-} \hlkwd{xts}\hlstd{(m4.climate}\hlopt{$}\hlstd{past,} \hlkwd{as.POSIXct}\hlstd{(}\hlstr{"2007-12-05"}\hlstd{)} \hlopt{+}
                   \hlkwd{days}\hlstd{(}\hlnum{0}\hlopt{:}\hlkwd{I}\hlstd{(}\hlkwd{length}\hlstd{(m4.climate}\hlopt{$}\hlstd{past)}\hlopt{-}\hlnum{1}\hlstd{)))}
@@ -219,7 +205,7 @@ The Makridakis competition~\cite{Makridakis2000451} is a set of forecasting chal
 
 
 \begin{figure}[h!]
-\includegraphics[width=.8\linewidth]{plot_m4_train.png}
+\includegraphics[width=.8\linewidth]{paper_figures/plot_m4_train.png}
 \centering
 \caption{The training data from the M4 forecasting competition}
 \label{fig:m4_train}
@@ -254,7 +240,7 @@ This paper uses the EUStockMarkets data set from the \pkg{datasets}~\cite{datase
 Figure~\ref{fig:eu_train} shows the plot of each series. Note that each stock index tends to follow a similar, but diverging, trend. This will be important to note when performing windowed cross-validation as it will be a real test to see how well the models adapt to what appears to be nonstationary data.
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{plot_eu_train.png}
+\includegraphics[width=\linewidth]{paper_figures/plot_eu_train.png}
 \centering
 \caption{The training data from the EuStockMarkets dataset}
 \label{fig:eu_train}
@@ -479,7 +465,7 @@ The scale invariance of MASE means that it is independent of the scale of the da
 \doublespacing
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{plot_ets_train.png}
+\includegraphics[width=\linewidth]{paper_figures/plot_ets_train.png}
 \centering
 \caption{The forecasts response from ets against the testing weather data}
 \label{fig:ets_train}
@@ -502,13 +488,13 @@ The scale invariance of MASE means that it is independent of the scale of the da
 ## predict.type: response
 ## threshold: 
 ## time: 0.00
-##                     response
-## 2009-09-04 23:59:54 2.531237
-## 2009-09-05 23:59:48 2.531536
-## 2009-09-06 23:59:43 2.531784
-## 2009-09-07 23:59:37 2.531990
-## 2009-09-08 23:59:31 2.532161
-## 2009-09-09 23:59:26 2.532303
+##                      response
+## 2009-09-04 23:59:54 2.0716814
+## 2009-09-05 23:59:48 1.8703286
+## 2009-09-06 23:59:43 3.4973941
+## 2009-09-07 23:59:37 3.4825407
+## 2009-09-08 23:59:31 0.4462708
+## 2009-09-09 23:59:26 2.3802832
 ## ... (35 rows, 1 cols)
 \end{verbatim}
 \end{kframe}
@@ -607,7 +593,7 @@ given that $m$ is the number of variables that are forecast.
 
 
 \begin{figure}[H]
-\includegraphics[width=.8\linewidth]{plot_bigvar_train.png}
+\includegraphics[width=.8\linewidth]{paper_figures/plot_bigvar_train.png}
 \centering
 \caption{The forecasts response from BigVAR against the true test stock index data}
 \label{fig:bigvar_train}
@@ -623,7 +609,7 @@ While ETS is one of the most popular time series models the error type, trend ty
 Forecasting in \pkg{mlr} takes a machine learning approach, creating a parameter set for a given model and using an optimization method to search over the parameter space. The forecasting extension of \pkg{mlr} includes growing and fixed window resampling schemes to train over the possible models. Resampling schemes such as cross-validation and bootstrapping are common in machine learning for dealing with the bias-variance tradeoff~\cite{Friedman1997}~\cite{rodriguezkfold}. When there is a time component to the data, windowing schemes are useful in allowing a valid resampling scheme while still accounting for the time properties of the series. Figure~\ref{fig:caret} gives an example of fixed and growing window cross validation. Let $h$ be a forecast horizon where the index of the starting and end points of the training data are $\text{start}_i$ and $\text{end}_i$ where $i$ is the index for each window. The first model will train on data between $\text{start}_i$ and $\text{end}_i$ while testing on data indexed between $\text{end}_i + h$. After each iteration the window slides forward $h$ steps such that $\text{end}_{i+1} = \text{end}_{i} + h$. In the case of the fixed window, the starting index will also shift such that $\text{start}_{i+1} = \text{start}_{i} + h$ while $\text{start}_i$ will remain constant in the growing window case. This type of growing and fixed window resampling~\cite{hyndman2014forecasting} is now available in the \code{resampling()} function of \pkg{mlr}.
 
 \begin{figure}[h!]
-  \includegraphics[width=\linewidth]{windowing_pic_caret}
+  \includegraphics[width=\linewidth]{paper_figures/windowing_pic_caret}
   \centering
   \caption{Resampling with a window scheme as exampled by \pkg{caret}~\cite{windowingcaret}. The top graphs are fixed window cross validation while the bottom graphs are growing window cross validation. }
   \label{fig:caret}
@@ -742,10 +728,12 @@ Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyz
 \hlcom{# Making graphics}
 \hlkwd{plotHyperParsEffect}\hlstd{(ets.hyp,} \hlkwc{x}\hlstd{=} \hlstr{"model"}\hlstd{,} \hlkwc{y} \hlstd{=} \hlstr{"mase.test.mean"}\hlstd{,}
                      \hlkwc{plot.type} \hlstd{=} \hlstr{"line"}\hlstd{,}
-                     \hlkwc{partial.dep.learn} \hlstd{=} \hlstr{"regr.randomForest"}\hlstd{)}
+                     \hlkwc{partial.dep.learn} \hlstd{=} \hlstr{"regr.randomForest"}\hlstd{)} \hlopt{+}
+  \hlkwd{theme_tufte}\hlstd{()}\hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{text} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{size}\hlstd{=}\hlnum{20}\hlstd{))}
 \hlkwd{plotHyperParsEffect}\hlstd{(ets.hyp,} \hlkwc{x}\hlstd{=} \hlstr{"opt.crit"}\hlstd{,} \hlkwc{y} \hlstd{=} \hlstr{"mase.test.mean"}\hlstd{,}
                      \hlkwc{plot.type} \hlstd{=} \hlstr{""}\hlstd{,}
-                     \hlkwc{partial.dep.learn} \hlstd{=} \hlstr{"regr.randomForest"}\hlstd{)}
+                     \hlkwc{partial.dep.learn} \hlstd{=} \hlstr{"regr.randomForest"}\hlstd{)} \hlopt{+}
+  \hlkwd{theme_tufte}\hlstd{()}\hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{text} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{size}\hlstd{=}\hlnum{20}\hlstd{))}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -756,12 +744,12 @@ Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyz
 \centering
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{ets_dep_plot_max_q.png}
+  \includegraphics[width=\linewidth]{paper_figures/ets_dep_plot_max_q.png}
   \label{fig:etsDep1}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{ets_dep_plot_max_p.png}
+  \includegraphics[width=\linewidth]{paper_figures/ets_dep_plot_max_p.png}
   \label{fig:etsDep2}
 \end{minipage}
 \caption{The figure on the left shows the dependence of the MASE score averaged over all windows for each value of ets models. The figure on the right does the same, but for the optimization criteria.}
@@ -825,7 +813,7 @@ For comparison, ETS is run in \pkg{forecast} with the model option ZZZ to automa
 
 The automated selection process gave a 0.13 point deduction in our MASE calculation. Now it is possible to see the clear benefit of the forecast extension to \pkg{mlr}. While \pkg{forecast} does some automatic tuning, this model would still require extensive manual testing in an attempt to find the best model. The automation of the modeling process allows for a faster and better solution with minimal work.
 
-In addition to testing against the \pkg{forecast} package, facebook's automated solution to forecasting known as \pkg{prophet} ~\cite{prophet} is tested against.
+In addition to testing against the \pkg{forecast} package, facebook's automated solution to forecasting known as \pkg{prophet} ~\cite{prophet} is implimented and compared against.
 
 \singlespacing
 \begin{knitrout}
@@ -862,12 +850,12 @@ In addition to testing against the \pkg{forecast} package, facebook's automated 
 \end{kframe}
 \end{knitrout}
 \doublespacing
-Figure seven shows that the ETS model tuned in \pkg{mlr} gives the best forecast, while \pkg{prophet} gives the second best followed by \pkg{forecast}. One important note is that prophet performs within a margin of error as good the the mlr model while it also computes much quicker. A future version of this extension to \pkg{mlr} may also include \pkg{prophet} as tuning hyperparameters such as the number of change points would most likely give \pkg{prophet} the bump to beat the tuned ETS model.
+Figure seven shows that the ETS model tuned in \pkg{mlr} gives the best forecast, while \pkg{prophet} gives the second best followed by \pkg{forecast}. One important note is that prophet performs within a margin of error as good the the mlr model while it also computes much quicker. A future version of this extension to \pkg{mlr} may also include \pkg{prophet}. Tuning hyperparameters such as the number of change points would most likely give \pkg{prophet} the bump to beat the tuned ETS model.
 
 
 
 \begin{figure}[H]
-  \includegraphics[width=\linewidth]{plot_ets_vs_forecast.png}
+  \includegraphics[width=\linewidth]{paper_figures/plot_ets_vs_forecast.png}
   \centering
   \caption{Forecasts of the tuned ETS from \pkg{mlr} and \pkg{forecast} and the GAM model from \pkg{prophet}}
   \label{fig:mlrvsforecast}
@@ -913,7 +901,7 @@ To this author's knowledge, this is the first package in \proglang{R} that allow
                     \hlkwc{par.set} \hlstd{= par_set,} \hlkwc{control} \hlstd{= ctrl,}
                     \hlkwc{measures} \hlstd{= mase)}
 \hlkwd{parallelStop}\hlstd{()}
-\hlstd{garchTune}
+\hlstd{garchTune}\hlopt{$}\hlstd{y}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -924,9 +912,8 @@ To this author's knowledge, this is the first package in \proglang{R} that allow
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-## Tune result:
-## Op. pars: model=sGARCH; garchOrder=3,4; armaOrder=7,1; include.mean=TRUE; archm=FALSE; distribution.model=norm; stationarity=1; fixed.se=1; solver=nloptr
-## mase.test.mean=0.895
+## mase.test.mean 
+##      0.8949257
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -942,10 +929,12 @@ Because the partial dependence plots are still in development they do not work w
 \begin{alltt}
 \hlkwd{plotHyperParsEffect}\hlstd{(garch.hyperpar,} \hlkwc{x}\hlstd{=} \hlstr{"garchOrder"}\hlstd{,}
                     \hlkwc{y} \hlstd{=} \hlstr{"mase.test.mean"}\hlstd{,} \hlkwc{plot.type} \hlstd{=} \hlstr{"line"}\hlstd{,}
-                     \hlkwc{partial.dep.learn} \hlstd{=} \hlstr{"regr.randomForest"}\hlstd{)}
+                     \hlkwc{partial.dep.learn} \hlstd{=} \hlstr{"regr.randomForest"}\hlstd{)}\hlopt{+}
+  \hlkwd{theme_tufte}\hlstd{()} \hlopt{+}\hlkwd{theme}\hlstd{(}\hlkwc{text} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{size}\hlstd{=}\hlnum{20}\hlstd{))}
 \hlkwd{plotHyperParsEffect}\hlstd{(garch.hyperpar,} \hlkwc{x}\hlstd{=} \hlstr{"armaOrder"}\hlstd{,}
                     \hlkwc{y} \hlstd{=} \hlstr{"mase.test.mean"}\hlstd{,} \hlkwc{plot.type} \hlstd{=} \hlstr{"line"}\hlstd{,}
-                     \hlkwc{partial.dep.learn} \hlstd{=} \hlstr{"regr.randomForest"}\hlstd{)}
+                     \hlkwc{partial.dep.learn} \hlstd{=} \hlstr{"regr.randomForest"}\hlstd{)}\hlopt{+}
+  \hlkwd{theme_tufte}\hlstd{()} \hlopt{+}\hlkwd{theme}\hlstd{(}\hlkwc{text} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{size}\hlstd{=}\hlnum{20}\hlstd{))}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -956,12 +945,12 @@ Because the partial dependence plots are still in development they do not work w
 \centering
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{garch_order.png}
+  \includegraphics[width=\linewidth]{paper_figures/garch_order.png}
   \label{fig:test1}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{arma_order.png}
+  \includegraphics[width=\linewidth]{paper_figures/arma_order.png}
   \label{fig:test2}
 \end{minipage}
 \caption{The figure on the left shows the dependence of the MASE score averaged over all windows for each value of the sum of $p,q$ terms in the GARCH order. The figure on the right does the same, but for the ARMA order}
@@ -969,7 +958,7 @@ Because the partial dependence plots are still in development they do not work w
 \end{figure}
 \doublespacing
 
-The dependence plots in figure~\ref{fig:depGarch} show that for both the GARCH and ARMA orders, as the order increases, the MASE score decreases. A better model would arise if the order of both the GARCH and ARMA components increased up to twenty or more. The forecasting extension of \pkg{mlr} treats forecasting models with quantiles the same as any other learner post-tuning. The best hyperparameters are taken, and a final model trains over the entire dataset.
+The dependence plots in figure~\ref{fig:depGarch} show that the best combinations of GARCH order are six and ARMA order is eight. The forecasting extension of \pkg{mlr} treats forecasting models with quantiles the same as any other learner post-tuning. The best hyperparameters are taken, and a final model trains over the entire dataset.
 
 \singlespacing
 \begin{knitrout}
@@ -1012,7 +1001,7 @@ The dependence plots in figure~\ref{fig:depGarch} show that for both the GARCH a
 
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{plot_garch_final.png}
+\includegraphics[width=\linewidth]{paper_figures/plot_garch_final.png}
 \centering
 \caption{The GARCH model with confidence intervals}
 \label{fig:garch_final}
@@ -1158,7 +1147,7 @@ where $\rho_i$ is the autoregressive parameter of order $p$ and $d$ is the lag o
 
 
 \begin{figure}[h!]
-\includegraphics[width=.8\linewidth]{plot_gbm_fore.png}
+\includegraphics[width=.8\linewidth]{paper_figures/plot_gbm_fore.png}
 \centering
 \caption{The forecast of the M4 data using a Gradient Boosting Machine}
 \label{fig:gbm_final}
@@ -1192,7 +1181,7 @@ Forecasting for binary or multiclass outcomes~\cite{forecastBinary} is a common 
 
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{plot_classif_fore.png}
+\includegraphics[width=\linewidth]{paper_figures/plot_classif_fore.png}
 \centering
 \caption{The percent change in price over a 7 day period for DAX. The top red line represents when a buy will be executed while the bottom blue line represents when a sell will be executed.}
 \label{fig:classif_plot}
@@ -1298,7 +1287,7 @@ Given that $U = (X-\mu_X)/\sigma_X$ where $\mu_X$, $\sigma_X$, $\delta$, and $\a
 
 
 \begin{figure}[H]
-\includegraphics[width=\linewidth]{cauchy_h_train.png}
+\includegraphics[width=\linewidth]{paper_figures/cauchy_h_train.png}
 \centering
 \caption{The top plot are samples from the cauchy distribution where the bottom plot represents the cauchy transformed variables with the $hh$ distribution to make the samples approximately normal.}
 \label{fig:cauchy_lambert}
@@ -1494,7 +1483,7 @@ The rest of the modeling process flows in a way similar to the standard training
 
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{ensemble_pred.png}
+\includegraphics[width=\linewidth]{paper_figures/ensemble_pred.png}
 \centering
 \caption{The forecast of the M4 data using the Stacked ARFIMA, TBATS, and GARCH model}
 \label{fig:ensemble_final}
@@ -1643,7 +1632,7 @@ Once the tuning is complete, \code{setHyperPar2()} extracts the final model para
 
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{multfore_tune.png}
+\includegraphics[width=\linewidth]{paper_figures/multfore_tune.png}
 \centering
 \caption{The forecast of the DAX Stock Index against the true values}
 \label{fig:multfore_tune}

@@ -6,3 +6,6 @@ Quandl
 ParamHelpers
 mlr
 lubridate
+devtools
+testthat
+checkmate

@@ -64,7 +64,7 @@
 \def\BState{\State\hskip-\ALG@thistlm}
 \makeatother
 
-\title{Time Series Methods in the R package \pkg{mlr}}
+\title{Integrating Forecasting and Machine Learning in the \pkg{mlr} Framework}
 
 % The \author macro works with any number of authors. There are two
 % commands used to separate the names and addresses of multiple
@@ -134,7 +134,7 @@ The Makridakis competition~\cite{Makridakis2000451} is a set of forecasting chal
 
 \singlespacing
 
-<<get_dat_weather>>=
+<<get_dat_weather, cache = TRUE, message = FALSE>>=
 
 # Read in M4 Data
 library(M4comp)
@@ -150,13 +150,13 @@ colnames(m4.test) <- "target_var"
 @
 
 <<plot_dat_weather, cache = FALSE, echo = FALSE, results='hide'>>=
-dev.copy(png,'plot_m4_train.png')
+dev.copy(png,'./paper_figures/plot_m4_train.png')
 plot_m4_train = plot(m4.train, main = "Daily Climate Data",ylab = "Temperature in Celcius")
 dev.off()
 @
 
 \begin{figure}[h!]
-\includegraphics[width=.8\linewidth]{plot_m4_train.png}
+\includegraphics[width=.8\linewidth]{paper_figures/plot_m4_train.png}
 \centering
 \caption{The training data from the M4 forecasting competition}
 \label{fig:m4_train}
@@ -185,7 +185,7 @@ col_names = colnames(eu.train)
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(EuStockMarkets))
 # Plot the overlayed series
-(dev.copy(png,'plot_eu_train.png'))
+(dev.copy(png,'./paper_figures/plot_eu_train.png'))
 plot(x = as.zoo(EuStockMarkets), ylab = "Price", main = "Daily Price of European Stock Indices",
 col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
@@ -199,7 +199,7 @@ dev.off()
 Figure~\ref{fig:eu_train} shows the plot of each series. Note that each stock index tends to follow a similar, but diverging, trend. This will be important to note when performing windowed cross-validation as it will be a real test to see how well the models adapt to what appears to be nonstationary data.
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{plot_eu_train.png}
+\includegraphics[width=\linewidth]{paper_figures/plot_eu_train.png}
 \centering
 \caption{The training data from the EuStockMarkets dataset}
 \label{fig:eu_train}
@@ -323,7 +323,7 @@ col_names = colnames(pred.ets.dat)
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(pred.ets.dat))
 # Plot the overlayed series
-dev.copy(png,'plot_ets_train.png')
+dev.copy(png,'./paper_figures/plot_ets_train.png')
 plot(x = pred.ets.dat, ylab = "Temperature", main = "Forecast of Temperature",
 col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
@@ -335,7 +335,7 @@ dev.off()
 \doublespacing
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{plot_ets_train.png}
+\includegraphics[width=\linewidth]{paper_figures/plot_ets_train.png}
 \centering
 \caption{The forecasts response from ets against the testing weather data}
 \label{fig:ets_train}
@@ -378,7 +378,7 @@ train.bigvar
 @
 
 <<bigVartrainreal, cache=TRUE, message=FALSE, error=FALSE, echo = FALSE>>=
-load("./bigvarmod.RData")
+load("./models/bigvarmod.RData")
 train.bigvar
 
 @
@@ -407,7 +407,7 @@ col_names = colnames(pred.bigvar.dat)
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(pred.bigvar.dat))
 # Plot the overlayed series
-dev.copy(png,'plot_bigvar_train.png')
+dev.copy(png,'./paper_figures/plot_bigvar_train.png')
 par(xpd = TRUE)
 plot(x = pred.bigvar.dat, ylab = "Price", main = "Forecast of Prices for Euro Stock Indices",
 col = tsRainbow, screens = 1)
@@ -422,7 +422,7 @@ dev.off()
 
 @
 \begin{figure}[H]
-\includegraphics[width=.8\linewidth]{plot_bigvar_train.png}
+\includegraphics[width=.8\linewidth]{paper_figures/plot_bigvar_train.png}
 \centering
 \caption{The forecasts response from BigVAR against the true test stock index data}
 \label{fig:bigvar_train}
@@ -438,7 +438,7 @@ While ETS is one of the most popular time series models the error type, trend ty
 Forecasting in \pkg{mlr} takes a machine learning approach, creating a parameter set for a given model and using an optimization method to search over the parameter space. The forecasting extension of \pkg{mlr} includes growing and fixed window resampling schemes to train over the possible models. Resampling schemes such as cross-validation and bootstrapping are common in machine learning for dealing with the bias-variance tradeoff~\cite{Friedman1997}~\cite{rodriguezkfold}. When there is a time component to the data, windowing schemes are useful in allowing a valid resampling scheme while still accounting for the time properties of the series. Figure~\ref{fig:caret} gives an example of fixed and growing window cross validation. Let $h$ be a forecast horizon where the index of the starting and end points of the training data are $\text{start}_i$ and $\text{end}_i$ where $i$ is the index for each window. The first model will train on data between $\text{start}_i$ and $\text{end}_i$ while testing on data indexed between $\text{end}_i + h$. After each iteration the window slides forward $h$ steps such that $\text{end}_{i+1} = \text{end}_{i} + h$. In the case of the fixed window, the starting index will also shift such that $\text{start}_{i+1} = \text{start}_{i} + h$ while $\text{start}_i$ will remain constant in the growing window case. This type of growing and fixed window resampling~\cite{hyndman2014forecasting} is now available in the \code{resampling()} function of \pkg{mlr}.
 
 \begin{figure}[h!]
-  \includegraphics[width=\linewidth]{windowing_pic_caret}
+  \includegraphics[width=\linewidth]{paper_figures/windowing_pic_caret}
   \centering
   \caption{Resampling with a window scheme as exampled by \pkg{caret}~\cite{windowingcaret}. The top graphs are fixed window cross validation while the bottom graphs are growing window cross validation. }
   \label{fig:caret}
@@ -509,7 +509,7 @@ save(etsTune, file = "./etsTuneFeb10th.RData")
 @
 
 <<loadTuneETS,echo = FALSE, cache = TRUE>>=
-load("./etsTuneFeb10th.RData")
+load("./models/etsTuneFeb10th.RData")
 etsTune$y
 
 @
@@ -524,6 +524,7 @@ Using \pkg{mlr}'s built in plotting routines the tuning parameters can be analyz
 # Make data for dependence plot
 ets.hyp = generateHyperParsEffectData(etsTune, partial.dep = TRUE,
                                         trafo = TRUE)
+
 @
 
 <<cleanTuneEts, cache = TRUE, echo = FALSE>>=
@@ -533,46 +534,46 @@ ets.hyp$data[,2] <- as.integer(ets.hyp$data[,2])
 ets.hyp$data[,3] <- as.integer(ets.hyp$data[,3])
 ets.hyp$data[,4] <- as.integer(ets.hyp$data[,4])
 ets.hyp$data[,7] <- as.integer(ets.hyp$data[,7])
-
 @
 
 <<loadTuneets3, eval = FALSE, warning=FALSE>>=
 # Making graphics
 plotHyperParsEffect(ets.hyp, x= "model", y = "mase.test.mean",
                      plot.type = "line",
-                     partial.dep.learn = "regr.randomForest")
+                     partial.dep.learn = "regr.randomForest") + 
+  theme_tufte()+ theme(text = element_text(size=20))
 plotHyperParsEffect(ets.hyp, x= "opt.crit", y = "mase.test.mean",
                      plot.type = "",
-                     partial.dep.learn = "regr.randomForest")
-
+                     partial.dep.learn = "regr.randomForest") +
+  theme_tufte()+ theme(text = element_text(size=20))
 @
 
 <<loadTuneetsReal, cache = TRUE, echo = FALSE, message=FALSE, error=FALSE, warning=FALSE>>=
 library(ggthemes)
 q = plotHyperParsEffect(ets.hyp, x= "model", y = "mase.test.mean",
                      plot.type = "line",
-                     partial.dep.learn = "regr.randomForest")
+                     partial.dep.learn = "regr.randomForest") 
 
-q = q + theme_tufte()
-ggsave("./ets_dep_plot_max_q.png",q)
+q = q + theme_tufte()+ theme(text = element_text(size=22))
+ggsave("./paper_figures/ets_dep_plot_max_q.png",q)
 p = plotHyperParsEffect(ets.hyp, x= "opt.crit", y = "mase.test.mean",
                      plot.type = "scatter",
                      partial.dep.learn = "regr.randomForest")
 
-p = p + theme_tufte()
-ggsave("./ets_dep_plot_max_p.png",p)
+p = p + theme_tufte() +theme(text = element_text(size=30))
+ggsave("./paper_figures/ets_dep_plot_max_p.png",p)
 @
 
 \begin{figure}[h!]
 \centering
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{ets_dep_plot_max_q.png}
+  \includegraphics[width=\linewidth]{paper_figures/ets_dep_plot_max_q.png}
   \label{fig:etsDep1}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{ets_dep_plot_max_p.png}
+  \includegraphics[width=\linewidth]{paper_figures/ets_dep_plot_max_p.png}
   \label{fig:etsDep2}
 \end{minipage}
 \caption{The figure on the left shows the dependence of the MASE score averaged over all windows for each value of ets models. The figure on the right does the same, but for the optimization criteria.}
@@ -616,7 +617,7 @@ forecast::accuracy(forecast.ets, x= ts(m4.test, end = c(93,2),
 
 The automated selection process gave a 0.13 point deduction in our MASE calculation. Now it is possible to see the clear benefit of the forecast extension to \pkg{mlr}. While \pkg{forecast} does some automatic tuning, this model would still require extensive manual testing in an attempt to find the best model. The automation of the modeling process allows for a faster and better solution with minimal work.
 
-In addition to testing against the \pkg{forecast} package, facebook's automated solution to forecasting known as \pkg{prophet} ~\cite{prophet} is tested against.
+In addition to testing against the \pkg{forecast} package, facebook's automated solution to forecasting known as \pkg{prophet} ~\cite{prophet} is implimented and compared against.
 
 \singlespacing
 <<prophetTrain, cache = TRUE, message = FALSE, results='hide'>>=
@@ -641,13 +642,13 @@ climate.pred.prophet$data$response <- pred.prophet$yhat
 performance(climate.pred.prophet,mase, climate.task)
 @
 \doublespacing
-Figure seven shows that the ETS model tuned in \pkg{mlr} gives the best forecast, while \pkg{prophet} gives the second best followed by \pkg{forecast}. One important note is that prophet performs within a margin of error as good the the mlr model while it also computes much quicker. A future version of this extension to \pkg{mlr} may also include \pkg{prophet} as tuning hyperparameters such as the number of change points would most likely give \pkg{prophet} the bump to beat the tuned ETS model.
+Figure seven shows that the ETS model tuned in \pkg{mlr} gives the best forecast, while \pkg{prophet} gives the second best followed by \pkg{forecast}. One important note is that prophet performs within a margin of error as good the the mlr model while it also computes much quicker. A future version of this extension to \pkg{mlr} may also include \pkg{prophet}. Tuning hyperparameters such as the number of change points would most likely give \pkg{prophet} the bump to beat the tuned ETS model.
 
 <<plotetsTune, cache = TRUE, echo = FALSE, results='hide'>>=
 pred.ets.dat = zoo(cbind(climate.pred$data, as.data.frame(forecast.ets$mean),pred.prophet$yhat), order.by = index(m4.test))
 colnames(pred.ets.dat) = c("truth", "mlr_response", "forecast_response","prophet_response")
 col_names = colnames(pred.ets.dat)
-dev.copy(png,'plot_ets_vs_forecast.png')
+dev.copy(png,'./paper_figures/plot_ets_vs_forecast.png')
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(pred.ets.dat))
 # Plot the overlayed series
@@ -660,7 +661,7 @@ dev.off()
 @
 
 \begin{figure}[H]
-  \includegraphics[width=\linewidth]{plot_ets_vs_forecast.png}
+  \includegraphics[width=\linewidth]{paper_figures/plot_ets_vs_forecast.png}
   \centering
   \caption{Forecasts of the tuned ETS from \pkg{mlr} and \pkg{forecast} and the GAM model from \pkg{prophet}}
   \label{fig:mlrvsforecast}
@@ -704,7 +705,7 @@ garchTune = tuneParams(garch.mod,
                     par.set = par_set, control = ctrl,
                     measures = mase)
 parallelStop()
-garchTune
+garchTune$y
 @
 \doublespacing
 
@@ -713,8 +714,8 @@ save(garchTune, file = "./garchTune.RData")
 @
 
 <<loadGarchTune, cache = TRUE, echo = FALSE>>=
-load("./garchTune.RData")
-garchTune
+load("./models/garchTune.RData")
+garchTune$y
 @
 
 
@@ -746,23 +747,25 @@ garch.hyperpar$data$archm = as.numeric(garch.hyperpar$data$archm)
 
 plotHyperParsEffect(garch.hyperpar, x= "garchOrder",
                     y = "mase.test.mean", plot.type = "line",
-                     partial.dep.learn = "regr.randomForest")
+                     partial.dep.learn = "regr.randomForest")+
+  theme_tufte() +theme(text = element_text(size=20))
 plotHyperParsEffect(garch.hyperpar, x= "armaOrder",
                     y = "mase.test.mean", plot.type = "line",
-                     partial.dep.learn = "regr.randomForest")
+                     partial.dep.learn = "regr.randomForest")+
+  theme_tufte() +theme(text = element_text(size=20))
 @
 
 <<garchdepPlot3, echo=FALSE, cache = TRUE, results='hide', message=FALSE>>=
 p = plotHyperParsEffect(garch.hyperpar, x= "garchOrder", y = "mase.test.mean",
                      plot.type = "line",
                      partial.dep.learn = "regr.randomForest")
-p = p + theme_tufte()
-ggsave("garch_order.png",p)
+p = p + theme_tufte() +theme(text = element_text(size=20))
+ggsave("./paper_figures/garch_order.png",p)
 q = plotHyperParsEffect(garch.hyperpar, x= "armaOrder", y = "mase.test.mean",
                      plot.type = "line",
                      partial.dep.learn = "regr.randomForest")
-q = q + theme_tufte()
-ggsave("arma_order.png",q)
+q = q + theme_tufte() +theme(text = element_text(size=20))
+ggsave("./paper_figures/arma_order.png",q)
 
 @
 
@@ -770,12 +773,12 @@ ggsave("arma_order.png",q)
 \centering
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{garch_order.png}
+  \includegraphics[width=\linewidth]{paper_figures/garch_order.png}
   \label{fig:test1}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{arma_order.png}
+  \includegraphics[width=\linewidth]{paper_figures/arma_order.png}
   \label{fig:test2}
 \end{minipage}
 \caption{The figure on the left shows the dependence of the MASE score averaged over all windows for each value of the sum of $p,q$ terms in the GARCH order. The figure on the right does the same, but for the ARMA order}
@@ -783,7 +786,7 @@ ggsave("arma_order.png",q)
 \end{figure}
 \doublespacing
 
-The dependence plots in figure~\ref{fig:depGarch} show that for both the GARCH and ARMA orders, as the order increases, the MASE score decreases. A better model would arise if the order of both the GARCH and ARMA components increased up to twenty or more. The forecasting extension of \pkg{mlr} treats forecasting models with quantiles the same as any other learner post-tuning. The best hyperparameters are taken, and a final model trains over the entire dataset.
+The dependence plots in figure~\ref{fig:depGarch} show that the best combinations of GARCH order are six and ARMA order is eight. The forecasting extension of \pkg{mlr} treats forecasting models with quantiles the same as any other learner post-tuning. The best hyperparameters are taken, and a final model trains over the entire dataset.
 
 \singlespacing
 <<trainGarchTuned1, cache = TRUE>>=
@@ -805,7 +808,7 @@ climate.pred
 
 <<trainGarchTuned4, cache = TRUE, echo = FALSE, results='hide'>>=
 nn <- ncol(climate.pred$data)
-dev.copy(png,'plot_garch_final.png')
+dev.copy(png,'./paper_figures/plot_garch_final.png')
 par(xpd = TRUE)
 matplot(climate.pred$data,type="l", xlab = "Forecast Horizon", ylab = "Temperature",
         main = "Forecast of Daily Climate Data\n With Confidence Intervals")
@@ -816,7 +819,7 @@ dev.off()
 @
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{plot_garch_final.png}
+\includegraphics[width=\linewidth]{paper_figures/plot_garch_final.png}
 \centering
 \caption{The GARCH model with confidence intervals}
 \label{fig:garch_final}
@@ -870,7 +873,7 @@ save(gbm.train, file = "./gbm_train.RData")
 
 
 <<realgbm, cache = TRUE, echo = FALSE>>=
-load("./gbm_train.RData")
+load("./models/gbm_train.RData")
 @
 \doublespacing
 
@@ -900,7 +903,7 @@ save(gbm.forecast, file = "./gbm_forecast.RData")
 
 
 <<forecastgbm3, cache = TRUE, echo = FALSE>>=
-load("./gbm_forecast.RData")
+load("./models/gbm_forecast.RData")
 @
 
 <<forecastgbm4, cache = TRUE>>=
@@ -920,7 +923,7 @@ col_names = colnames(pred.gbm.dat)
 # Set a color scheme:
 tsRainbow <- rainbow(ncol(pred.gbm.dat))
 # Plot the overlayed series
-dev.copy(png,'plot_gbm_fore.png')
+dev.copy(png,'./paper_figures/plot_gbm_fore.png')
 plot(x = pred.gbm.dat, ylab = "Temperature", main = "GBM Forecast of Temperature",
 col = tsRainbow, screens = 1)
 # Set a legend in the upper left hand corner to match color to return series
@@ -930,7 +933,7 @@ dev.off()
 @
 
 \begin{figure}[h!]
-\includegraphics[width=.8\linewidth]{plot_gbm_fore.png}
+\includegraphics[width=.8\linewidth]{paper_figures/plot_gbm_fore.png}
 \centering
 \caption{The forecast of the M4 data using a Gradient Boosting Machine}
 \label{fig:gbm_final}
@@ -959,7 +962,7 @@ euro.classif.test  = euro.classif.data[1839:1848,,drop = FALSE]
 
 <<classifPlot, cache = TRUE, results='hide',echo=FALSE>>=
 # Plot the overlayed series
-dev.copy(png,'plot_classif_fore.png')
+dev.copy(png,'./paper_figures/plot_classif_fore.png')
 plot(x = DAX, ylab = "Percent Change in Price", main = "Percent Change in Price over 7 days for DAX")
 abline(h = .03, col = "red")
 abline(h = -.02, col = "blue")
@@ -967,7 +970,7 @@ dev.off()
 @
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{plot_classif_fore.png}
+\includegraphics[width=\linewidth]{paper_figures/plot_classif_fore.png}
 \centering
 \caption{The percent change in price over a 7 day period for DAX. The top red line represents when a buy will be executed while the bottom blue line represents when a sell will be executed.}
 \label{fig:classif_plot}
@@ -1004,8 +1007,8 @@ save(classif.fc, file = "classif_fc.RData")
 @
 
 <<classlagtrainreal, echo = FALSE, cache = TRUE>>=
-load("./classif_train.RData")
-load("./classif_fc.RData")
+load("./models/classif_train.RData")
+load("./models/classif_fc.RData")
 @
 
 <<classifEval, cache=TRUE>>=
@@ -1061,7 +1064,7 @@ dev.off()
 @
 
 \begin{figure}[H]
-\includegraphics[width=\linewidth]{cauchy_h_train.png}
+\includegraphics[width=\linewidth]{paper_figures/cauchy_h_train.png}
 \centering
 \caption{The top plot are samples from the cauchy distribution where the bottom plot represents the cauchy transformed variables with the $hh$ distribution to make the samples approximately normal.}
 \label{fig:cauchy_lambert}
@@ -1217,7 +1220,7 @@ dev.off()
 @
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{ensemble_pred.png}
+\includegraphics[width=\linewidth]{paper_figures/ensemble_pred.png}
 \centering
 \caption{The forecast of the M4 data using the Stacked ARFIMA, TBATS, and GARCH model}
 \label{fig:ensemble_final}
@@ -1349,7 +1352,7 @@ dev.off()
 
 
 \begin{figure}[h!]
-\includegraphics[width=\linewidth]{multfore_tune.png}
+\includegraphics[width=\linewidth]{paper_figures/multfore_tune.png}
 \centering
 \caption{The forecast of the DAX Stock Index against the true values}
 \label{fig:multfore_tune}

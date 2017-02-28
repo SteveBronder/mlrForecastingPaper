@@ -44,22 +44,23 @@ aaplXts <- xts(aapl$Close, order.by = as.POSIXlt(aapl$Date))
 colnames(aaplXts) <- "Close"
 aaplXtsTrain <- aaplXts[1:9000,]
 aaplXtsTest  <- aaplXts[9001:9035,]
-
 ```
 
 Plot of aapl Stock
 =====================================================
 
-```{r quandlPlot, cache = TRUE, eval = FALSE, echo = FALSE}
+```{r quandlPlotTrain, cache = TRUE, eval = TRUE, echo = FALSE}
 plot(aaplXtsTrain, main = "Training: Closing Price of Apple by Day")
-plot(aaplXtsTest, main = "Testing: Closing Price of Apple by Day")
+
 ```
 
-<img src="training_aapl.png" alt="Drawing" style="width: 90%; height: 90%"/>
 
 ***
 
-<img src="testing_aapl.png" alt="Drawing" style="width: 90%; height: 90%"/>
+
+```{r quandlPlotTest, cache = TRUE, eval = TRUE, echo = FALSE}
+plot(aaplXtsTest, main = "Testing: Closing Price of Apple by Day")
+```
 
 Creating a Forecasting Task
 ========================================================
@@ -73,7 +74,7 @@ aaplTask <- makeForecastRegrTask(
   id = "Forecast aapl Closing Price",
   data = aaplXtsTrain,
   target  = "Close",
-  frequency = 7L)
+  frequency = 5L)
 
 ```
 
@@ -118,6 +119,7 @@ Predict With a Forecast Learner
 ```{r predictArima2, cache = TRUE}
 predAapl <- predict(garch.train, newdata = as.data.frame(aaplXtsTest))
 performance(predAapl, measures = mase, task = aaplTask)
+
 ```
 
 Prediction Plot
@@ -205,7 +207,7 @@ garch.res
 Tuning Over Parameter Space: Final Model
 ===========================================
 
-```{r garchTrain, eval = TRUE}
+```{r garchTrain, eval = TRUE, cache = TRUE}
 library(mlr)
 garch.final = setHyperPars(makeLearner("fcregr.garch", n.ahead = 35, solver = 'nloptr',
                                        solver.control = list(maxeval = 200000, solver = 10),
@@ -301,6 +303,7 @@ tune_mod
 ```{r xgboostTaskTuneReal, cache = TRUE, eval = TRUE, echo = FALSE}
 load("./gbm_tune_mod.RData")
 tune_mod
+
 ```
 
 Using an ML Model
